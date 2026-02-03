@@ -89,9 +89,11 @@ CREATE TABLE fidele (
     date_naissance DATE,
     numero_carte VARCHAR(50),
     id_grade INT NOT NULL,
+    id_contact INT,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_grade) REFERENCES grade(id) ON DELETE RESTRICT
+    FOREIGN KEY (id_grade) REFERENCES grade(id) ON DELETE RESTRICT,
+    FOREIGN KEY (id_contact) REFERENCES contact(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
@@ -154,9 +156,13 @@ CREATE TABLE structure (
     nom VARCHAR(100) NOT NULL,
     id_echellon_eclesiastique INT NOT NULL,
     id_line INT NOT NULL COMMENT 'ID du continent, nation, province, ville, ou paroisse',
+    id_adresse INT,
+    id_contact INT,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_echellon_eclesiastique) REFERENCES echellon_eclesiastique(id) ON DELETE RESTRICT
+    FOREIGN KEY (id_echellon_eclesiastique) REFERENCES echellon_eclesiastique(id) ON DELETE RESTRICT,
+    FOREIGN KEY (id_adresse) REFERENCES adresse(id) ON DELETE SET NULL,
+    FOREIGN KEY (id_contact) REFERENCES contact(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
