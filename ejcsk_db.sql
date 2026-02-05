@@ -36,8 +36,10 @@ CREATE TABLE adresse (
     id_nation INT NOT NULL,
     province_etat VARCHAR(100),
     ville VARCHAR(100),
-    commune VARCHAR(100),
-    adresse_complete TEXT,
+    commune VARCHAR(100) DEFAULT NULL,
+    avenue VARCHAR(100),
+    numero VARCHAR(50),
+    adresse_complete TEXT DEFAULT NULL,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_nation) REFERENCES nation(id) ON DELETE RESTRICT
@@ -49,9 +51,9 @@ CREATE TABLE adresse (
 CREATE TABLE contact (
     id INT PRIMARY KEY AUTO_INCREMENT,
     tel1 VARCHAR(20),
-    tel2 VARCHAR(20),
-    whatsapp VARCHAR(20),
-    email VARCHAR(100),
+    tel2 VARCHAR(20) DEFAULT NULL,
+    whatsapp VARCHAR(20) DEFAULT NULL,
+    email VARCHAR(100) DEFAULT NULL,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -86,14 +88,21 @@ CREATE TABLE fidele (
     nom VARCHAR(100) NOT NULL,
     postnom VARCHAR(100),
     prenom VARCHAR(100) NOT NULL,
+    sexe CHAR(1) CHECK (sexe IN ('M', 'F')) NOT NULL,
+    numero_carte VARCHAR(50) DEFAULT NULL,
     date_naissance DATE,
-    numero_carte VARCHAR(50),
+    id_fidele_type INT,
     id_grade INT NOT NULL,
-    id_contact INT,
+    id_contact INT DEFAULT NULL,
+    id_adresse INT DEFAULT NULL,
+    tel VARCHAR(20),
+    password VARCHAR(255),
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_grade) REFERENCES grade(id) ON DELETE RESTRICT,
-    FOREIGN KEY (id_contact) REFERENCES contact(id) ON DELETE SET NULL
+    FOREIGN KEY (id_fidele_type) REFERENCES fidele_type(id) ON DELETE RESTRICT,
+    FOREIGN KEY (id_contact) REFERENCES contact(id) ON DELETE SET NULL,
+    FOREIGN KEY (id_adresse) REFERENCES adresse(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
