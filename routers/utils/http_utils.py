@@ -14,7 +14,6 @@ from routers.utils.constants import HTTP_CODES, ErrorTypes
 # ) -> dict: return {"type": type, "loc": loc, "msg": msg, "input": input}
 
 
-
 def send(
     data: object | None = None,
     error_message: str | None = None,
@@ -145,3 +144,27 @@ def send500(e: Exception | None = None, error_message: str | None = None):
         error_message=error_message or HTTP_CODES[500]["message"],
         code=HTTP_CODES[500]["code"],
     )
+
+    """
+    Valide et retourne le type de document et l'ID
+    
+    Returns:
+        tuple: (id_document_type, id_document, error_message)
+        - id_document_type: 1=FIDELE, 2=PAROISSE, 3=STRUCTURE
+        - id_document: L'ID du document
+        - error_message: Message d'erreur si validation échoue, None sinon
+    """
+    params = [id_fidele, id_paroisse, id_structure]
+    provided_params = sum(1 for p in params if p is not None)
+    
+    if provided_params == 0:
+        return None, None, "Au moins un paramètre (id_fidele, id_paroisse ou id_structure) est requis"
+    if provided_params > 1:
+        return None, None, "Un seul paramètre parmi (id_fidele, id_paroisse, id_structure) doit être fourni"
+    
+    if id_fidele is not None:
+        return 1, id_fidele, None  # 1 = FIDELE
+    elif id_paroisse is not None:
+        return 2, id_paroisse, None  # 2 = PAROISSE
+    else:
+        return 3, id_structure, None  # 3 = STRUCTURE

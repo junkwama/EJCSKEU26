@@ -2,24 +2,31 @@ from sqlmodel import SQLModel
 from pydantic_core.core_schema import no_info_after_validator_function
 from datetime import datetime, timezone
 from enum import Enum
-
+from typing import Optional
 
 from utils.utils import PydanticField, SQLModelField
+
 from modules.oauth2.utils import password_context
 from utils.constants import Regex
 
 class BaseModelClass(SQLModel):
-    """Schéma pour les tables de base avec des champs communs"""
-    id: int | None = SQLModelField(default=None, primary_key=True)
+    """Base class with soft delete support"""
+    id: Optional[int] = SQLModelField(default=None, primary_key=True)
+    est_supprimee: bool = PydanticField(
+        default=False, 
+        description="Est supprimée (soft delete)"
+    )
+    date_suppression: Optional[datetime] = PydanticField(
+        default=None, 
+        description="Date de suppression logique"
+    )
     date_creation: datetime = PydanticField(
-        ...,
-        description="Date de création de l'entrée",
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(timezone.utc),
+        description="Date de création"
     )
     date_modification: datetime = PydanticField(
-        ...,
-        description="Date de dernière modification de l'entrée",
         default_factory=lambda: datetime.now(timezone.utc),
+        description="Date de modification"
     )
 
     class Config:
@@ -29,72 +36,6 @@ class BaseModelClass(SQLModel):
 class Gender(Enum):
     M = "M"
     F = "F"
-
-class Adresse(BaseModelClass, table=True):
-    """Modèle de la table Adresse"""
-    id_nation: int = SQLModelField(
-        ...,
-        ge=1,
-        le=231,
-        description="Identifiant de la nation. Ex 170 pour la RDC",
-        foreign_key="nation.id"
-    )
-    province_etat: str = PydanticField(
-        ...,
-        max_length=100,
-        description="Nom de la province ou État",
-    )
-    ville: str = PydanticField(
-        ...,
-        max_length=100,
-        description="Nom de la ville",
-    )
-    commune: str | None = PydanticField(
-        None,
-        max_length=100,
-        description="Nom de la commune ou district",
-    )
-    avenue: str = PydanticField(
-        ...,
-        max_length=100,
-        description="Nom de l'avenue",
-    )
-    numero: str = PydanticField(
-        ...,
-        max_length=50,
-        description="Numéro de la maison ou du bâtiment",
-    )
-    adresse_complete: str | None = PydanticField(
-        None,
-        max_length=500,
-        description="L'adresse complète",
-    )
-
-
-class Contact(BaseModelClass, table=True):
-    """Modèle de la table Contact"""
-    
-    tel1: str | None = PydanticField(
-        None,
-        pattern=Regex.PHONE.value,
-        description="Téléphone principal",
-    )
-    tel2: str | None = PydanticField(
-        None,
-        pattern=Regex.PHONE.value,
-        description="Téléphone secondaire",
-    )
-    whatsapp: str | None = PydanticField(
-        None,
-        pattern=Regex.PHONE.value,
-        description="Numéro WhatsApp",
-    )
-    email: str | None = PydanticField(
-        None,
-        pattern=Regex.EMAIL.value,
-        description="Adresse email",
-    )
-
 
 class Password(str):
 

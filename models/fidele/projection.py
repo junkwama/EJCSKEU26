@@ -1,7 +1,8 @@
 from pydantic import BaseModel, computed_field
 from datetime import date, datetime
 
-from models.utils.utils import Contact, Adresse
+from models.adresse.projection import AdresseProjShallow
+from models.contact.projection import ContactProjShallow
 from utils.utils import PydanticField
 
 class GradeBasic(BaseModel):
@@ -41,6 +42,9 @@ class FideleProjFlat(BaseModel):
     
     sexe: str
     date_naissance: date
+    est_baptise: bool = PydanticField(..., description="Est-ce que le fidèle est baptisé")
+    date_bapteme: date | None = PydanticField(None, description="Date de baptême")
+    
     @computed_field
     @property
     def age(self) -> int:
@@ -49,6 +53,14 @@ class FideleProjFlat(BaseModel):
         return today.year - self.date_naissance.year - (
             (today.month, today.day) < (self.date_naissance.month, self.date_naissance.day)
         )
+
+    id_grade: int 
+    id_fidele_type: int
+    id_adresse: int | None = None
+    id_contact: int | None = None
+
+    est_supprimee: bool
+    date_suppression: datetime | None = None
     
     date_creation: datetime
     date_modification: datetime
@@ -68,5 +80,5 @@ class FideleProjShallow(FideleProjFlat):
     # Flat versions of related fields (with their nested fields)
     grade: GradeBasic | None = None
     fidele_type: FideleTypeBasic | None = None
-    contact: Contact | None = None
-    adresse: Adresse | None = None
+    contact: ContactProjShallow | None = None
+    adresse: AdresseProjShallow | None = None

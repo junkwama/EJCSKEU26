@@ -1,91 +1,98 @@
 # External modules
 from sqlmodel import SQLModel
+from pydantic import BaseModel
 from datetime import date
+from models.constants.types import GradeEnum, FideleTypeEnum
 from utils.utils import PydanticField, SQLModelField
-
 
 # Local modules
 from models.utils.utils import (
     PSW_FIELD_PROPS,
-    BaseModelClass,
     Password,
     Gender
 )
 
 from utils.constants import Regex
 
-class Grade(BaseModelClass, table=True):
-    """Modèle de la table GradeFidele"""
-    nom: str = PydanticField(
-        ..., 
-        max_length=100,
-        description="Nom du grade du fidele"
-    )
-
-class FideleType(BaseModelClass, table=True):
-    """Modèle de la table FideleType"""
-    __tablename__ = "fidele_type"
-    nom: str = PydanticField(
-        ..., 
-        max_length=100,
-        description="Nom du type du fidele"
-    )
+# ---- FIDELE FIELDS CONFIG -----#
+FIDELE_FIELDS_CONFIG = {
+    "nom": {
+        "max_length": 100,
+        "min_length": 2,
+        "examples": ["Mulamba"],
+        "description": "Nom du fidele",
+    },
+    "postnom": {
+        "max_length": 100,
+        "min_length": 2,
+        "examples": ["Matwiudi"],
+        "description": "Postnom du fidele",
+    },
+    "prenom": {
+        "max_length": 100,
+        "min_length": 2,
+        "examples": ["Jean Marc"],
+        "description": "Prenom du fidele",
+    },
+    "sexe": {
+        "examples": ["M"],
+        "description": "Sexe du fidele. M pour Masculin et F pour Féminin",
+    },
+    "date_naissance": {
+        "examples": ["1990-01-01"],
+        "description": "Date de naissance du fidele."
+    },
+    "est_baptise": {
+        "description": "Indique si le fidèle est baptisé"
+    },
+    "date_bapteme": {
+        "examples": ["2015-06-15"],
+        "description": "Date de baptême du fidèle (optionnel si pas baptisé)"
+    },
+    "numero_carte": {
+        "examples": ["123456"],
+        "description": "Numéro de carte du fidele."
+    },
+    "id_grade": {
+        "description": "L'id du grade du fidele."
+    },
+    "id_fidele_type": {
+        "description": "L'id du type du fidele."
+    },
+    "tel": {
+        "pattern": Regex.PHONE.value,
+        "examples": ["+243812345678"],
+        "description": "Numero de téléphone au format international. Ex: +243812345678",
+    },
+}
 
 # ---- USER BASE MODEL -----#
 class FideleBase(SQLModel):
-    nom: str = PydanticField(
-        ...,
-        max_length=100,
-        min_length=2,
-        examples=["Mulamba"],
-        description="Nom du fidele",
-    )
-    postnom: str | None = PydanticField(
-        None,
-        max_length=100,
-        min_length=2,
-        examples=["Matwiudi"],
-        description="Postnom du fidele",
-    )
-    prenom: str = PydanticField(
-        ...,
-        max_length=100,
-        min_length=2,
-        examples=["Jean Marc"],
-        description="Prenom du fidele",
-    )
-    sexe: Gender = PydanticField(
-        ...,
-        examples=["M"],
-        description="Sexe du fidele. M pour Masculin et F pour Féminin",
-    )
-    date_naissance: date = PydanticField(
-        ...,
-        examples=["1990-01-01"],
-        description="Date de naissance du fidele."
-    )
-    numero_carte: str | None = PydanticField(
-        None,
-        examples=["123456"],
-        description="Numéro de carte du fidele."
-    )
-    id_grade: int | None = SQLModelField(
-        None,
-        description="L'id du grade du fidele.",
-        foreign_key="grade.id"
-    )
-    id_fidele_type: int | None = SQLModelField(
-        None,
-        description="L'id du type du fidele.",
-        foreign_key="fidele_type.id"
-    )
-    tel: str = PydanticField(
-        ...,
-        pattern=Regex.PHONE.value,
-        examples=["+243812345678"],
-        description="Numero de téléphone au format international. Ex: +243812345678",
-    )
+    nom: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["nom"])
+    postnom: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["postnom"])
+    prenom: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["prenom"])
+    sexe: Gender = PydanticField(..., **FIDELE_FIELDS_CONFIG["sexe"])
+    date_naissance: date = PydanticField(..., **FIDELE_FIELDS_CONFIG["date_naissance"])
+    est_baptise: bool = PydanticField(..., **FIDELE_FIELDS_CONFIG["est_baptise"])
+    date_bapteme: date | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["date_bapteme"])
+    numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
+    id_grade: GradeEnum | None = SQLModelField(None, **FIDELE_FIELDS_CONFIG["id_grade"], foreign_key="grade.id")
+    id_fidele_type: FideleTypeEnum | None = SQLModelField(None, **FIDELE_FIELDS_CONFIG["id_fidele_type"], foreign_key="fidele_type.id")
+    tel: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["tel"])
     password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)
 
-# class FideleBasePswRequired(FideleBase):
-#     password: Password = PydanticField(..., **PSW_FIELD_PROPS)
+# ---- FIDELE UPDATE MODEL -----#
+class FideleUpdate(BaseModel):
+    """Modèle pour les mises à jour de fidele (tous les champs optionnels)"""
+    nom: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["nom"])
+    postnom: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["postnom"])
+    prenom: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["prenom"])
+    sexe: Gender | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["sexe"])
+    date_naissance: date | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["date_naissance"])
+    est_baptise: bool | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["est_baptise"])
+    date_bapteme: date | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["date_bapteme"])
+    numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
+    id_grade: GradeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_grade"])
+    id_fidele_type: FideleTypeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_type"])
+    tel: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["tel"])
+    password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)

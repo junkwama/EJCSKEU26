@@ -24,6 +24,9 @@ from routers.utils.http_utils import (
 
 # Routers
 from routers.fidele import fidele_router
+from routers.adresse import adresse_router
+from routers.contact import contact_router
+from routers.constants import constants_router
 
 # Lifespan event handler
 @asynccontextmanager
@@ -35,7 +38,12 @@ async def lifespan(app: FastAPI):
     # Shutdown code 
     print("Shutting down...")
 
-app = FastAPI(lifespan=lifespan) # The app's fastweb instance
+app = FastAPI(
+    title="EJCSK API",
+    description="Recencement des Fidèles de l'Église Kimbaguiste",
+    version="1.0.0",
+    lifespan=lifespan
+) # The app's fastweb instance
 
 # 401: Uncontroled or automatically generated
 @app.exception_handler(401)
@@ -92,7 +100,10 @@ def server_status():
     )
 
 # Attaching routers
-app.include_router(fidele_router, prefix="/fidele", tags=["Fidele"])
+app.include_router(fidele_router, prefix="/fidele")
+app.include_router(adresse_router, prefix="/addresse")
+app.include_router(contact_router, prefix="/contact")
+app.include_router(constants_router, prefix="/constants")
 
 
 # start the app with: uvicorn main:app --reload
