@@ -18,6 +18,7 @@ from models.contact import Contact
 from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
+from routers.dependencies import required_fidele
 from routers.utils.http_utils import send200, send404
 
 fidele_router = APIRouter(tags=["Fidele"])
@@ -106,9 +107,10 @@ async def get_fidele(
 
 @fidele_router.put("/{id}")
 async def update_fidele(
-    id: Annotated[int, Path(..., description="Fidele's Id")],
+    # id: Annotated[int, Path(..., description="Fidele's Id")],
     fidele_data: FideleUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
+    fidele: Annotated[Fidele, Depends(required_fidele)],
 ) -> FideleProjShallow:
     """
     Modifier un fidele existant
@@ -117,14 +119,14 @@ async def update_fidele(
         id (int): L'Id du fidele à modifier
         fidele_data (FideleUpdate): Les données mises à jour du fidele
     """
-    # Fetch the fidele
-    statement = select(Fidele).where((Fidele.id == id) & (Fidele.est_supprimee == False))
-    result = await session.exec(statement)
-    fidele = result.first()
+    # # Fetch the fidele
+    # statement = select(Fidele).where((Fidele.id == id) & (Fidele.est_supprimee == False))
+    # result = await session.exec(statement)
+    # fidele = result.first()
 
-    # If there's no matching fidele
-    if not fidele:
-        return send404(["body", "id"], "Fidele non existant")
+    # # If there's no matching fidele
+    # if not fidele:
+    #     return send404(["body", "id"], "Fidele non existant")
 
     # Update fields (only provided fields)
     update_data = fidele_data.model_dump(mode='json', exclude_unset=True)

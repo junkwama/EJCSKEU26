@@ -15,6 +15,7 @@ from core.db import init_db
 # Routers utils
 from routers.utils.http_utils import (
     send200,
+    send404,
     send500,
     send422,
     # send409,
@@ -55,6 +56,10 @@ def exc_handler_401(request: Request, e: HTTPException):
 def exc_handler_403(request: Request, e: HTTPException):
     return send403(str(e) or None)
 
+# 404: Resource not found
+@app.exception_handler(404)
+def exc_handler_404(request: Request, e: HTTPException):
+    return send404(["path"], str(e) or "Resource not found")
 
 # # 409 DB Unique Key Duplication Error
 # @app.exception_handler(DuplicateKeyError)
