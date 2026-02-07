@@ -23,8 +23,8 @@ contact_router = APIRouter(tags=["Contact"])
 @contact_router.post("")
 async def create_contact(
     contact_data: ContactBase,
-    session: Annotated[AsyncSession, Depends(get_session)],  # ✅ FIXED - no = None
-) -> ContactProjFlat:  # ✅ FIXED - consistent return type
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> ContactProjFlat: 
     """
     Créer un nouveau contact
 
@@ -78,7 +78,7 @@ async def update_contact(
     update_data = contact_data.model_dump(
         mode="json",
         exclude_unset=True,
-        exclude={"id_document_type", "id_document"},  # ✅ FIXED - exclude these
+        exclude={"id_document_type", "id_document"},
     )
     for field, value in update_data.items():
         setattr(contact, field, value)
@@ -107,7 +107,6 @@ async def delete_contact(
     if not contact:
         return send404(["query", "id"], "Contact non existant")
 
-    # ✅ Convert to projection BEFORE deletion
     contact_proj = ContactProjShallow.model_validate(contact)
     
     # Hard delete (NO await - delete is not async)

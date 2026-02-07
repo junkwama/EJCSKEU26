@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field as PydanticField
 CONTACT_FIELDS_CONFIG = {
     "id_document_type": {
         "ge": 1,
-        "le": 3,  # ✅ ADDED - validate range (1-3)
+        "le": 3, 
         "description": "Type de document (1=FIDELE, 2=PAROISSE, 3=STRUCTURE)",
     },
     "id_document": {
@@ -50,7 +50,6 @@ class ContactBase(SQLModel):
 # ---- CONTACT UPDATE MODEL -----#
 class ContactUpdate(BaseModel):
     """Modèle pour les mises à jour de contact (tous les champs optionnels)"""
-    # ✅ REMOVED id_document_type and id_document - NOT editable
     tel1: str | None = PydanticField(None, **CONTACT_FIELDS_CONFIG["tel1"])
     tel2: str | None = PydanticField(None, **CONTACT_FIELDS_CONFIG["tel2"])
     whatsapp: str | None = PydanticField(None, **CONTACT_FIELDS_CONFIG["whatsapp"])

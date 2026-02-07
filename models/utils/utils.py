@@ -7,11 +7,10 @@ from typing import Optional
 from utils.utils import PydanticField, SQLModelField
 
 from modules.oauth2.utils import password_context
-from utils.constants import Regex
 
 class BaseModelClass(SQLModel):
     """Base class with soft delete support"""
-    id: Optional[int] = SQLModelField(default=None, primary_key=True)
+    id: int = SQLModelField(primary_key=True)
     est_supprimee: bool = PydanticField(
         default=False, 
         description="Est supprimée (soft delete)"

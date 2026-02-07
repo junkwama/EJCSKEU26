@@ -3,7 +3,7 @@ from sqlmodel import SQLModel
 from pydantic import BaseModel
 from datetime import date
 from models.constants.types import GradeEnum, FideleTypeEnum
-from utils.utils import PydanticField, SQLModelField
+from utils.utils import PydanticField
 
 # Local modules
 from models.utils.utils import (
@@ -54,9 +54,11 @@ FIDELE_FIELDS_CONFIG = {
         "description": "Numéro de carte du fidele."
     },
     "id_grade": {
+        "examples": [1, 2, 3],
         "description": "L'id du grade du fidele."
     },
     "id_fidele_type": {
+        "examples": [1, 2, 3],
         "description": "L'id du type du fidele."
     },
     "tel": {
@@ -76,8 +78,8 @@ class FideleBase(SQLModel):
     est_baptise: bool = PydanticField(..., **FIDELE_FIELDS_CONFIG["est_baptise"])
     date_bapteme: date | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["date_bapteme"])
     numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
-    id_grade: GradeEnum | None = SQLModelField(None, **FIDELE_FIELDS_CONFIG["id_grade"], foreign_key="grade.id")
-    id_fidele_type: FideleTypeEnum | None = SQLModelField(None, **FIDELE_FIELDS_CONFIG["id_fidele_type"], foreign_key="fidele_type.id")
+    id_grade: GradeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_grade"])
+    id_fidele_type: FideleTypeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_fidele_type"])
     tel: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["tel"])
     password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)
 
@@ -94,5 +96,3 @@ class FideleUpdate(BaseModel):
     numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
     id_grade: GradeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_type"])
-    tel: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["tel"])
-    password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)

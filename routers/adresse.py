@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from datetime import datetime, timezone
 
@@ -16,6 +17,19 @@ from routers.utils.http_utils import send200, send404
 # ============================================================================
 adresse_router = APIRouter(tags=["Adresse"])
 
+
+async def get_adresse_complete_data_by_id(id: int, session: AsyncSession) -> Adresse:
+    statement = (
+        select(Adresse)
+        .where(Adresse.id == id)
+        .options(
+            selectinload(Adresse.nation)
+        )
+    )
+    result = await session.exec(statement)
+    adresse = result.first()
+    
+    return adresse
 
 # ============================================================================
 # ENDPOINTS
@@ -48,9 +62,7 @@ async def get_adresse(
     """
     Récupérer une adresse par son ID
     """
-    statement = select(Adresse).where(Adresse.id == id)
-    result = await session.exec(statement)
-    adresse = result.first()
+    adresse = await get_adresse_complete_data_by_id(id, session)
     
     if not adresse:
         return send404(["query", "id"], "Adresse non existante")
@@ -84,8 +96,11 @@ async def update_adresse(
     session.add(adresse)
     await session.commit()
     await session.refresh(adresse)
+
+    # Fetch the complete data with relations for the response for the Shallow Projection
+    adresse_complet_data = await get_adresse_complete_data_by_id(id, session)
     
-    return send200(AdresseProjShallow.model_validate(adresse))
+    return send200(AdresseProjShallow.model_validate(adresse_complet_data))
 
 
 @adresse_router.delete("/{id}")
@@ -103,7 +118,6 @@ async def delete_adresse(
     if not adresse:
         return send404(["query", "id"], "Adresse non existante")
     
-    # ✅ Convert to projection BEFORE deletion
     adresse_proj = AdresseProjFlat.model_validate(adresse)
     
     # Hard delete (NO await - delete is not async)

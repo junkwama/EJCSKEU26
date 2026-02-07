@@ -124,8 +124,6 @@ CREATE TABLE fidele (
     date_bapteme DATE DEFAULT NULL,
     id_fidele_type INT,
     id_grade INT,
-    id_contact INT DEFAULT NULL,
-    id_adresse INT DEFAULT NULL,
     tel VARCHAR(20),
     password VARCHAR(255) DEFAULT NULL,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -133,9 +131,7 @@ CREATE TABLE fidele (
     est_supprimee BOOLEAN DEFAULT FALSE,
     date_suppression TIMESTAMP NULL,
     FOREIGN KEY (id_grade) REFERENCES grade(id) ON DELETE RESTRICT,
-    FOREIGN KEY (id_fidele_type) REFERENCES fidele_type(id) ON DELETE RESTRICT,
-    FOREIGN KEY (id_contact) REFERENCES contact(id) ON DELETE SET NULL,
-    FOREIGN KEY (id_adresse) REFERENCES adresse(id) ON DELETE SET NULL
+    FOREIGN KEY (id_fidele_type) REFERENCES fidele_type(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================

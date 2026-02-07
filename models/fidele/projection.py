@@ -2,24 +2,10 @@ from pydantic import BaseModel, computed_field
 from datetime import date, datetime
 
 from models.adresse.projection import AdresseProjShallow
+from models.constants.projections import FideleTypeProjFlat, GradeProjFlat
+from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
 from utils.utils import PydanticField
-
-class GradeBasic(BaseModel):
-    """Basic projection of Grade"""
-    id: int = PydanticField(..., description="Identifiant unique du grade")
-    nom: str = PydanticField(..., description="Nom du grade du fidèle")
-
-    class Config:
-        from_attributes = True
-
-class FideleTypeBasic(BaseModel):
-    """Basic projection of FideleType"""
-    id: int = PydanticField(..., description="Identifiant unique du type de fidèle")
-    nom: str = PydanticField(..., description="Nom du type de fidèle")
-
-    class Config:
-        from_attributes = True
 
 class FideleProjFlat(BaseModel):
     """
@@ -54,8 +40,8 @@ class FideleProjFlat(BaseModel):
             (today.month, today.day) < (self.date_naissance.month, self.date_naissance.day)
         )
 
-    id_grade: int 
-    id_fidele_type: int
+    id_grade: GradeEnum 
+    id_fidele_type: FideleTypeEnum
     id_adresse: int | None = None
     id_contact: int | None = None
 
@@ -68,17 +54,13 @@ class FideleProjFlat(BaseModel):
     class Config:
         from_attributes = True
 
-    class Config:
-        from_attributes = True
-
-
 class FideleProjShallow(FideleProjFlat):
     """
     PUBLIC x SHALLOW PROJECTION
     Everything in PublicFlat + Flat versions of public related fields
     """
     # Flat versions of related fields (with their nested fields)
-    grade: GradeBasic | None = None
-    fidele_type: FideleTypeBasic | None = None
+    grade: GradeProjFlat
+    fidele_type: FideleTypeProjFlat
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None

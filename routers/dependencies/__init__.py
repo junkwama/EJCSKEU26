@@ -1,7 +1,11 @@
-from typing import Annotated, Type, TypeVar
+from typing import TYPE_CHECKING, Annotated, Type, TypeVar
 from fastapi import Depends, HTTPException, Path
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import SQLModel, select
+
+# Avoid circular dependency
+if TYPE_CHECKING:
+    from models.fidele import Fidele
 
 from core.db import get_session
 

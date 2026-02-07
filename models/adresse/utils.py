@@ -1,12 +1,15 @@
 # External modules
 from sqlmodel import SQLModel
-from pydantic import BaseModel, Field as PydanticField
+from pydantic import BaseModel
+
+# Local modules
+from utils.utils import PydanticField, SQLModelField
 
 # ---- ADRESSE FIELDS CONFIG -----#
 ADRESSE_FIELDS_CONFIG = {
     "id_document_type": {
         "ge": 1,
-        "le": 3,  # ✅ ADDED - validate range (1-3)
+        "le": 3,
         "description": "Type de document (1=FIDELE, 2=PAROISSE, 3=STRUCTURE)",
     },
     "id_document": {
@@ -56,7 +59,7 @@ class AdresseBase(SQLModel):
     """Modèle de base pour créer une adresse"""
     id_document_type: int = PydanticField(..., **ADRESSE_FIELDS_CONFIG["id_document_type"], foreign_key="document_type.id")
     id_document: int = PydanticField(..., **ADRESSE_FIELDS_CONFIG["id_document"])
-    id_nation: int = PydanticField(..., **ADRESSE_FIELDS_CONFIG["id_nation"])
+    id_nation: int = SQLModelField(..., **ADRESSE_FIELDS_CONFIG["id_nation"], foreign_key="nation.id")
     province_etat: str = PydanticField(..., **ADRESSE_FIELDS_CONFIG["province_etat"])
     ville: str = PydanticField(..., **ADRESSE_FIELDS_CONFIG["ville"])
     commune: str | None = PydanticField(None, **ADRESSE_FIELDS_CONFIG["commune"])

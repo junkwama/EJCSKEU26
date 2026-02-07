@@ -9,9 +9,14 @@ class Nation(BaseModelClass, table=True):
     __tablename__ = "nation"
     
     nom: str = PydanticField(..., max_length=100, description="Nom de la nation")
-    model_config = {"from_attributes": True}
+
+    class Config:
+        from_attributes = True
 
 class Adresse(AdresseBase, BaseModelClass, table=True):
     """Modèle de la table Adresse - Addresses avec support multi-document"""
 
     nation: Nation = Relationship()
+
+    class Config:
+        from_attributes = True

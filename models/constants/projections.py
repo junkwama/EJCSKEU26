@@ -10,6 +10,9 @@ class DocumentTypeProjFlat(BaseModel):
     id: int
     nom: str
 
+    class Config:
+        from_attributes = True
+
 # ============================================================================
 # GRADE PROJECTIONS
 # ============================================================================
@@ -21,6 +24,9 @@ class GradeProjFlat(BaseModel):
     est_supprimee: bool
     date_suppression: datetime | None
 
+    class Config:
+        from_attributes = True
+
 # ============================================================================
 # FIDELE TYPE PROJECTIONS
 # ============================================================================
@@ -31,3 +37,6 @@ class FideleTypeProjFlat(BaseModel):
     nom: str
     est_supprimee: bool
     date_suppression: datetime | None
+
+    class Config:
+        from_attributes = True

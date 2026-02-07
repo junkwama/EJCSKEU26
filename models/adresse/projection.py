@@ -23,8 +23,10 @@ class AdresseProjFlat(BaseModel):
     date_creation: datetime
     date_modification: datetime
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
 
 class AdresseProjShallow(AdresseProjFlat):
     """Projection d'adresse avec relations imbriquées"""
     nation: NationProjFlat | None = None
+    
