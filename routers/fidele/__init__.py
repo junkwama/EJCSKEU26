@@ -222,6 +222,27 @@ async def delete_fidele(
 
 # ========================== ADRESSE ENDPOINTS ==========================
 
+@fidele_router.get("/{id}/adresse")
+async def get_fidele_adresse(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    fidele: Annotated[Fidele, Depends(required_fidele)]
+) -> AdresseProjShallow:
+    """
+    Récupérer l'adresse associée à un fidele
+
+    ARGS:
+        id (int): L'Id du fidele
+    """
+    
+    # Query adresse by document type (FIDELE=1) and fidele id
+    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session)
+    
+    if not adresse:
+        return send404(["query", "id"], "Adresse non trouvée pour ce fidele")
+    
+    return send200(AdresseProjShallow.model_validate(adresse))
+
+
 @fidele_router.put("/{id}/adresse")
 async def update_fidele_adresse(
     adresse_data: AdresseUpdate,
