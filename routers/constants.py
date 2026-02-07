@@ -1,11 +1,14 @@
 from typing import Annotated, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 # Local modules
 from core.db import get_session
+from models.adresse.projection import NationProjShallow
 from models.constants import FideleType, Grade, DocumentType
+from models.adresse import Nation
 from routers.utils.http_utils import send200
 
 # ============================================================================
@@ -66,3 +69,25 @@ async def get_fidele_types(
     fidele_types = result.all()
 
     return send200(fidele_types)
+
+
+@constants_router.get("/nations")
+async def get_nations(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> List[NationProjShallow]:
+    """
+    Récupérer la liste des nations disponibles
+
+    Returns:
+        Liste des nations disponibles pour les adresses
+    """
+    statement = (
+        select(Nation)
+        .options(selectinload(Nation.continent))
+    )
+    
+    result = await session.exec(statement)
+    nations = result.all()
+    nations_proj = [NationProjShallow.from_orm(nation) for nation in nations]
+
+    return send200(nations_proj)
