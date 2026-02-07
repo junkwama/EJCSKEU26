@@ -8,7 +8,6 @@ from datetime import datetime, timezone
 
 # Local modules
 from core.config import Config
-from models import fidele
 from models.constants.types import DocumentTypeEnum
 from models.fidele import Fidele
 from models.fidele.utils import FideleBase, FideleUpdate
@@ -20,10 +19,18 @@ from models.contact import Contact
 from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
-from routers.dependencies import required_fidele
+from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send404
 
 fidele_router = APIRouter(tags=["Fidele"])
+
+async def required_fidele(
+    id: Annotated[int, Path(..., description="Fidele's ID")],
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> Fidele:
+    """Get and validate Fidele exists"""
+    return await check_resource_exists(Fidele, id, session)
+
 
 async def get_fidele_complete_data_by_id(id: int, session: AsyncSession) -> Fidele:
     statement = (

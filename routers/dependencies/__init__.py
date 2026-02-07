@@ -53,13 +53,3 @@ async def check_resource_exists(
         )
     
     return resource
-
-
-async def required_fidele(
-    id: Annotated[int, Path(..., description="Fidele's ID")],
-    session: Annotated[AsyncSession, Depends(get_session)],
-) -> "Fidele":
-    """Get and validate Fidele exists"""
-    from models.fidele import Fidele
-    return await check_resource_exists(Fidele, id, session)
-
