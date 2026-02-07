@@ -12,7 +12,7 @@ from models.constants.types import DocumentTypeEnum
 from models.fidele import Fidele
 from models.fidele.utils import FideleBase, FideleUpdate
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
-from models.adresse import Adresse
+from models.adresse import Adresse, Nation
 from models.adresse.utils import AdresseUpdate
 from models.adresse.projection import AdresseProjFlat, AdresseProjShallow
 from models.contact import Contact
@@ -40,13 +40,31 @@ async def get_fidele_complete_data_by_id(id: int, session: AsyncSession) -> Fide
             selectinload(Fidele.grade),
             selectinload(Fidele.fidele_type),
             selectinload(Fidele.contact),
-            selectinload(Fidele.adresse)
+            selectinload(Fidele.adresse),
+            (
+                selectinload(Fidele.adresse)
+                .selectinload(Adresse.nation)
+                .selectinload(Nation.continent)
+            )
         )
     )
     result = await session.exec(statement)
-    fidele = result.first()
+    return result.first()
     
-    return fidele
+async def get_fidele_adresse_complete_data_by_id(fidele_id: int, session: AsyncSession) -> Adresse:
+    # Query adresse by document type (FIDELE=1) and fidele id
+    adresse_stmt = (
+        select(Adresse).where(
+            (Adresse.id_document_type == DocumentTypeEnum.FIDELE.value) & 
+            (Adresse.id_document == fidele_id)
+        ).options(
+            selectinload(Adresse.nation)
+            .selectinload(Nation.continent)
+        )
+    )
+    
+    adresse_result = await session.exec(adresse_stmt)
+    return adresse_result.first()
 
 @fidele_router.post("")
 async def create_fidele(
@@ -219,15 +237,7 @@ async def update_fidele_adresse(
     """
     
     # Query adresse by document type (FIDELE=1) and fidele id
-    adresse_stmt = (
-        select(Adresse).where(
-            (Adresse.id_document_type == DocumentTypeEnum.FIDELE.value) & 
-            (Adresse.id_document == fidele.id)
-        ).options(selectinload(Adresse.nation))
-    )
-    
-    adresse_result = await session.exec(adresse_stmt)
-    adresse = adresse_result.first()
+    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session)
     
     if not adresse:
         # Create new adresse if not found
@@ -278,14 +288,8 @@ async def delete_fidele_adresse(
         id (int): L'Id du fidele
     """
 
-    # Query adresse by document type and fidele id
-    adresse_stmt = select(Adresse).where(
-        (Adresse.id_document_type == DocumentTypeEnum.FIDELE.value) & 
-        (Adresse.id_document == fidele.id)
-    ).options(selectinload(Adresse.nation))
-
-    adresse_result = await session.exec(adresse_stmt)
-    adresse = adresse_result.first()
+    # Query adresse
+    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session)
     
     if not adresse:
         return send404(["query", "id"], "Adresse non trouvée pour ce fidele")

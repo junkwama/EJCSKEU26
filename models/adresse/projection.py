@@ -1,10 +1,27 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
+class ContinentProjFlat(BaseModel):
+    """Projection plate de continent"""
+    id: int
+    nom: str
+
+    class Config:
+        from_attributes = True
+
 class NationProjFlat(BaseModel):
     """Projection plate de nation"""
     id: int
     nom: str
+    id_continent: int
+    class Config:
+        from_attributes = True
+
+class NationProjShallow(NationProjFlat):
+    """Projection de nation avec relations imbriquées (continent)"""
+    continent: ContinentProjFlat | None = None
+
     class Config:
         from_attributes = True
 
@@ -28,5 +45,5 @@ class AdresseProjFlat(BaseModel):
 
 class AdresseProjShallow(AdresseProjFlat):
     """Projection d'adresse avec relations imbriquées"""
-    nation: NationProjFlat | None = None
+    nation: NationProjShallow | None = None
     

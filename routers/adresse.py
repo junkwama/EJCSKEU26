@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 # Local modules
 from core.db import get_session
-from models.adresse import Adresse
+from models.adresse import Adresse, Nation
 from models.adresse.utils import AdresseBase, AdresseUpdate
 from models.adresse.projection import AdresseProjFlat, AdresseProjShallow
 from routers.utils.http_utils import send200, send404
@@ -22,7 +22,7 @@ adresse_router = APIRouter(tags=["Adresse"])
 async def address_required(
     id: Annotated[int, Path(..., description="ID de l'adresse")],
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> Adresse:
+) -> AdresseProjShallow:
     """Get and validate Adresse exists"""
     return await check_resource_exists(Adresse, id, session)
 
@@ -32,6 +32,7 @@ async def get_adresse_complete_data_by_id(id: int, session: AsyncSession) -> Adr
         .where(Adresse.id == id)
         .options(
             selectinload(Adresse.nation)
+            .selectinload(Nation.continent)
         )
     )
     result = await session.exec(statement)
@@ -58,8 +59,11 @@ async def create_adresse(
     session.add(adresse)
     await session.commit()
     await session.refresh(adresse)
+
+    # Re-fetch the adresse with relations for the Shallow Projection response
+    adresse_complet_data = await get_adresse_complete_data_by_id(adresse.id, session)
     
-    return send200(AdresseProjShallow.model_validate(adresse))
+    return send200(AdresseProjShallow.model_validate(adresse_complet_data))
 
 
 @adresse_router.get("/{id}")
