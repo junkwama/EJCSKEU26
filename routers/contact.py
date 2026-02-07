@@ -10,11 +10,30 @@ from models.contact import Contact
 from models.contact.utils import ContactBase, ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from routers.utils.http_utils import send200, send404
+from routers.dependencies import check_resource_exists
 
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
 contact_router = APIRouter(tags=["Contact"])
+
+
+async def contact_required(
+    id: Annotated[int, Path(..., description="ID du contact")],
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> Contact:
+    """Get and validate Contact exists"""
+    return await check_resource_exists(Contact, id, session)
+
+async def get_contact_data_by_id(id: int, session: AsyncSession) -> Contact:
+    statement = select(Contact).where(
+       (Contact.id == id) & 
+       (Contact.est_supprime == False)
+    )
+    result = await session.exec(statement)
+    contact = result.first()
+    
+    return contact
 
 
 # ============================================================================
@@ -48,10 +67,8 @@ async def get_contact(
     """
     Récupérer un contact par son ID
     """
-    statement = select(Contact).where(Contact.id == id)
-    result = await session.exec(statement)
-    contact = result.first()
-
+    contact = await get_contact_data_by_id(id, session)
+    
     if not contact:
         return send404(["query", "id"], "Contact non existant")
 
@@ -60,20 +77,13 @@ async def get_contact(
 
 @contact_router.put("/{id}")
 async def update_contact(
-    id: Annotated[int, Path(..., description="ID du contact")],
     contact_data: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
+    contact: Annotated[Contact, Depends(contact_required)],
 ) -> ContactProjShallow:
     """
     Modifier un contact existant
     """
-    statement = select(Contact).where(Contact.id == id)
-    result = await session.exec(statement)
-    contact = result.first()
-
-    if not contact:
-        return send404(["query", "id"], "Contact non existant")
-
     # Update fields (exclude document identifiers - they shouldn't be changed)
     update_data = contact_data.model_dump(
         mode="json",
@@ -89,27 +99,24 @@ async def update_contact(
     await session.commit()
     await session.refresh(contact)
 
-    return send200(ContactProjShallow.model_validate(contact))
+    # Fetch the complete data with relations for the response for the Shallow Projection
+    contact_complet_data = await get_contact_data_by_id(contact.id, session)
+
+    return send200(ContactProjShallow.model_validate(contact_complet_data))
 
 
 @contact_router.delete("/{id}")
 async def delete_contact(
-    id: Annotated[int, Path(..., description="ID du contact")],
     session: Annotated[AsyncSession, Depends(get_session)],
+    contact: Annotated[Contact, Depends(contact_required)],
 ) -> dict:
     """
     Supprimer un contact (hard delete)
     """
-    statement = select(Contact).where(Contact.id == id)
-    result = await session.exec(statement)
-    contact = result.first()
-
-    if not contact:
-        return send404(["query", "id"], "Contact non existant")
-
+    # save the contact data for the response before deleting
     contact_proj = ContactProjShallow.model_validate(contact)
     
-    # Hard delete (NO await - delete is not async)
+    # Hard delete the contact
     session.delete(contact)
     await session.commit()
 
