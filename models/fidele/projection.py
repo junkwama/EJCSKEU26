@@ -42,8 +42,6 @@ class FideleProjFlat(BaseModel):
 
     id_grade: GradeEnum 
     id_fidele_type: FideleTypeEnum
-    id_adresse: int | None = None
-    id_contact: int | None = None
 
     est_supprimee: bool
     date_suppression: datetime | None = None
