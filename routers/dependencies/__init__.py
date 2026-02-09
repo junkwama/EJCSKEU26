@@ -1,13 +1,9 @@
-from typing import TYPE_CHECKING, Annotated, Type, TypeVar
-from fastapi import Depends, HTTPException, Path
+from typing import Type, TypeVar
+from fastapi import HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import SQLModel, select
+from sqlalchemy import and_
 
-# Avoid circular dependency
-if TYPE_CHECKING:
-    from models.fidele import Fidele
-
-from core.db import get_session
 
 T = TypeVar('T', bound=SQLModel)
 
@@ -41,7 +37,14 @@ async def check_resource_exists(
         ):
             return send200(UserProj.model_validate(user))
     """
-    statement = select(model).where(getattr(model, id_field) == resource_id)
+    statement = (
+        select(model).where(
+            and_(
+                getattr(model, id_field) == resource_id,
+                getattr(model, "est_supprime") == False if hasattr(model, "est_supprime") else True
+            )
+        )
+    )
     result = await session.exec(statement)
     resource = result.first()
     

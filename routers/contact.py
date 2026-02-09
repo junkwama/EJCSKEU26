@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from core.db import get_session
 from models.contact import Contact
 from models.contact.utils import ContactBase, ContactUpdate
-from models.contact.projection import ContactProjFlat, ContactProjShallow
+from models.contact.projection import ContactProjFlat
 from routers.utils.http_utils import send200, send404
 from routers.dependencies import check_resource_exists
 
@@ -25,7 +25,7 @@ async def contact_required(
     """Get and validate Contact exists"""
     return await check_resource_exists(Contact, id, session)
 
-async def get_contact_data_by_id(id: int, session: AsyncSession) -> Contact:
+async def get_contact_complete_data_by_id(id: int, session: AsyncSession) -> Contact:
     statement = select(Contact).where(
        (Contact.id == id) & 
        (Contact.est_supprime == False)
@@ -63,16 +63,17 @@ async def create_contact(
 async def get_contact(
     id: Annotated[int, Path(..., description="ID du contact")],
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> ContactProjShallow:
+    contact: Annotated[Contact, Depends(contact_required)],
+) -> ContactProjFlat:
     """
     Récupérer un contact par son ID
     """
-    contact = await get_contact_data_by_id(id, session)
+    contact = await get_contact_complete_data_by_id(id, session)
     
     if not contact:
         return send404(["query", "id"], "Contact non existant")
 
-    return send200(ContactProjShallow.model_validate(contact))
+    return send200(ContactProjFlat.model_validate(contact))
 
 
 @contact_router.put("/{id}")
@@ -80,7 +81,7 @@ async def update_contact(
     contact_data: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     contact: Annotated[Contact, Depends(contact_required)],
-) -> ContactProjShallow:
+) -> ContactProjFlat:
     """
     Modifier un contact existant
     """
@@ -100,21 +101,21 @@ async def update_contact(
     await session.refresh(contact)
 
     # Fetch the complete data with relations for the response for the Shallow Projection
-    contact_complet_data = await get_contact_data_by_id(contact.id, session)
+    contact_complet_data = await get_contact_complete_data_by_id(contact.id, session)
 
-    return send200(ContactProjShallow.model_validate(contact_complet_data))
+    return send200(ContactProjFlat.model_validate(contact_complet_data))
 
 
 @contact_router.delete("/{id}")
 async def delete_contact(
     session: Annotated[AsyncSession, Depends(get_session)],
     contact: Annotated[Contact, Depends(contact_required)],
-) -> dict:
+) -> ContactProjFlat:
     """
     Supprimer un contact (hard delete)
     """
     # save the contact data for the response before deleting
-    contact_proj = ContactProjShallow.model_validate(contact)
+    contact_proj = ContactProjFlat.model_validate(contact)
     
     # Hard delete the contact
     session.delete(contact)

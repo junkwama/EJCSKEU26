@@ -1,16 +1,16 @@
 # External modules
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from typing import List, Optional
+from typing import List
 
 # Local modules
 from utils.utils import log
 from routers.utils.constants import HTTP_CODES, ErrorTypes
 
 # def get_error_details(
-#     type: Optional[str] = None, loc: Optional[list] = None,
-#     msg: Optional[str] = None, input: Optional[Any] = None
+#     type: str | None = None, loc: list | None = None,
+#     msg: str | None = None, input: Any | None = None
 # ) -> dict: return {"type": type, "loc": loc, "msg": msg, "input": input}
 
 
@@ -18,9 +18,9 @@ def send(
     data: object | None = None,
     error_message: str | None = None,
     code: int | None = HTTP_CODES[200]["code"],
-    error_location: Optional[str] = None,
-    error_field: Optional[str] = None,
-    error_type: Optional[str] = None,
+    error_location: str | None = None,
+    error_field: str | None = None,
+    error_type: str | None = None,
 ):
     content = {
         "code": code,
@@ -56,7 +56,7 @@ def send400(error_location: List[str] | None = None, error_message: str | None =
     )
 
 
-def send401(error_message: Optional[str] = None):
+def send401(error_message: str | None = None):
     return send(
         error_message=error_message or HTTP_CODES[401]["message"],
         error_type=ErrorTypes.authentication_error.name,
@@ -89,7 +89,7 @@ def send404(error_location: list[str], error_message: str | None = None):
     )
 
 
-def send409(error_location: list, error_message: Optional[str] = None):
+def send409(error_location: list, error_message: str | None = None):
     return send(
         error_message=error_message or HTTP_CODES[409]["message"],
         error_type=ErrorTypes.database_error.name,
@@ -145,26 +145,3 @@ def send500(e: Exception | None = None, error_message: str | None = None):
         code=HTTP_CODES[500]["code"],
     )
 
-    """
-    Valide et retourne le type de document et l'ID
-    
-    Returns:
-        tuple: (id_document_type, id_document, error_message)
-        - id_document_type: 1=FIDELE, 2=PAROISSE, 3=STRUCTURE
-        - id_document: L'ID du document
-        - error_message: Message d'erreur si validation échoue, None sinon
-    """
-    params = [id_fidele, id_paroisse, id_structure]
-    provided_params = sum(1 for p in params if p is not None)
-    
-    if provided_params == 0:
-        return None, None, "Au moins un paramètre (id_fidele, id_paroisse ou id_structure) est requis"
-    if provided_params > 1:
-        return None, None, "Un seul paramètre parmi (id_fidele, id_paroisse, id_structure) doit être fourni"
-    
-    if id_fidele is not None:
-        return 1, id_fidele, None  # 1 = FIDELE
-    elif id_paroisse is not None:
-        return 2, id_paroisse, None  # 2 = PAROISSE
-    else:
-        return 3, id_structure, None  # 3 = STRUCTURE

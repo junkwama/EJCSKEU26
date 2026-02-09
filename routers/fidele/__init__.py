@@ -21,8 +21,11 @@ from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
 from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send404
+from routers.utils import apply_projection
+from utils.constants import ProjDepth
 
 fidele_router = APIRouter(tags=["Fidele"])
+
 
 async def required_fidele(
     id: Annotated[int, Path(..., description="Fidele's ID")],
@@ -32,11 +35,12 @@ async def required_fidele(
     return await check_resource_exists(Fidele, id, session)
 
 
-async def get_fidele_complete_data_by_id(id: int, session: AsyncSession) -> Fidele:
-    statement = (
-        select(Fidele)
-        .where(Fidele.id == id)
-        .options(
+async def get_fidele_complete_data_by_id(
+    id: int, session: AsyncSession, proj: ProjDepth = ProjDepth.SHALLOW
+) -> Fidele:
+    statement = select(Fidele).where(Fidele.id == id)
+    if proj == ProjDepth.SHALLOW:
+        statement = statement.options(
             selectinload(Fidele.grade),
             selectinload(Fidele.fidele_type),
             selectinload(Fidele.contact),
@@ -47,30 +51,36 @@ async def get_fidele_complete_data_by_id(id: int, session: AsyncSession) -> Fide
                 .selectinload(Nation.continent)
             )
         )
-    )
+
     result = await session.exec(statement)
     return result.first()
-    
-async def get_fidele_adresse_complete_data_by_id(fidele_id: int, session: AsyncSession) -> Adresse:
-    # Query adresse by document type (FIDELE=1) and fidele id
-    adresse_stmt = (
-        select(Adresse).where(
-            (Adresse.id_document_type == DocumentTypeEnum.FIDELE.value) & 
-            (Adresse.id_document == fidele_id)
-        ).options(
-            selectinload(Adresse.nation)
-            .selectinload(Nation.continent)
+
+
+async def get_fidele_adresse_complete_data_by_id(
+    fidele_id: int, session: AsyncSession, proj: ProjDepth = ProjDepth.SHALLOW
+) -> Adresse:
+    statement = (
+        select(Adresse)
+        .where(
+            (Adresse.id_document_type == DocumentTypeEnum.FIDELE.value)
+            & (Adresse.id_document == fidele_id)
         )
     )
-    
-    adresse_result = await session.exec(adresse_stmt)
-    return adresse_result.first()
+    if proj == ProjDepth.SHALLOW:
+        statement = statement.options(
+            selectinload(Adresse.nation).selectinload(Nation.continent)
+        )
+
+    result = await session.exec(statement)
+    return result.first()
+
 
 @fidele_router.post("")
 async def create_fidele(
     fidele_data: FideleBase,
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> FideleProjShallow:
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> FideleProjShallow | FideleProjFlat:
     """
     Créer un nouveau fidele
 
@@ -78,7 +88,7 @@ async def create_fidele(
         fidele_data (FideleBase): Les données du fidele à créer
     """
     # Create new fidele instance
-    new_fidele = Fidele(**fidele_data.model_dump(mode='json'))
+    new_fidele = Fidele(**fidele_data.model_dump(mode="json"))
 
     # Add to session and commit
     session.add(new_fidele)
@@ -86,41 +96,39 @@ async def create_fidele(
     await session.refresh(new_fidele)
 
     # Return the created fidele
-    return send200(FideleProjShallow.model_validate(new_fidele))
+    projected_response = apply_projection(new_fidele, FideleProjFlat, FideleProjShallow, proj)
+    return send200(projected_response)
 
 
 @fidele_router.get("")
 async def get_fideles(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
-    limit: Annotated[int, Query(le=Config.MAX_ITEMS_PER_PAGE)] = Config.MAX_ITEMS_PER_PAGE,
+    limit: Annotated[
+        int, Query(le=Config.MAX_ITEMS_PER_PAGE)
+    ] = Config.MAX_ITEMS_PER_PAGE,
 ) -> List[FideleProjFlat]:
     """
     Recuperer la liste des fideles avec pagination
     """
     # Fetching main data
     statement = (
-        select(Fidele)
-        .where(Fidele.est_supprimee == False)
-        .offset(offset)
-        .limit(limit)
+        select(Fidele).where(Fidele.est_supprimee == False).offset(offset).limit(limit)
     )
-    
+
     result = await session.exec(statement)
     fidele_list = result.all()
 
     # Returning the list
-    return send200([
-        FideleProjFlat.model_validate(fidele) 
-        for fidele in fidele_list
-    ])
+    return send200([FideleProjFlat.model_validate(fidele) for fidele in fidele_list])
 
 
 @fidele_router.get("/{id}")
 async def get_fidele(
     id: Annotated[int, Path(..., description="Fidele's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> FideleProjShallow:
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> FideleProjShallow | FideleProjFlat:
     """
     Recuperer un fidele par son Id avec ses relations
 
@@ -128,14 +136,15 @@ async def get_fidele(
         id (int): L'Id du fidele à récupérer
     """
     # Fetching the requested fidele WITH eager loading
-    fidele = await get_fidele_complete_data_by_id(id, session)
+    fidele = await get_fidele_complete_data_by_id(id, session, proj)
 
     # If there's no matching fidele
     if not fidele:
         return send404(["body", "id"], "Fidele non existant")
 
     # Return the fidele as projection
-    return send200(FideleProjShallow.model_validate(fidele))
+    projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
+    return send200(projected_response)
 
 
 @fidele_router.put("/{id}")
@@ -143,7 +152,8 @@ async def update_fidele(
     fidele_data: FideleUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-) -> FideleProjShallow:
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> FideleProjShallow | FideleProjFlat:
     """
     Modifier un fidele existant
 
@@ -153,10 +163,10 @@ async def update_fidele(
     """
 
     # Update fields (only provided fields)
-    update_data = fidele_data.model_dump(mode='json', exclude_unset=True)
+    update_data = fidele_data.model_dump(mode="json", exclude_unset=True)
     for field, value in update_data.items():
         setattr(fidele, field, value)
-    
+
     # Update modification timestamp
     fidele.date_modification = datetime.now(timezone.utc)
 
@@ -165,16 +175,19 @@ async def update_fidele(
     await session.commit()
 
     # Re-query with eager loads so relationships are available for projection
-    fidele_complete_data = await get_fidele_complete_data_by_id(fidele.id, session)
+    fidele_complete_data = await get_fidele_complete_data_by_id(fidele.id, session, proj)
 
     # Return the updated fidele with related objects already loaded
-    return send200(FideleProjShallow.model_validate(fidele_complete_data))
+    projected_response = apply_projection(fidele_complete_data, FideleProjFlat, FideleProjShallow, proj)
+    return send200(projected_response)
+
 
 @fidele_router.put("/{id}/restore")
 async def restore_fidele(
     session: Annotated[AsyncSession, Depends(get_session)],
-    fidele: Annotated[Fidele, Depends(required_fidele)]
-) -> FideleProjShallow:
+    fidele: Annotated[Fidele, Depends(required_fidele)],
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> FideleProjShallow | FideleProjFlat:
     """
     Restaurer un fidele supprimé (soft delete)
 
@@ -193,9 +206,10 @@ async def restore_fidele(
         await session.commit()
 
     # Re-query with eager loads so relationships are available for projection
-    fidele_complete_data = await get_fidele_complete_data_by_id(fidele.id, session)
+    fidele_complete_data = await get_fidele_complete_data_by_id(fidele.id, session, proj)
 
-    return send200(FideleProjShallow.model_validate(fidele_complete_data))
+    projected_response = apply_projection(fidele_complete_data, FideleProjFlat, FideleProjShallow, proj)
+    return send200(projected_response)
 
 @fidele_router.delete("/{id}")
 async def delete_fidele(
@@ -222,33 +236,37 @@ async def delete_fidele(
 
 # ========================== ADRESSE ENDPOINTS ==========================
 
+
 @fidele_router.get("/{id}/adresse")
 async def get_fidele_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
-    fidele: Annotated[Fidele, Depends(required_fidele)]
-) -> AdresseProjShallow:
+    fidele: Annotated[Fidele, Depends(required_fidele)],
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> AdresseProjShallow | AdresseProjFlat:
     """
     Récupérer l'adresse associée à un fidele
 
     ARGS:
         id (int): L'Id du fidele
     """
-    
+
     # Query adresse by document type (FIDELE=1) and fidele id
-    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session)
-    
+    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session, proj)
+
     if not adresse:
         return send404(["query", "id"], "Adresse non trouvée pour ce fidele")
-    
-    return send200(AdresseProjShallow.model_validate(adresse))
+
+    projected_response = apply_projection(adresse, AdresseProjFlat, AdresseProjShallow, proj)
+    return send200(projected_response)
 
 
 @fidele_router.put("/{id}/adresse")
 async def update_fidele_adresse(
     adresse_data: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
-    fidele: Annotated[Fidele, Depends(required_fidele)]
-) -> AdresseProjShallow:
+    fidele: Annotated[Fidele, Depends(required_fidele)],
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> AdresseProjShallow | AdresseProjFlat:
     """
     Modifier l'adresse associée à un fidele
 
@@ -256,27 +274,30 @@ async def update_fidele_adresse(
         id (int): L'Id du fidele
         adresse_data (AdresseUpdate): Les données mises à jour de l'adresse
     """
-    
+
     # Query adresse by document type (FIDELE=1) and fidele id
-    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session)
-    
+    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session, proj)
+
     if not adresse:
         # Create new adresse if not found
         new_adresse = Adresse(
             id_document_type=DocumentTypeEnum.FIDELE.value,
             id_document=fidele.id,
-            **adresse_data.model_dump(mode='json', exclude_unset=True)
+            **adresse_data.model_dump(mode="json", exclude_unset=True)
         )
         session.add(new_adresse)
         await session.commit()
         await session.refresh(new_adresse)
-        return send200(AdresseProjShallow.model_validate(new_adresse))
-    
+
+        if proj == ProjDepth.SHALLOW: # if shallow fetc related data
+            new_adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session, proj)
+
+        projected_response = apply_projection(new_adresse, AdresseProjFlat, AdresseProjShallow, proj)
+        return send200(projected_response)
+
     # Update fields (exclude document identifiers)
     update_data = adresse_data.model_dump(
-        mode='json', 
-        exclude_unset=True, 
-        exclude={'id_document_type', 'id_document'}
+        mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"}
     )
     for field, value in update_data.items():
         setattr(adresse, field, value)
@@ -284,17 +305,18 @@ async def update_fidele_adresse(
     # maybe it was deleted so let's make sure to restore it if that's the case
     adresse.est_supprimee = False
     adresse.date_suppression = None
-    
+
     # Update modification timestamp
     adresse.date_modification = datetime.now(timezone.utc)
-    
+
     # Commit changes
     session.add(adresse)
     await session.commit()
     await session.refresh(adresse)
-    
+
     # Return the updated adresse
-    return send200(AdresseProjShallow.model_validate(adresse))
+    projected_response = apply_projection(adresse, AdresseProjFlat, AdresseProjShallow, proj)
+    return send200(projected_response)
 
 
 @fidele_router.delete("/{id}/adresse")
@@ -310,29 +332,31 @@ async def delete_fidele_adresse(
     """
 
     # Query adresse
-    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session)
-    
+    adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session, ProjDepth.FLAT)
+
     if not adresse:
         return send404(["query", "id"], "Adresse non trouvée pour ce fidele")
-    
+
     # Convert to projection BEFORE deletion
     adresse_proj = AdresseProjFlat.model_validate(adresse)
-    
+
     # Hard delete
     session.delete(adresse)
     await session.commit()
-    
+
     return send200(adresse_proj)
 
 
 # ========================== CONTACT ENDPOINTS ==========================
+
 
 @fidele_router.put("/{id}/contact")
 async def update_fidele_contact(
     contact_data: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-) -> ContactProjShallow:
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> ContactProjShallow | ContactProjFlat:
     """
     Modifier le contact associé à un fidele
 
@@ -340,46 +364,50 @@ async def update_fidele_contact(
         id (int): L'Id du fidele
         contact_data (ContactUpdate): Les données mises à jour du contact
     """
-    
+
     # Query contact by document type (FIDELE=1) and fidele id
     contact_stmt = select(Contact).where(
-        (Contact.id_document_type == DocumentTypeEnum.FIDELE.value) & 
-        (Contact.id_document == fidele.id)
+        (Contact.id_document_type == DocumentTypeEnum.FIDELE.value)
+        & (Contact.id_document == fidele.id)
     )
     contact_result = await session.exec(contact_stmt)
     contact = contact_result.first()
-    
+
     if not contact:
         # Create new contact if not found
         new_contact = Contact(
             id_document_type=DocumentTypeEnum.FIDELE.value,
             id_document=fidele.id,
-            **contact_data.model_dump(mode='json', exclude_unset=True)
+            **contact_data.model_dump(mode="json", exclude_unset=True)
         )
         session.add(new_contact)
         await session.commit()
         await session.refresh(new_contact)
-        return send200(ContactProjShallow.model_validate(new_contact))
-    
+        projected_response = apply_projection(new_contact, ContactProjFlat, ContactProjShallow, proj)
+        return send200(projected_response)
+
     # Update fields (exclude document identifiers)
-    update_data = contact_data.model_dump(mode='json', exclude_unset=True, exclude={'id_document_type', 'id_document'})
+    update_data = contact_data.model_dump(
+        mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"}
+    )
     for field, value in update_data.items():
         setattr(contact, field, value)
 
     # maybe it was deleted so let's make sure to restore it if that's the case
     contact.est_supprimee = False
     contact.date_suppression = None
-    
+
     # Update modification timestamp
     contact.date_modification = datetime.now(timezone.utc)
-    
+
     # Commit changes
     session.add(contact)
     await session.commit()
     await session.refresh(contact)
-    
+
     # Return the updated contact
-    return send200(ContactProjShallow.model_validate(contact))
+    projected_response = apply_projection(contact, ContactProjFlat, ContactProjShallow, proj)
+    return send200(projected_response)
 
 
 @fidele_router.delete("/{id}/contact")
@@ -393,11 +421,11 @@ async def delete_fidele_contact(
     ARGS:
         id (int): L'Id du fidele
     """
-    
+
     # Query contact by document type and fidele id
     contact_stmt = select(Contact).where(
-        (Contact.id_document_type == DocumentTypeEnum.FIDELE.value) & 
-        (Contact.id_document == fidele.id)
+        (Contact.id_document_type == DocumentTypeEnum.FIDELE.value)
+        & (Contact.id_document == fidele.id)
     )
     contact_result = await session.exec(contact_stmt)
     contact = contact_result.first()
@@ -406,9 +434,7 @@ async def delete_fidele_contact(
         return send404(["query", "id"], "Contact non trouvé pour ce fidele")
 
     contact_proj = ContactProjFlat.model_validate(contact)
-    
-    # Hard delete (NO await - delete is not async)
     session.delete(contact)
     await session.commit()
-    
+
     return send200(contact_proj)
