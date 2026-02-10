@@ -33,7 +33,7 @@ CREATE TABLE nation (
 
 -- ============================================================================
 -- TABLE: document_type
--- Description: Types de documents (FIDELE, PAROISSE, STRUCTURE)
+-- Description: Types de documents (FIDELE, PAROISSE, VILLE, PROVINCE, NATION, CONTINENT, GENERALE)
 -- ============================================================================
 CREATE TABLE document_type (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -150,115 +150,14 @@ CREATE TABLE fidele (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
--- TABLE: echellon_eclesiastique
--- Description: Niveaux hiérarchiques (Continent, Nation, Province/État, Ville, Paroisse)
--- ============================================================================
-CREATE TABLE echellon_eclesiastique (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nom VARCHAR(100) NOT NULL,
-    id_echellon_parent INT,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL,
-    FOREIGN KEY (id_echellon_parent) REFERENCES echellon_eclesiastique(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- TABLE: structure_type
--- Description: Types de structures (Mouvement, Association, Regroupement)
--- ============================================================================
-CREATE TABLE structure_type (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nom VARCHAR(100) NOT NULL UNIQUE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- TABLE: structure_list
--- Description: Liste des structures possibles
--- ============================================================================
-CREATE TABLE structure_list (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nom VARCHAR(100) NOT NULL,
-    id_structure_type INT NOT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL,
-    FOREIGN KEY (id_structure_type) REFERENCES structure_type(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- TABLE: structure
--- Description: Instances de structures aux différents échelons
--- ============================================================================
-CREATE TABLE structure (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nom VARCHAR(100) NOT NULL,
-    id_echellon_eclesiastique INT NOT NULL,
-    id_line INT NOT NULL COMMENT 'ID du continent, nation, province, ville, ou paroisse',
-    id_adresse INT,
-    id_contact INT,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL,
-    FOREIGN KEY (id_echellon_eclesiastique) REFERENCES echellon_eclesiastique(id) ON DELETE RESTRICT,
-    FOREIGN KEY (id_adresse) REFERENCES adresse(id) ON DELETE SET NULL,
-    FOREIGN KEY (id_contact) REFERENCES contact(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- TABLE: fonction_list
--- Description: Liste des fonctions possibles dans les structures
--- ============================================================================
-CREATE TABLE fonction_list (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nom VARCHAR(100) NOT NULL UNIQUE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- TABLE: structure_fonction
--- Description: Attribution de fonctions aux fidèles dans les structures
--- ============================================================================
-CREATE TABLE structure_fonction (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_structure INT NOT NULL,
-    id_fonction INT NOT NULL,
-    id_fidele INT NOT NULL,
-    date_debut DATE NOT NULL,
-    date_fin DATE,
-    est_suspendu BOOLEAN DEFAULT FALSE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL,
-    FOREIGN KEY (id_structure) REFERENCES structure(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_fonction) REFERENCES fonction_list(id) ON DELETE RESTRICT,
-    FOREIGN KEY (id_fidele) REFERENCES fidele(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
 -- INDEX DE PERFORMANCE
 -- ============================================================================
 CREATE INDEX idx_fidele_nom ON fidele(nom);
 CREATE INDEX idx_fidele_grade ON fidele(id_grade);
-CREATE INDEX idx_structure_echellon ON structure(id_echellon_eclesiastique);
-CREATE INDEX idx_structure_fonction_structure ON structure_fonction(id_structure);
-CREATE INDEX idx_structure_fonction_fidele ON structure_fonction(id_fidele);
 CREATE INDEX idx_adresse_nation ON adresse(id_nation);
 CREATE INDEX idx_adresse_document ON adresse(id_document_type, id_document);
 CREATE INDEX idx_contact_document ON contact(id_document_type, id_document);
 CREATE INDEX idx_fidele_est_supprimee ON fidele(est_supprimee);
-CREATE INDEX idx_structure_est_supprimee ON structure(est_supprimee);
 CREATE INDEX idx_contact_est_supprimee ON contact(est_supprimee);
 CREATE INDEX idx_adresse_est_supprimee ON adresse(est_supprimee);
 
@@ -533,22 +432,14 @@ INSERT INTO fonction_list (nom) VALUES ('Dirigeant technique');
 INSERT INTO fonction_list (nom) VALUES ('Chef de cellule');
 INSERT INTO fonction_list (nom) VALUES ('Chef de partition');
 
--- Échelons ecclésiastiques (hiérarchie)
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Général', NULL);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Continent', 1);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Nation', 2);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Province ou État', 3);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Ville', 4);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Paroisse', 5);
--- Types de structures
-INSERT INTO structure_type (nom) VALUES ('Mouvement');
-INSERT INTO structure_type (nom) VALUES ('Association');
-INSERT INTO structure_type (nom) VALUES ('Regroupement');
-
 -- Document types
 INSERT INTO document_type (nom, Document_key) VALUES ('FIDELE', 'FIDELE');
 INSERT INTO document_type (nom, Document_key) VALUES ('PAROISSE', 'PAROISSE');
-INSERT INTO document_type (nom, Document_key) VALUES ('STRUCTURE', 'STRUCTURE');
+INSERT INTO document_type (nom, Document_key) VALUES ('VILLE', 'VILLE');
+INSERT INTO document_type (nom, Document_key) VALUES ('PROVINCE', 'PROVINCE');
+INSERT INTO document_type (nom, Document_key) VALUES ('NATION', 'NATION');
+INSERT INTO document_type (nom, Document_key) VALUES ('CONTINENT', 'CONTINENT');
+INSERT INTO document_type (nom, Document_key) VALUES ('GENERALE', 'GENERALE');
 
 -- ============================================================================
 -- FIN DU SCRIPT DE CRÉATION
