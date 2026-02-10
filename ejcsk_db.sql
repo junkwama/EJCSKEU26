@@ -124,6 +124,7 @@ CREATE TABLE fidele (
     date_bapteme DATE DEFAULT NULL,
     id_fidele_type INT,
     id_grade INT,
+    id_paroisse INT DEFAULT NULL,
     tel VARCHAR(20),
     password VARCHAR(255) DEFAULT NULL,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -131,7 +132,21 @@ CREATE TABLE fidele (
     est_supprimee BOOLEAN DEFAULT FALSE,
     date_suppression TIMESTAMP NULL,
     FOREIGN KEY (id_grade) REFERENCES grade(id) ON DELETE RESTRICT,
-    FOREIGN KEY (id_fidele_type) REFERENCES fidele_type(id) ON DELETE RESTRICT
+    FOREIGN KEY (id_fidele_type) REFERENCES fidele_type(id) ON DELETE RESTRICT,
+    FOREIGN KEY (id_paroisse) REFERENCES paroisse(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- TABLE: paroisse
+-- Description: Paroisses de l'Église Kimbaguiste
+-- ============================================================================
+CREATE TABLE paroisse (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(100) NOT NULL UNIQUE,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    est_supprimee BOOLEAN DEFAULT FALSE,
+    date_suppression TIMESTAMP NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
@@ -519,12 +534,12 @@ INSERT INTO fonction_list (nom) VALUES ('Chef de cellule');
 INSERT INTO fonction_list (nom) VALUES ('Chef de partition');
 
 -- Échelons ecclésiastiques (hiérarchie)
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Continent', NULL);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Nation', 1);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Province ou État', 2);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Ville', 3);
-INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Paroisse', 4);
-
+INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Général', NULL);
+INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Continent', 1);
+INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Nation', 2);
+INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Province ou État', 3);
+INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Ville', 4);
+INSERT INTO echellon_eclesiastique (nom, id_echellon_parent) VALUES ('Paroisse', 5);
 -- Types de structures
 INSERT INTO structure_type (nom) VALUES ('Mouvement');
 INSERT INTO structure_type (nom) VALUES ('Association');

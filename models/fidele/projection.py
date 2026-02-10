@@ -6,6 +6,7 @@ from models.constants.projections import FideleTypeProjFlat, GradeProjFlat
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
 from utils.utils import PydanticField
+from models.paroisse import Paroisse
 
 class FideleProjFlat(BaseModel):
     """
@@ -42,6 +43,7 @@ class FideleProjFlat(BaseModel):
 
     id_grade: GradeEnum 
     id_fidele_type: FideleTypeEnum
+    id_paroisse: int | None = None
 
     est_supprimee: bool
     date_suppression: datetime | None = None
@@ -60,5 +62,7 @@ class FideleProjShallow(FideleProjFlat):
     # Flat versions of related fields (with their nested fields)
     grade: GradeProjFlat
     fidele_type: FideleTypeProjFlat
+    paroisse: Paroisse | None = None
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None
+    
