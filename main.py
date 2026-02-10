@@ -25,6 +25,7 @@ from routers.utils.http_utils import (
 
 # Routers
 from routers.fidele import fidele_router
+from routers.paroisse import paroisse_router
 from routers.adresse import adresse_router
 from routers.contact import contact_router
 from routers.constants import constants_router
@@ -106,6 +107,7 @@ def server_status():
 
 # Attaching routers
 app.include_router(fidele_router, prefix="/fidele")
+app.include_router(paroisse_router, prefix="/paroisse")
 app.include_router(adresse_router, prefix="/addresse")
 app.include_router(contact_router, prefix="/contact")
 app.include_router(constants_router, prefix="/constants")

@@ -110,6 +110,19 @@ CREATE TABLE grade (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
+-- TABLE: paroisse
+-- Description: Paroisses de l'Église Kimbaguiste
+-- ============================================================================
+CREATE TABLE paroisse (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(100) NOT NULL UNIQUE,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    est_supprimee BOOLEAN DEFAULT FALSE,
+    date_suppression TIMESTAMP NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
 -- TABLE: fidele
 -- ============================================================================
 CREATE TABLE fidele (
@@ -134,19 +147,6 @@ CREATE TABLE fidele (
     FOREIGN KEY (id_grade) REFERENCES grade(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_fidele_type) REFERENCES fidele_type(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_paroisse) REFERENCES paroisse(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- TABLE: paroisse
--- Description: Paroisses de l'Église Kimbaguiste
--- ============================================================================
-CREATE TABLE paroisse (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nom VARCHAR(100) NOT NULL UNIQUE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
