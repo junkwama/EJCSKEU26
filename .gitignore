@@ -2,3 +2,4 @@
 .env.local
 __pycache__/
 zz_prompts/
+*.prompt.txt
