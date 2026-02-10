@@ -12,10 +12,10 @@ USE ejcsk;
 CREATE TABLE continent (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL UNIQUE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
@@ -25,10 +25,10 @@ CREATE TABLE nation (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL UNIQUE,
     id_continent INT NOT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
@@ -57,10 +57,10 @@ CREATE TABLE adresse (
     avenue VARCHAR(100),
     numero VARCHAR(50),
     adresse_complete TEXT DEFAULT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
+    est_supprimee TINYINT(1) DEFAULT 0,
     date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_document_type) REFERENCES document_type(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_nation) REFERENCES nation(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -76,10 +76,10 @@ CREATE TABLE contact (
     tel2 VARCHAR(20) DEFAULT NULL,
     whatsapp VARCHAR(20) DEFAULT NULL,
     email VARCHAR(100) DEFAULT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
+    est_supprimee TINYINT(1) DEFAULT 0,
     date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_document_type) REFERENCES document_type(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -90,10 +90,10 @@ CREATE TABLE contact (
 CREATE TABLE fidele_type (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL UNIQUE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
@@ -103,10 +103,10 @@ CREATE TABLE fidele_type (
 CREATE TABLE grade (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL UNIQUE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
@@ -116,10 +116,10 @@ CREATE TABLE grade (
 CREATE TABLE paroisse (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL UNIQUE,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
-    date_suppression TIMESTAMP NULL
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
@@ -140,14 +140,112 @@ CREATE TABLE fidele (
     id_paroisse INT DEFAULT NULL,
     tel VARCHAR(20),
     password VARCHAR(255) DEFAULT NULL,
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    est_supprimee BOOLEAN DEFAULT FALSE,
+    est_supprimee TINYINT(1) DEFAULT 0,
     date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_grade) REFERENCES grade(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_fidele_type) REFERENCES fidele_type(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_paroisse) REFERENCES paroisse(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- MOUVEMENTS / FONCTIONS (ASSOCIATIONS ET DIRECTIONS)
+-- ============================================================================
+
+-- ============================================================================
+-- TABLE: mouvement_association
+-- Description: Type d'association (chorale, scouts, ...)
+-- ============================================================================
+CREATE TABLE mouvement_association (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(255) NOT NULL,
+    code VARCHAR(100) DEFAULT NULL,
+    description TEXT DEFAULT NULL,
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- TABLE: fonction_list
+-- Description: Catalogue des fonctions (president, secretaire, ...)
+-- ============================================================================
+CREATE TABLE fonction_list (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(150) NOT NULL,
+    description TEXT DEFAULT NULL,
+    ordre INT DEFAULT NULL,
+    id_document_type INT DEFAULT NULL,
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_document_type) REFERENCES document_type(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- TABLE: direction
+-- Description: Instance d'un mouvement à un echelon/entité (pattern polymorphique)
+-- ============================================================================
+CREATE TABLE direction (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_mouvement INT NOT NULL,
+    id_document_type INT NOT NULL,
+    id_document INT NOT NULL,
+    nom VARCHAR(255) DEFAULT NULL,
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_mouvement) REFERENCES mouvement_association(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE INDEX idx_direction_doc ON direction (id_document_type, id_document);
+CREATE INDEX idx_direction_mouvement ON direction (id_mouvement);
+
+-- ============================================================================
+-- TABLE: fidele_fonction
+-- Description: Mandat d'un fidèle occupant une fonction dans une direction
+-- ============================================================================
+CREATE TABLE fidele_fonction (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_fidele INT NOT NULL,
+    id_direction INT NOT NULL,
+    id_fonction INT NOT NULL,
+    date_debut DATE NOT NULL,
+    date_fin DATE DEFAULT NULL,
+    est_actif TINYINT(1) DEFAULT 1,
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_fidele) REFERENCES fidele(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_direction) REFERENCES direction(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_fonction) REFERENCES fonction_list(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE INDEX idx_fidele_fonction_current ON fidele_fonction (id_direction, est_actif);
+CREATE INDEX idx_fidele_fonction_fidele ON fidele_fonction (id_fidele);
+
+-- ============================================================================
+-- TABLE: fidele_mouvement_association
+-- Description: Adhésion / appartenance d'un fidèle à une direction
+-- ============================================================================
+CREATE TABLE fidele_mouvement_association (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_fidele INT NOT NULL,
+    id_direction INT NOT NULL,
+    date_adhesion DATE NOT NULL,
+    date_sortie DATE DEFAULT NULL,
+    est_supprimee TINYINT(1) DEFAULT 0,
+    date_suppression TIMESTAMP NULL,
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_fidele) REFERENCES fidele(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_direction) REFERENCES direction(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE INDEX idx_fidele_mouvement_fidele ON fidele_mouvement_association (id_fidele);
+CREATE INDEX idx_fidele_mouvement_direction ON fidele_mouvement_association (id_direction);
 
 -- ============================================================================
 -- INDEX DE PERFORMANCE
@@ -160,6 +258,11 @@ CREATE INDEX idx_contact_document ON contact(id_document_type, id_document);
 CREATE INDEX idx_fidele_est_supprimee ON fidele(est_supprimee);
 CREATE INDEX idx_contact_est_supprimee ON contact(est_supprimee);
 CREATE INDEX idx_adresse_est_supprimee ON adresse(est_supprimee);
+CREATE INDEX idx_mouvement_association_est_supprimee ON mouvement_association(est_supprimee);
+CREATE INDEX idx_fonction_list_est_supprimee ON fonction_list(est_supprimee);
+CREATE INDEX idx_direction_est_supprimee ON direction(est_supprimee);
+CREATE INDEX idx_fidele_fonction_est_supprimee ON fidele_fonction(est_supprimee);
+CREATE INDEX idx_fidele_mouvement_association_est_supprimee ON fidele_mouvement_association(est_supprimee);
 
 -- ============================================================================
 -- DONNÉES INITIALES RECOMMANDÉES
