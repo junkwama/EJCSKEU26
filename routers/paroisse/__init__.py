@@ -87,7 +87,7 @@ async def get_paroisse_adresse_complete_data_by_id(
 async def create_paroisse(
     paroisse_data: ParoisseBase,
     session: Annotated[AsyncSession, Depends(get_session)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjFlat | ParoisseProjShallow:
     """
     Créer une nouvelle paroisse
@@ -147,7 +147,7 @@ async def get_paroisse(
     id: Annotated[int, Path(..., description="Paroisse's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjFlat | ParoisseProjShallow:
     """
     Recuperer une paroisse par son Id
@@ -171,7 +171,7 @@ async def update_paroisse(
     paroisse_data: ParoisseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjFlat | ParoisseProjShallow:
     """
     Modifier une paroisse existante
@@ -206,7 +206,7 @@ async def update_paroisse(
 async def restore_paroisse(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjShallow | ParoisseProjFlat:
     """
     Restaurer une paroisse supprimée (soft deleted)
@@ -265,7 +265,7 @@ async def delete_paroisse(
 async def get_paroisse_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> AdresseProjShallow | AdresseProjFlat:
     """
     Récupérer l'adresse associée à une paroisse
@@ -289,7 +289,7 @@ async def update_paroisse_adresse(
     adresse_data: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjShallow | ParoisseProjFlat:
     """
     Modifier l'adresse associée à un fidele
@@ -376,7 +376,7 @@ async def delete_paroisse_adresse(
 async def get_paroisse_contact(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ContactProjShallow | ContactProjFlat:
     """
     Récupérer le contact associée à un paroisse
@@ -403,7 +403,7 @@ async def update_paroisse_contact(
     contact_data: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ContactProjShallow | ContactProjFlat:
     """
     Modifier le contact associé à un paroisse

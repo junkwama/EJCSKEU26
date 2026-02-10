@@ -48,7 +48,7 @@ async def get_adresse_complete_data_by_id(id: int, session: AsyncSession) -> Adr
 async def create_adresse(
     adresse_data: AdresseBase,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> AdresseProjShallow | AdresseProjFlat:
     """
     Créer une nouvelle adresse
@@ -81,7 +81,7 @@ async def get_adresse(
     id: Annotated[int, Path(..., description="ID de l'adresse")],
     session: Annotated[AsyncSession, Depends(get_session)],
     adresse: Annotated[Adresse, Depends(address_required)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> AdresseProjShallow | AdresseProjFlat:
     """
     Récupérer une adresse par son ID
@@ -103,7 +103,7 @@ async def update_adresse(
     adresse_data: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     adresse: Annotated[Adresse, Depends(address_required)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> AdresseProjShallow | AdresseProjFlat:
     """
     Modifier une adresse existante

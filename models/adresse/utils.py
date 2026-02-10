@@ -6,6 +6,31 @@ from pydantic import BaseModel
 from models.constants.types import DocumentTypeEnum
 from utils.utils import PydanticField, SQLModelField
 
+# ---- NATION FIELDS CONFIG -----#
+NATION_FIELDS_CONFIG = {
+    "id_continent": {
+        "ge": 1,
+        "description": "Identifiant du continent",
+    },
+    "nom": {
+        "max_length": 100,
+        "examples": ["République Démocratique du Congo"],
+        "description": "Nom de la nation",
+    },
+}
+
+# ---- NATION BASE MODEL -----#
+class NationBase(SQLModel):
+    """Modèle de base pour créer une nation"""
+    id_continent: int = SQLModelField(..., **NATION_FIELDS_CONFIG["id_continent"], foreign_key="continent.id")
+    nom: str = PydanticField(..., **NATION_FIELDS_CONFIG["nom"])
+
+# ---- NATION UPDATE MODEL -----#
+class NationUpdate(BaseModel):
+    """Modèle pour les mises à jour de nation (tous les champs optionnels)"""
+    id_continent: int | None = SQLModelField(None, **NATION_FIELDS_CONFIG["id_continent"], foreign_key="continent.id")
+    nom: str | None = PydanticField(None, **NATION_FIELDS_CONFIG["nom"])
+
 # ---- ADRESSE FIELDS CONFIG -----#
 ADRESSE_FIELDS_CONFIG = {
     "id_document_type": {

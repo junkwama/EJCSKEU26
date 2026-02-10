@@ -80,7 +80,7 @@ async def get_fidele_adresse_complete_data_by_id(
 async def create_fidele(
     fidele_data: FideleBase,
     session: Annotated[AsyncSession, Depends(get_session)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> FideleProjShallow | FideleProjFlat:
     """
     Créer un nouveau fidele
@@ -134,7 +134,7 @@ async def get_fidele(
     id: Annotated[int, Path(..., description="Fidele's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[AsyncSession, Depends(required_fidele)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> FideleProjShallow | FideleProjFlat:
     """
     Recuperer un fidele par son Id avec ses relations
@@ -156,7 +156,7 @@ async def update_fidele(
     fidele_data: FideleUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> FideleProjShallow | FideleProjFlat:
     """
     Modifier un fidele existant
@@ -179,10 +179,11 @@ async def update_fidele(
     await session.commit()
 
     # Re-query with eager loads so relationships are available for projection
-    fidele_complete_data = await get_fidele_complete_data_by_id(fidele.id, session, proj)
+    if proj == ProjDepth.SHALLOW:
+        fidele = await get_fidele_complete_data_by_id(fidele.id, session, proj)
 
     # Return the updated fidele with related objects already loaded
-    projected_response = apply_projection(fidele_complete_data, FideleProjFlat, FideleProjShallow, proj)
+    projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
     return send200(projected_response)
 
 
@@ -190,7 +191,7 @@ async def update_fidele(
 async def restore_fidele(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> FideleProjShallow | FideleProjFlat:
     """
     Restaurer un fidele supprimé (soft delete)
@@ -245,7 +246,7 @@ async def delete_fidele(
 async def get_fidele_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> AdresseProjShallow | AdresseProjFlat:
     """
     Récupérer l'adresse associée à un fidele
@@ -269,7 +270,7 @@ async def update_fidele_adresse(
     adresse_data: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> AdresseProjShallow | AdresseProjFlat:
     """
     Modifier l'adresse associée à un fidele
@@ -357,7 +358,7 @@ async def delete_fidele_adresse(
 async def get_fidele_contact(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ContactProjShallow | ContactProjFlat:
     """
     Récupérer le contact associée à un fidele
@@ -386,7 +387,7 @@ async def update_fidele_contact(
     contact_data: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ContactProjShallow | ContactProjFlat:
     """
     Modifier le contact associé à un fidele

@@ -40,3 +40,36 @@ class FideleTypeProjFlat(BaseModel):
 
     class Config:
         from_attributes = True
+
+# ============================================================================
+# MOUVEMENT ASSOCIATION PROJECTIONS
+# ============================================================================
+
+class MouvementAssociationProjFlat(BaseModel):
+    """Projection plate de MouvementAssociation - sans relations"""
+    id: int
+    nom: str
+    code: str | None
+    description: str | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+
+    class Config:
+        from_attributes = True
+
+# ============================================================================
+# FONCTION LIST PROJECTIONS
+# ============================================================================
+
+class FonctionProjFlat(BaseModel):
+    """Projection plate de Fonction - sans relations"""
+    id: int
+    nom: str
+    description: str | None
+    ordre: int | None
+    id_document_type: int | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+
+    class Config:
+        from_attributes = True
