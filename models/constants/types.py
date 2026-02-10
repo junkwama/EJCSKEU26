@@ -8,7 +8,11 @@ class DocumentTypeEnum(int, Enum):
     """Enum pour les types de documents"""
     FIDELE = 1
     PAROISSE = 2
-    STRUCTURE = 3
+    VILLE = 3
+    PROVINCE = 4
+    NATION = 5
+    CONTINENT = 6
+    GENERALE = 7
 
 
 # ============================================================================
