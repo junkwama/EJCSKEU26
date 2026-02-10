@@ -43,8 +43,8 @@ async def get_fidele_complete_data_by_id(
         statement = statement.options(
             selectinload(Fidele.grade),
             selectinload(Fidele.fidele_type),
+            selectinload(Fidele.paroisse),
             selectinload(Fidele.contact),
-            selectinload(Fidele.adresse),
             (
                 selectinload(Fidele.adresse)
                 .selectinload(Adresse.nation)
@@ -64,6 +64,7 @@ async def get_fidele_adresse_complete_data_by_id(
         .where(
             (Adresse.id_document_type == DocumentTypeEnum.FIDELE.value)
             & (Adresse.id_document == fidele_id)
+            & (Adresse.est_supprimee == False)
         )
     )
     if proj == ProjDepth.SHALLOW:
@@ -88,15 +89,19 @@ async def create_fidele(
         fidele_data (FideleBase): Les données du fidele à créer
     """
     # Create new fidele instance
-    new_fidele = Fidele(**fidele_data.model_dump(mode="json"))
+    fidele = Fidele(**fidele_data.model_dump(mode="json"))
 
     # Add to session and commit
-    session.add(new_fidele)
+    session.add(fidele)
     await session.commit()
-    await session.refresh(new_fidele)
+    await session.refresh(fidele)
+
+    # re-fetch to get related data for shallow projection
+    if proj == ProjDepth.SHALLOW:
+        fidele = await get_fidele_complete_data_by_id(fidele.id, session, proj)
 
     # Return the created fidele
-    projected_response = apply_projection(new_fidele, FideleProjFlat, FideleProjShallow, proj)
+    projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
     return send200(projected_response)
 
 
@@ -104,16 +109,17 @@ async def create_fidele(
 async def get_fideles(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
-    limit: Annotated[
-        int, Query(le=Config.MAX_ITEMS_PER_PAGE)
-    ] = Config.MAX_ITEMS_PER_PAGE,
+    limit: int = Query(Config.PREVIEW_LIST_ITEM_NUMBER, ge=1, le=Config.MAX_ITEMS_PER_PAGE),
 ) -> List[FideleProjFlat]:
     """
     Recuperer la liste des fideles avec pagination
     """
     # Fetching main data
     statement = (
-        select(Fidele).where(Fidele.est_supprimee == False).offset(offset).limit(limit)
+        select(Fidele)
+        .where(Fidele.est_supprimee == False)
+        .offset(offset)
+        .limit(limit)
     )
 
     result = await session.exec(statement)
@@ -127,6 +133,7 @@ async def get_fideles(
 async def get_fidele(
     id: Annotated[int, Path(..., description="Fidele's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
+    fidele: Annotated[AsyncSession, Depends(required_fidele)],
     proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
 ) -> FideleProjShallow | FideleProjFlat:
     """
@@ -135,12 +142,9 @@ async def get_fidele(
     ARGS:
         id (int): L'Id du fidele à récupérer
     """
-    # Fetching the requested fidele WITH eager loading
-    fidele = await get_fidele_complete_data_by_id(id, session, proj)
-
-    # If there's no matching fidele
-    if not fidele:
-        return send404(["body", "id"], "Fidele non existant")
+    # Fetching related data for the shallow projection
+    if proj == ProjDepth.SHALLOW:
+        fidele = await get_fidele_complete_data_by_id(id, session, proj)
 
     # Return the fidele as projection
     projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
@@ -206,9 +210,10 @@ async def restore_fidele(
         await session.commit()
 
     # Re-query with eager loads so relationships are available for projection
-    fidele_complete_data = await get_fidele_complete_data_by_id(fidele.id, session, proj)
+    if proj == ProjDepth.SHALLOW:
+        fidele = await get_fidele_complete_data_by_id(fidele.id, session, proj)
 
-    projected_response = apply_projection(fidele_complete_data, FideleProjFlat, FideleProjShallow, proj)
+    projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
     return send200(projected_response)
 
 @fidele_router.delete("/{id}")
@@ -231,12 +236,11 @@ async def delete_fidele(
     session.add(fidele)
     await session.commit()
 
-    return send200(FideleProjFlat.model_validate(fidele))
+    projected_fidele = FideleProjFlat.model_validate(fidele)
+    return send200(projected_fidele)
 
 
 # ========================== ADRESSE ENDPOINTS ==========================
-
-
 @fidele_router.get("/{id}/adresse")
 async def get_fidele_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -348,6 +352,33 @@ async def delete_fidele_adresse(
 
 
 # ========================== CONTACT ENDPOINTS ==========================
+
+@fidele_router.get("/{id}/contact")
+async def get_fidele_contact(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    fidele: Annotated[Fidele, Depends(required_fidele)],
+    proj: ProjDepth | None = Query(ProjDepth.SHALLOW),
+) -> ContactProjShallow | ContactProjFlat:
+    """
+    Récupérer le contact associée à un fidele
+
+    ARGS:
+        id (int): L'Id du fidele
+    """
+    # Query contact by document type (FIDELE=1) and fidele id
+    statement = select(Contact).where(
+        (Contact.id_document_type == DocumentTypeEnum.FIDELE.value)
+        & (Contact.id_document == fidele.id)
+        & (Contact.est_supprimee == False)
+    )
+    contact_result = await session.exec(statement)
+    contact = contact_result.first()
+
+    if not contact:
+        return send404(["query", "id"], "Contact non trouvé pour ce fidele")
+
+    projected_response = apply_projection(contact, ContactProjFlat, ContactProjShallow, proj)
+    return send200(projected_response)
 
 
 @fidele_router.put("/{id}/contact")

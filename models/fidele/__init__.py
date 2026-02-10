@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from sqlmodel import Relationship
 from sqlalchemy import and_
 from sqlalchemy.orm import relationship
@@ -14,7 +14,6 @@ from models.utils.utils import BaseModelClass
 if TYPE_CHECKING:
     from models.paroisse import Paroisse
 
-
 class Fidele(FideleBase, BaseModelClass, table=True):
     """Modèle de la table Fidele"""
     # OVERWRITTING TO AVOID ENUM TYPE ISSUES
@@ -25,7 +24,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     # Relationships
     grade: Grade = Relationship()
     fidele_type: FideleType = Relationship()
-    paroisse: Paroisse | None = Relationship(back_populates="fideles")
+    paroisse: Optional["Paroisse"] = Relationship(back_populates="fideles")
     contact: Contact | None = Relationship(
         sa_relationship=relationship(
             "Contact",
