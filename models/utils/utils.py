@@ -10,7 +10,7 @@ from modules.oauth2.utils import password_context
 
 class BaseModelClass(SQLModel):
     """Base class with soft delete support"""
-    id: int = SQLModelField(primary_key=True)
+    id: int | None = SQLModelField(default=None, primary_key=True)
     est_supprimee: bool = PydanticField(
         default=False, 
         description="Est supprimée (soft delete)"

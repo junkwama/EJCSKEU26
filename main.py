@@ -108,7 +108,7 @@ def server_status():
 # Attaching routers
 app.include_router(fidele_router, prefix="/fidele")
 app.include_router(paroisse_router, prefix="/paroisse")
-app.include_router(adresse_router, prefix="/addresse")
+app.include_router(adresse_router, prefix="/adresse")
 app.include_router(contact_router, prefix="/contact")
 app.include_router(constant_router, prefix="/constant")
 

@@ -27,8 +27,8 @@ async def contact_required(
 
 async def get_contact_complete_data_by_id(id: int, session: AsyncSession) -> Contact:
     statement = select(Contact).where(
-       (Contact.id == id) & 
-       (Contact.est_supprime == False)
+        (Contact.id == id) & 
+        (Contact.est_supprimee == False)
     )
     result = await session.exec(statement)
     contact = result.first()
