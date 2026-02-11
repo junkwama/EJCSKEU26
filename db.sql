@@ -245,7 +245,7 @@ CREATE INDEX idx_fidele_fonction_fidele ON fidele_fonction (id_fidele);
 CREATE TABLE fidele_structure (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_fidele INT NOT NULL,
-    id_direction INT NOT NULL,
+    id_structure INT NOT NULL,
     date_adhesion DATE DEFAULT NULL,
     date_sortie DATE DEFAULT NULL,
     est_supprimee TINYINT(1) DEFAULT 0,
@@ -253,10 +253,10 @@ CREATE TABLE fidele_structure (
     date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_fidele) REFERENCES fidele(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_direction) REFERENCES direction(id) ON DELETE CASCADE
+    FOREIGN KEY (id_structure) REFERENCES structure(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE INDEX idx_fidele_structure_fidele ON fidele_structure (id_fidele);
-CREATE INDEX idx_fidele_structure_direction ON fidele_structure (id_direction);
+CREATE INDEX idx_fidele_structure_structure ON fidele_structure (id_structure);
 
 -- ============================================================================
 -- INDEX DE PERFORMANCE
