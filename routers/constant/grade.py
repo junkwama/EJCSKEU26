@@ -14,7 +14,7 @@ from routers.utils.http_utils import send200
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
-grades_router = APIRouter(prefix="/grades", tags=["Constants - Grades"])
+grade_router = APIRouter(prefix="/grade", tags=["Constants - Grades"])
 
 
 # ============================================================================
@@ -31,7 +31,7 @@ async def required_grade(
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
-@grades_router.get("")
+@grade_router.get("")
 async def get_grades(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> List[GradeProjFlat]:
@@ -49,7 +49,7 @@ async def get_grades(
     return send200(grades_proj)
 
 
-@grades_router.post("")
+@grade_router.post("")
 async def create_grade(
     grade_data: GradeBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -71,7 +71,7 @@ async def create_grade(
     return send200(GradeProjFlat.model_validate(grade))
 
 
-@grades_router.put("/{id}")
+@grade_router.put("/{id}")
 async def update_grade(
     grade_data: GradeUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],

@@ -14,7 +14,7 @@ from routers.utils.http_utils import send200
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
-document_types_router = APIRouter(prefix="/types_document", tags=["Constants - Document Types"])
+document_type_router = APIRouter(prefix="/types_document", tags=["Constants - Document Types"])
 
 
 # ============================================================================
@@ -31,7 +31,7 @@ async def required_document_type(
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
-@document_types_router.get("")
+@document_type_router.get("")
 async def get_document_types(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> List[DocumentTypeProjFlat]:
@@ -49,7 +49,7 @@ async def get_document_types(
     return send200(document_types_proj)
 
 
-@document_types_router.post("")
+@document_type_router.post("")
 async def create_document_type(
     document_type_data: DocumentTypeBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -71,7 +71,7 @@ async def create_document_type(
     return send200(DocumentTypeProjFlat.model_validate(document_type))
 
 
-@document_types_router.put("/{id}")
+@document_type_router.put("/{id}")
 async def update_document_type(
     document_type_data: DocumentTypeUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],

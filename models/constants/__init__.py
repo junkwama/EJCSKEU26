@@ -1,7 +1,9 @@
+from sqlmodel import Relationship
 from models.utils.utils import BaseModelClass
+from utils.utils import SQLModelField
 from models.constants.utils import (
     DocumentTypeBase, GradeBase, FideleTypeBase,
-    MouvementAssociationBase, FonctionBase
+    StructureBase, FonctionBase, StructureTypeBase
 )
 
 
@@ -28,9 +30,20 @@ class FideleType(FideleTypeBase, BaseModelClass, table=True):
         from_attributes = True
 
 
-class MouvementAssociation(MouvementAssociationBase, BaseModelClass, table=True):
-    """Modèle de la table MouvementAssociation - Type d'association (chorale, scouts, ...)"""
-    __tablename__ = "mouvement_association"
+class StructureType(StructureTypeBase, BaseModelClass, table=True):
+    """Modèle de la table StructureType - Types de structures (Mouvement, Association, Service)"""
+    __tablename__ = "structure_type"
+
+    class Config:
+        from_attributes = True
+
+
+class Structure(StructureBase, BaseModelClass, table=True):
+    """Modèle de la table Structure - Types de structures (Mouvement, Association, Service)"""
+    __tablename__ = "structure"
+
+    id_structure_type: int = SQLModelField(..., foreign_key="structure_type.id")
+    structure_type: StructureType = Relationship()
 
     class Config:
         from_attributes = True

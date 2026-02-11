@@ -17,7 +17,7 @@ from utils.constants import ProjDepth
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
-nations_router = APIRouter(prefix="/nations", tags=["Constants - Nations"])
+nation_router = APIRouter(prefix="/nation", tags=["Constants - Nations"])
 
 
 # ============================================================================
@@ -48,7 +48,7 @@ async def get_nation_complete_data_by_id(
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
-@nations_router.get("")
+@nation_router.get("")
 async def get_nations(
     session: Annotated[AsyncSession, Depends(get_session)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -74,7 +74,7 @@ async def get_nations(
     return send200(projected_nations)
 
 
-@nations_router.post("")
+@nation_router.post("")
 async def create_nation(
     nation_data: NationBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -102,7 +102,7 @@ async def create_nation(
     projected_response = apply_projection(nation, NationProjFlat, NationProjShallow, proj)
     return send200(projected_response)
 
-@nations_router.put("/{id}")
+@nation_router.put("/{id}")
 async def update_nation(
     nation_data: NationUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],

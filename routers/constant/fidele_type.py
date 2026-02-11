@@ -14,7 +14,7 @@ from routers.utils.http_utils import send200
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
-fidele_types_router = APIRouter(prefix="/fidele_types", tags=["Constants - Fidele Types"])
+fidele_type_router = APIRouter(prefix="/fidele_type", tags=["Constants - Fidele Types"])
 
 
 # ============================================================================
@@ -31,7 +31,7 @@ async def required_fidele_type(
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
-@fidele_types_router.get("")
+@fidele_type_router.get("")
 async def get_fidele_types(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> List[FideleTypeProjFlat]:
@@ -49,7 +49,7 @@ async def get_fidele_types(
     return send200(fidele_types_proj)
 
 
-@fidele_types_router.post("")
+@fidele_type_router.post("")
 async def create_fidele_type(
     fidele_type_data: FideleTypeBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -71,7 +71,7 @@ async def create_fidele_type(
     return send200(FideleTypeProjFlat.model_validate(fidele_type))
 
 
-@fidele_types_router.put("/{id}")
+@fidele_type_router.put("/{id}")
 async def update_fidele_type(
     fidele_type_data: FideleTypeUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],

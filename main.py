@@ -28,7 +28,7 @@ from routers.fidele import fidele_router
 from routers.paroisse import paroisse_router
 from routers.adresse import adresse_router
 from routers.contact import contact_router
-from routers.constants import constants_router
+from routers.constant import constant_router
 
 # Lifespan event handler
 @asynccontextmanager
@@ -110,7 +110,7 @@ app.include_router(fidele_router, prefix="/fidele")
 app.include_router(paroisse_router, prefix="/paroisse")
 app.include_router(adresse_router, prefix="/addresse")
 app.include_router(contact_router, prefix="/contact")
-app.include_router(constants_router, prefix="/constants")
+app.include_router(constant_router, prefix="/constant")
 
 
 # start the app with: uvicorn main:app --reload

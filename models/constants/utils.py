@@ -2,7 +2,6 @@ from sqlmodel import SQLModel
 from pydantic import BaseModel
 from utils.utils import PydanticField
 
-
 # ============================================================================
 # DOCUMENT TYPE FIELDS CONFIG
 # ============================================================================
@@ -37,19 +36,34 @@ FIDELE_TYPE_FIELDS_CONFIG = {
 
 
 # ============================================================================
-# MOUVEMENT ASSOCIATION FIELDS CONFIG
+# STRUCTURE TYPE FIELDS CONFIG
 # ============================================================================
-MOUVEMENT_ASSOCIATION_FIELDS_CONFIG = {
+STRUCTURE_TYPE_FIELDS_CONFIG = {
+    "nom": {
+        "max_length": 100,
+        "description": "Nom du type de structure (Mouvement, Association, Service)"
+    }
+}
+
+
+# ============================================================================
+# STRUCTURE FIELDS CONFIG
+# ============================================================================
+STRUCTURE_FIELDS_CONFIG = {
     "nom": {
         "max_length": 255,
-        "description": "Nom du mouvement/association"
+        "description": "Nom de la structure"
     },
     "code": {
         "max_length": 100,
-        "description": "Code du mouvement/association"
+        "description": "Code de la structure"
     },
     "description": {
-        "description": "Description du mouvement/association"
+        "description": "Description de la structure"
+    },
+    "id_structure_type": {
+        "ge": 1,
+        "description": "Type de structure (Mouvement, Association, Service)"
     }
 }
 
@@ -108,18 +122,31 @@ class FideleTypeUpdate(BaseModel):
 
 
 # ============================================================================
-# MOUVEMENT ASSOCIATION BASE & UPDATE
+# STRUCTURE TYPE BASE & UPDATE
 # ============================================================================
-class MouvementAssociationBase(SQLModel):
-    nom: str = PydanticField(..., **MOUVEMENT_ASSOCIATION_FIELDS_CONFIG["nom"])
-    code: str | None = PydanticField(None, **MOUVEMENT_ASSOCIATION_FIELDS_CONFIG["code"])
-    description: str | None = PydanticField(None, **MOUVEMENT_ASSOCIATION_FIELDS_CONFIG["description"])
+class StructureTypeBase(SQLModel):
+    nom: str = PydanticField(..., **STRUCTURE_TYPE_FIELDS_CONFIG["nom"])
 
 
-class MouvementAssociationUpdate(BaseModel):
-    nom: str | None = PydanticField(None, **MOUVEMENT_ASSOCIATION_FIELDS_CONFIG["nom"])
-    code: str | None = PydanticField(None, **MOUVEMENT_ASSOCIATION_FIELDS_CONFIG["code"])
-    description: str | None = PydanticField(None, **MOUVEMENT_ASSOCIATION_FIELDS_CONFIG["description"])
+class StructureTypeUpdate(BaseModel):
+    nom: str | None = PydanticField(None, **STRUCTURE_TYPE_FIELDS_CONFIG["nom"])
+
+
+# ============================================================================
+# STRUCTURE BASE & UPDATE
+# ============================================================================
+class StructureBase(SQLModel):
+    nom: str = PydanticField(..., **STRUCTURE_FIELDS_CONFIG["nom"])
+    code: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["code"])
+    description: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["description"])
+    id_structure_type: int = PydanticField(..., **STRUCTURE_FIELDS_CONFIG["id_structure_type"], foreign_key="structure_type.id")
+
+
+class StructureUpdate(BaseModel):
+    nom: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["nom"])
+    code: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["code"])
+    description: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["description"])
+    id_structure_type: int | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["id_structure_type"], foreign_key="structure_type.id")
 
 
 # ============================================================================

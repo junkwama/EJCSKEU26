@@ -14,7 +14,7 @@ from routers.utils.http_utils import send200
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
-fonctions_router = APIRouter(prefix="/fonctions", tags=["Constants - Fonctions"])
+fonction_router = APIRouter(prefix="/fonction", tags=["Constants - Fonctions"])
 
 
 # ============================================================================
@@ -31,7 +31,7 @@ async def required_fonction(
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
-@fonctions_router.get("")
+@fonction_router.get("")
 async def get_fonctions(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> List[FonctionProjFlat]:
@@ -49,7 +49,7 @@ async def get_fonctions(
     return send200(fonctions_proj)
 
 
-@fonctions_router.post("")
+@fonction_router.post("")
 async def create_fonction(
     fonction_data: FonctionBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -71,7 +71,7 @@ async def create_fonction(
     return send200(FonctionProjFlat.model_validate(fonction))
 
 
-@fonctions_router.put("/{id}")
+@fonction_router.put("/{id}")
 async def update_fonction(
     fonction_data: FonctionUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],

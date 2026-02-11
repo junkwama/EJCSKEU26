@@ -42,20 +42,41 @@ class FideleTypeProjFlat(BaseModel):
         from_attributes = True
 
 # ============================================================================
-# MOUVEMENT ASSOCIATION PROJECTIONS
+# STRUCTURE TYPE PROJECTIONS
 # ============================================================================
 
-class MouvementAssociationProjFlat(BaseModel):
-    """Projection plate de MouvementAssociation - sans relations"""
+class StructureTypeProjFlat(BaseModel):
+    """Projection plate de StructureType - sans relations"""
+    id: int
+    nom: str
+
+    class Config:
+        from_attributes = True
+
+# ============================================================================
+# STRUCTURE PROJECTIONS
+# ============================================================================
+
+class StructureProjFlat(BaseModel):
+    """Projection plate de Structure - sans relations"""
     id: int
     nom: str
     code: str | None
     description: str | None
+    id_structure_type: int
     est_supprimee: bool
     date_suppression: datetime | None
 
     class Config:
         from_attributes = True
+
+class StructureProjShallow(StructureProjFlat):
+    """Projection shallow de Structure - avec relations"""
+    structure_type: StructureTypeProjFlat
+
+    class Config:
+        from_attributes = True
+
 
 # ============================================================================
 # FONCTION LIST PROJECTIONS

@@ -36,3 +36,14 @@ class FideleTypeEnum(int, Enum):
     """Enum pour les types de fidèles"""
     PRATIQUANT = 1
     SYMPATHISANT = 2
+
+
+# ============================================================================
+# STRUCTURE TYPE ENUMS
+# ============================================================================
+
+class StructureTypeEnum(int, Enum):
+    """Enum pour les types de structures"""
+    MOUVEMENT = 1
+    ASSOCIATION = 2
+    SERVICE = 3
