@@ -25,7 +25,7 @@ async def address_required(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> AdresseProjShallow:
     """Get and validate Adresse exists"""
-    return await check_resource_exists(Adresse, id, session)
+    return await check_resource_exists(Adresse, session, filters={"id": id})
 
 async def get_adresse_complete_data_by_id(id: int, session: AsyncSession) -> Adresse:
     statement = (

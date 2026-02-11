@@ -25,7 +25,7 @@ async def required_fidele_type(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> FideleType:
     """Get and validate FideleType exists"""
-    return await check_resource_exists(FideleType, id, session)
+    return await check_resource_exists(FideleType, session, filters={"id": id})
 
 
 # ============================================================================

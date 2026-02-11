@@ -25,7 +25,7 @@ async def required_fonction(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Fonction:
     """Get and validate Fonction exists"""
-    return await check_resource_exists(Fonction, id, session)
+    return await check_resource_exists(Fonction, session, filters={"id": id})
 
 
 # ============================================================================

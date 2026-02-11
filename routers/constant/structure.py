@@ -17,7 +17,7 @@ from utils.constants import ProjDepth
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
-structure_router = APIRouter(prefix="/structures", tags=["Constants - Structures"])
+structure_router = APIRouter(prefix="/structure", tags=["Constants - Structures"])
 
 
 # ============================================================================
@@ -28,7 +28,7 @@ async def required_structure(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Structure:
     """Get and validate Structure exists"""
-    return await check_resource_exists(Structure, id, session)
+    return await check_resource_exists(Structure, session, filters={"id": id})
 
 async def get_structure_complete_data_by_id(id: int, session: AsyncSession, proj: ProjDepth = ProjDepth.SHALLOW) -> Structure:
     statement = select(Structure).where(

@@ -40,7 +40,7 @@ async def required_paroisse(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Paroisse:
     """Get and validate Paroisse exists"""
-    return await check_resource_exists(Paroisse, id, session)
+    return await check_resource_exists(Paroisse, session, filters={"id": id})
 
 
 async def get_paroisse_complete_data_by_id(

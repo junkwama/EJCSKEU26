@@ -1,58 +1,55 @@
-from typing import Type, TypeVar
+from typing import Any, Mapping, Type, TypeVar
+
 from fastapi import HTTPException
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel import SQLModel, select
 from sqlalchemy import and_
+from sqlmodel import SQLModel, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
+T = TypeVar("T", bound=SQLModel)
 
-T = TypeVar('T', bound=SQLModel)
 
 async def check_resource_exists(
     model: Type[T],
-    resource_id: int,
     session: AsyncSession,
-    id_field: str = "id",
+    *,
+    filters: Mapping[str, Any] | None = None,
 ) -> T:
     """
-    Generic dependency to check if a resource exists in the database
-    
+    Generic dependency to check if a resource exists using MANY columns.
+
     Args:
         model: SQLModel class to query
-        resource_id: ID value to check
         session: Database session
-        id_field: Field name to match against (default: "id")
-    
-    Returns:
-        Resource object if found
-    
-    Raises:
-        HTTPException 404 if not found (using send404 error format)
-    
-    Example in route:
-        @router.get("/{id}")
-        async def get_user(
-            user: Annotated["User", Depends(
-                lambda id, s=Depends(get_session): check_resource_exists(User, id, s)
-            )]
-        ):
-            return send200(UserProj.model_validate(user))
-    """
-    statement = (
-        select(model).where(
-            and_(
-                getattr(model, id_field) == resource_id,
-                getattr(model, "est_supprime") == False if hasattr(model, "est_supprime") else True
-            )
+        filters: mapping of model field names to values (combined with AND)
+
+    Example:
+        await check_resource_exists(
+            Direction,
+            session,
+            filters={"id_structure": 1, "id_document_type": 5, "id_document": 10},
         )
-    )
+    """
+    if not filters:
+        raise ValueError("check_resource_exists requires at least one filter")
+
+    clauses = []
+    for field_name, value in filters.items():
+        if not hasattr(model, field_name):
+            raise ValueError(f"{model.__name__} has no field '{field_name}'")
+        clauses.append(getattr(model, field_name) == value)
+
+    # soft-delete filter (if model has est_supprimee)
+    if hasattr(model, "est_supprimee"):
+        clauses.append(getattr(model, "est_supprimee") == False)
+
+    statement = select(model).where(and_(*clauses))
     result = await session.exec(statement)
     resource = result.first()
-    
+
     if not resource:
-        # Raise HTTPException with send404 format as detail
         raise HTTPException(
             status_code=404,
-            detail=f"{model.__name__} with {id_field}={resource_id} not found"
+            detail=f"{model.__name__} not found for filters={dict(filters)}",
         )
-    
+
     return resource

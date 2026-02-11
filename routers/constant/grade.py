@@ -25,7 +25,7 @@ async def required_grade(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Grade:
     """Get and validate Grade exists"""
-    return await check_resource_exists(Grade, id, session)
+    return await check_resource_exists(Grade, session, filters={"id": id})
 
 
 # ============================================================================

@@ -28,7 +28,7 @@ async def required_nation(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Nation:
     """Get and validate Nation exists"""
-    return await check_resource_exists(Nation, id, session)
+    return await check_resource_exists(Nation, session, filters={"id": id})
 
 async def get_nation_complete_data_by_id(
     id: int, 

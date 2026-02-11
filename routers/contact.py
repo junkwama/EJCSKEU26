@@ -23,7 +23,7 @@ async def contact_required(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Contact:
     """Get and validate Contact exists"""
-    return await check_resource_exists(Contact, id, session)
+    return await check_resource_exists(Contact, session, filters={"id": id})
 
 async def get_contact_complete_data_by_id(id: int, session: AsyncSession) -> Contact:
     statement = select(Contact).where(

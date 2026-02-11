@@ -25,7 +25,7 @@ async def required_document_type(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> DocumentType:
     """Get and validate DocumentType exists"""
-    return await check_resource_exists(DocumentType, id, session)
+    return await check_resource_exists(DocumentType, session, filters={"id": id})
 
 
 # ============================================================================
