@@ -537,6 +537,7 @@ INSERT INTO fonction_list (nom) VALUES ('Chef de partition');
 
 -- Document types
 INSERT INTO document_type (nom, Document_key) VALUES ('FIDELE', 'FIDELE');
+INSERT INTO document_type (nom, Document_key) VALUES ('STRUCTURE', 'STRUCTURE');
 INSERT INTO document_type (nom, Document_key) VALUES ('PAROISSE', 'PAROISSE');
 INSERT INTO document_type (nom, Document_key) VALUES ('VILLE', 'VILLE');
 INSERT INTO document_type (nom, Document_key) VALUES ('PROVINCE', 'PROVINCE');

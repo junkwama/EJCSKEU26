@@ -274,7 +274,7 @@ async def get_paroisse_adresse(
         id (int): L'Id de la paroisse
     """
 
-    # Query adresse by document type (PAROISSE=2) and paroisse id
+    # Query adresse by document type (PAROISSE=3) and paroisse id
     adresse = await get_paroisse_adresse_complete_data_by_id(paroisse.id, session, proj)
 
     if not adresse:
@@ -299,7 +299,7 @@ async def update_paroisse_adresse(
         adresse_data (AdresseUpdate): Les données mises à jour de l'adresse
     """
 
-    # Query adresse by document type (PAROISSE=2) and paroisse id
+    # Query adresse by document type (PAROISSE=3) and paroisse id
     adresse = await get_paroisse_adresse_complete_data_by_id(paroisse.id, session, proj)
 
     if not adresse:
@@ -384,7 +384,7 @@ async def get_paroisse_contact(
     ARGS:
         id (int): L'Id du paroisse
     """
-    # Query contact by document type (PAROISSE=2) and paroisse id
+    # Query contact by document type (PAROISSE=3) and paroisse id
     statement = select(Contact).where(
         (Contact.id_document_type == DocumentTypeEnum.PAROISSE.value)
         & (Contact.id_document == paroisse.id)
@@ -413,7 +413,7 @@ async def update_paroisse_contact(
         contact_data (ContactUpdate): Les données mises à jour du contact
     """
 
-    # Query contact by document type (PAROISSE=2) and paroisse id
+    # Query contact by document type (PAROISSE=3) and paroisse id
     statement = select(Contact).where(
         (Contact.id_document_type == DocumentTypeEnum.PAROISSE.value)
         & (Contact.id_document == paroisse.id)
