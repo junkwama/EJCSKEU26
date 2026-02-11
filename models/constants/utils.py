@@ -19,6 +19,7 @@ DOCUMENT_TYPE_FIELDS_CONFIG = {
 GRADE_FIELDS_CONFIG = {
     "nom": {
         "max_length": 100,
+        "examples": ["Kengi"],
         "description": "Nom du grade ecclésiastique"
     }
 }
@@ -30,6 +31,7 @@ GRADE_FIELDS_CONFIG = {
 FIDELE_TYPE_FIELDS_CONFIG = {
     "nom": {
         "max_length": 100,
+        "examples": ["Sympatisant"],
         "description": "Nom du type de fidèle"
     }
 }
@@ -41,6 +43,7 @@ FIDELE_TYPE_FIELDS_CONFIG = {
 STRUCTURE_TYPE_FIELDS_CONFIG = {
     "nom": {
         "max_length": 100,
+        "examples": ["Mouvement"],
         "description": "Nom du type de structure (Mouvement, Association, Service)"
     }
 }
@@ -52,19 +55,25 @@ STRUCTURE_TYPE_FIELDS_CONFIG = {
 STRUCTURE_FIELDS_CONFIG = {
     "nom": {
         "max_length": 255,
-        "description": "Nom de la structure"
+        "examples": ["Union de la Jeunesse Kimbanguiste"],
+        "description": "Nom de la structure",
     },
     "code": {
         "max_length": 100,
-        "description": "Code de la structure"
+        "examples": ["UJKI"],
+        "description": "Code de la structure",
     },
     "description": {
-        "description": "Description de la structure"
+        "examples": [
+            "Union de la Jeunesse Kimbanguiste, mouvement de jeunesse de l'Eglise Kimbanguiste"
+        ],
+        "description": "Description de la structure",
     },
     "id_structure_type": {
         "ge": 1,
-        "description": "Type de structure (Mouvement, Association, Service)"
-    }
+        "examples": [2],
+        "description": "Type de structure (Mouvement, Association, Service)",
+    },
 }
 
 
@@ -74,17 +83,23 @@ STRUCTURE_FIELDS_CONFIG = {
 FONCTION_FIELDS_CONFIG = {
     "nom": {
         "max_length": 150,
-        "description": "Nom de la fonction"
+        "examples": ["Président"],
+        "description": "Nom de la fonction",
     },
     "description": {
-        "description": "Description de la fonction"
+        "examples": ["Président d'une structure"],
+        "description": "Description de la fonction",
     },
     "ordre": {
-        "description": "Ordre d'affichage de la fonction"
+        "ge": 0,
+        "examples": [1],
+        "description": "Ordre d'affichage de la fonction",
     },
     "id_document_type": {
-        "description": "Type de document auquel s'applique cette fonction (optionnel)"
-    }
+        "ge": 1,
+        "examples": [1],
+        "description": "Type de document auquel s'applique cette fonction (optionnel)",
+    },
 }
 
 
@@ -139,14 +154,14 @@ class StructureBase(SQLModel):
     nom: str = PydanticField(..., **STRUCTURE_FIELDS_CONFIG["nom"])
     code: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["code"])
     description: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["description"])
-    id_structure_type: int = PydanticField(..., **STRUCTURE_FIELDS_CONFIG["id_structure_type"], foreign_key="structure_type.id")
+    id_structure_type: int = PydanticField(..., **STRUCTURE_FIELDS_CONFIG["id_structure_type"])
 
 
 class StructureUpdate(BaseModel):
     nom: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["nom"])
     code: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["code"])
     description: str | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["description"])
-    id_structure_type: int | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["id_structure_type"], foreign_key="structure_type.id")
+    id_structure_type: int | None = PydanticField(None, **STRUCTURE_FIELDS_CONFIG["id_structure_type"])
 
 
 # ============================================================================
