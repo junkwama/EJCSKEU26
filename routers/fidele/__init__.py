@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 # Local modules
 from core.config import Config
 from models.constants.types import DocumentTypeEnum
-from models.fidele import Fidele
+from models.fidele import Fidele, FideleStructure
 from models.fidele.utils import FideleBase, FideleUpdate
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
 from models.adresse import Adresse, Nation
@@ -19,21 +19,12 @@ from models.contact import Contact
 from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
-from routers.dependencies import check_resource_exists
+from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
 
 fidele_router = APIRouter()
-
-
-async def required_fidele(
-    id: Annotated[int, Path(..., description="Fidele's ID")],
-    session: Annotated[AsyncSession, Depends(get_session)],
-) -> Fidele:
-    """Get and validate Fidele exists"""
-    return await check_resource_exists(Fidele, id, session)
-
 
 async def get_fidele_complete_data_by_id(
     id: int, session: AsyncSession, proj: ProjDepth = ProjDepth.SHALLOW
@@ -49,7 +40,8 @@ async def get_fidele_complete_data_by_id(
                 selectinload(Fidele.adresse)
                 .selectinload(Adresse.nation)
                 .selectinload(Nation.continent)
-            )
+            ),
+            selectinload(Fidele.structures).selectinload(FideleStructure.structure),
         )
 
     result = await session.exec(statement)
@@ -470,3 +462,9 @@ async def delete_fidele_contact(
     await session.commit()
 
     return send200(contact_proj)
+
+
+# ========================== STRUCTURE ENDPOINTS ==========================
+from routers.fidele.structures import fidele_structures_router
+
+fidele_router.include_router(fidele_structures_router)

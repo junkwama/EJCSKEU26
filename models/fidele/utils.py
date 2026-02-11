@@ -1,7 +1,7 @@
 # External modules
 from sqlmodel import SQLModel
 from pydantic import BaseModel
-from datetime import date, datetime
+from datetime import date
 from models.constants.types import GradeEnum, FideleTypeEnum
 from utils.utils import PydanticField
 
@@ -104,18 +104,21 @@ class FideleUpdate(BaseModel):
     id_paroisse: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_paroisse"])
 
 
-class FideleStructureBase(BaseModel):
+class FideleStructureBase(SQLModel):
     id_fidele: int = PydanticField(...)
     id_structure: int = PydanticField(...)
-    date_adhesion: datetime | None = PydanticField(..., description="Date d'adhésion")
-    date_sortie: datetime | None = PydanticField(None, description="Date de sortie")
+    date_adhesion: date | None = PydanticField(None, description="Date d'adhésion")
+    date_sortie: date | None = PydanticField(None, description="Date de sortie")
 
     class Config:
         from_attributes = True
 
 class FideleStructureUpdate(BaseModel):
-    date_adhesion: datetime | None = PydanticField(..., description="Date d'adhésion")
-    date_sortie: datetime | None = PydanticField(None, description="Date de sortie")
+    date_adhesion: date | None = PydanticField(None, description="Date d'adhésion")
+    date_sortie: date | None = PydanticField(None, description="Date de sortie")
 
     class Config:
         from_attributes = True
+
+class FideleStructureCreate(FideleStructureUpdate):
+    id_structure: int

@@ -80,8 +80,8 @@ class FideleStructureProjFlat(BaseModel):
     id: int
     id_fidele: int
     id_structure: int
-    date_adhesion: datetime | None
-    date_sortie: datetime | None
+    date_adhesion: date | None
+    date_sortie: date | None
     est_supprimee: bool
     date_suppression: datetime | None
     date_creation: datetime
