@@ -10,7 +10,6 @@ from models.constants.utils import (
 if TYPE_CHECKING:
     from models.fidele import FideleStructure
 
-
 class DocumentType(DocumentTypeBase, BaseModelClass, table=True):
     """Modèle de la table DocumentType - Types de documents (FIDELE, PAROISSE, STRUCTURE)"""
     __tablename__ = "document_type"
@@ -40,7 +39,7 @@ class StructureType(StructureTypeBase, BaseModelClass, table=True):
 
     class Config:
         from_attributes = True
-
+        
 
 class Structure(StructureBase, BaseModelClass, table=True):
     """Modèle de la table Structure - Types de structures (Mouvement, Association, Service)"""
@@ -51,7 +50,7 @@ class Structure(StructureBase, BaseModelClass, table=True):
     
     # N-N relationship with Fidele through FideleStructure
     fideles: List["FideleStructure"] = Relationship(back_populates="structure")
-
+    
     class Config:
         from_attributes = True
         
