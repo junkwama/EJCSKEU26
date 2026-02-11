@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 from sqlmodel import Relationship
 from sqlalchemy import and_
 from sqlalchemy.orm import relationship
@@ -7,8 +7,8 @@ from models.constants.types import DocumentTypeEnum
 from utils.utils import SQLModelField
 from models.adresse import Adresse
 from models.contact import Contact
-from models.fidele.utils import FideleBase
-from models.constants import FideleType, Grade
+from models.fidele.utils import FideleBase, FideleStructureBase
+from models.constants import FideleType, Grade, Structure
 from models.utils.utils import BaseModelClass
 
 if TYPE_CHECKING:
@@ -48,6 +48,24 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             uselist=False
         )
     )
+    
+    # N-N relationship with Structure through FideleStructure
+    structures: List["FideleStructure"] = Relationship(back_populates="fidele")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleStructure(FideleStructureBase,BaseModelClass,  table=True):
+    """Modèle de la table FideleStructure - Table dell'Association entre fidele et structure"""
+    __tablename__ = "fidele_structure"
+
+    id_fidele: int = SQLModelField(..., foreign_key="fidele.id")
+    id_structure: int = SQLModelField(..., foreign_key="structure.id")
+
+    # Relationships
+    fidele: Fidele = Relationship(back_populates="structures")
+    structure: Structure = Relationship(back_populates="fideles")
 
     class Config:
         from_attributes = True

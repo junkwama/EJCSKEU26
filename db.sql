@@ -150,10 +150,6 @@ CREATE TABLE fidele (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================
--- MOUVEMENTS / FONCTIONS (ASSOCIATIONS ET DIRECTIONS)
--- ============================================================================
-
--- ============================================================================
 -- TABLE: structure_type
 -- Description: Types de structures (Mouvement, Association, Service)
 -- ============================================================================
@@ -250,7 +246,7 @@ CREATE TABLE fidele_structure (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_fidele INT NOT NULL,
     id_direction INT NOT NULL,
-    date_adhesion DATE NOT NULL,
+    date_adhesion DATE DEFAULT NULL,
     date_sortie DATE DEFAULT NULL,
     est_supprimee TINYINT(1) DEFAULT 0,
     date_suppression TIMESTAMP NULL,
@@ -524,6 +520,11 @@ INSERT INTO nation (nom, id_continent) VALUES ('Wallis-et-Futuna', 6);
 INSERT INTO nation (nom, id_continent) VALUES ('Yémen', 5);
 INSERT INTO nation (nom, id_continent) VALUES ('Zambie', 1);
 INSERT INTO nation (nom, id_continent) VALUES ('Zimbabwe', 1);
+
+-- Types de structure
+INSERT INTO structure_type (nom) VALUES ('Mouvement');
+INSERT INTO structure_type (nom) VALUES ('Association');
+INSERT INTO structure_type (nom) VALUES ('Service');
 
 -- Types de fidèles
 INSERT INTO fidele_type (nom) VALUES ('Pratiquant');

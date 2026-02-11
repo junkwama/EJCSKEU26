@@ -1,8 +1,9 @@
+from typing import List
 from pydantic import BaseModel, computed_field
 from datetime import date, datetime
 
 from models.adresse.projection import AdresseProjShallow
-from models.constants.projections import FideleTypeProjFlat, GradeProjFlat
+from models.constants.projections import FideleTypeProjFlat, GradeProjFlat, StructureProjFlat
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
 from utils.utils import PydanticField
@@ -65,4 +66,49 @@ class FideleProjShallow(FideleProjFlat):
     paroisse: Paroisse | None = None
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None
+    structures: List["FideleStructureProjShallow"] = []
     
+    class Config:
+        from_attributes = True
+
+## ============================================================================
+## FIDELE-STRUCTURE PROJECTIONS
+## ============================================================================
+
+class FideleStructureProjFlat(BaseModel):
+    """Projection plate de FideleStructure - sans relations"""
+    id: int
+    id_fidele: int
+    id_structure: int
+    date_adhesion: datetime | None
+    date_sortie: datetime | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FideleStructureProjShallow(FideleStructureProjFlat):
+    """Projection shallow de FideleStructure - avec les relations Fidele et Structure"""
+    fidele: FideleProjFlat
+    structure: StructureProjFlat
+
+    class Config:
+        from_attributes = True
+
+class FideleStructureProjShallowWithFideleData(FideleStructureProjFlat):
+    """Projection shallow de FideleStructure - Contenant Fidele"""
+    fidele: FideleProjFlat
+
+    class Config:
+        from_attributes = True
+
+class FideleStructureProjShallowWithStructureData(FideleStructureProjFlat):
+    """Projection shallow de FideleStructure - Contenant Structure"""
+    structure: StructureProjFlat
+
+    class Config:
+        from_attributes = True

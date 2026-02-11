@@ -49,6 +49,8 @@ class StructureTypeProjFlat(BaseModel):
     """Projection plate de StructureType - sans relations"""
     id: int
     nom: str
+    est_supprimee: bool
+    date_suppression: datetime | None
 
     class Config:
         from_attributes = True
