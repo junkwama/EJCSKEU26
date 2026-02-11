@@ -24,7 +24,7 @@ from routers.utils.http_utils import send200, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
 
-fidele_router = APIRouter(tags=["Fidele"])
+fidele_router = APIRouter()
 
 
 async def required_fidele(
@@ -76,7 +76,7 @@ async def get_fidele_adresse_complete_data_by_id(
     return result.first()
 
 
-@fidele_router.post("")
+@fidele_router.post("", tags=["Fidele"])
 async def create_fidele(
     fidele_data: FideleBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -105,7 +105,7 @@ async def create_fidele(
     return send200(projected_response)
 
 
-@fidele_router.get("")
+@fidele_router.get("", tags=["Fidele"])
 async def get_fideles(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
@@ -129,7 +129,7 @@ async def get_fideles(
     return send200([FideleProjFlat.model_validate(fidele) for fidele in fidele_list])
 
 
-@fidele_router.get("/{id}")
+@fidele_router.get("/{id}", tags=["Fidele"])
 async def get_fidele(
     id: Annotated[int, Path(..., description="Fidele's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -151,7 +151,7 @@ async def get_fidele(
     return send200(projected_response)
 
 
-@fidele_router.put("/{id}")
+@fidele_router.put("/{id}", tags=["Fidele"])
 async def update_fidele(
     fidele_data: FideleUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -187,7 +187,7 @@ async def update_fidele(
     return send200(projected_response)
 
 
-@fidele_router.put("/{id}/restore")
+@fidele_router.put("/{id}/restore", tags=["Fidele"])
 async def restore_fidele(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
@@ -217,7 +217,7 @@ async def restore_fidele(
     projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
     return send200(projected_response)
 
-@fidele_router.delete("/{id}")
+@fidele_router.delete("/{id}", tags=["Fidele"])
 async def delete_fidele(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
@@ -242,7 +242,7 @@ async def delete_fidele(
 
 
 # ========================== ADRESSE ENDPOINTS ==========================
-@fidele_router.get("/{id}/adresse")
+@fidele_router.get("/{id}/adresse", tags=["Fidele - Adresse"])
 async def get_fidele_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
@@ -265,7 +265,7 @@ async def get_fidele_adresse(
     return send200(projected_response)
 
 
-@fidele_router.put("/{id}/adresse")
+@fidele_router.put("/{id}/adresse", tags=["Fidele - Adresse"])
 async def update_fidele_adresse(
     adresse_data: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -324,7 +324,7 @@ async def update_fidele_adresse(
     return send200(projected_response)
 
 
-@fidele_router.delete("/{id}/adresse")
+@fidele_router.delete("/{id}/adresse", tags=["Fidele - Adresse"])
 async def delete_fidele_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
@@ -354,7 +354,7 @@ async def delete_fidele_adresse(
 
 # ========================== CONTACT ENDPOINTS ==========================
 
-@fidele_router.get("/{id}/contact")
+@fidele_router.get("/{id}/contact", tags=["Fidele - Contact"])
 async def get_fidele_contact(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
@@ -382,7 +382,7 @@ async def get_fidele_contact(
     return send200(projected_response)
 
 
-@fidele_router.put("/{id}/contact")
+@fidele_router.put("/{id}/contact", tags=["Fidele - Contact"])
 async def update_fidele_contact(
     contact_data: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -442,7 +442,7 @@ async def update_fidele_contact(
     return send200(projected_response)
 
 
-@fidele_router.delete("/{id}/contact")
+@fidele_router.delete("/{id}/contact", tags=["Fidele - Contact"])
 async def delete_fidele_contact(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],

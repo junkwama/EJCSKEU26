@@ -33,7 +33,7 @@ from routers.utils.http_utils import send200, send404
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
-paroisse_router = APIRouter(tags=["Paroisse"])
+paroisse_router = APIRouter()
 
 async def required_paroisse(
     id: Annotated[int, Path(..., description="Paroisse's ID")],
@@ -83,7 +83,7 @@ async def get_paroisse_adresse_complete_data_by_id(
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
-@paroisse_router.post("")
+@paroisse_router.post("", tags=["Paroisse"])
 async def create_paroisse(
     paroisse_data: ParoisseBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -111,7 +111,7 @@ async def create_paroisse(
     return send200(projected_response)
 
 
-@paroisse_router.get("")
+@paroisse_router.get("", tags=["Paroisse"])
 async def get_paroisses(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
@@ -142,7 +142,7 @@ async def get_paroisses(
     return send200(projected_paroisse_list)
 
 
-@paroisse_router.get("/{id}")
+@paroisse_router.get("/{id}", tags=["Paroisse"])
 async def get_paroisse(
     id: Annotated[int, Path(..., description="Paroisse's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -166,7 +166,7 @@ async def get_paroisse(
     return send200(projected_response)
 
 
-@paroisse_router.put("/{id}")
+@paroisse_router.put("/{id}", tags=["Paroisse"])
 async def update_paroisse(
     paroisse_data: ParoisseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -202,7 +202,7 @@ async def update_paroisse(
     projected_response = apply_projection(paroisse, ParoisseProjFlat, ParoisseProjShallow, proj)
     return send200(projected_response)
 
-@paroisse_router.put("/{id}/restore")
+@paroisse_router.put("/{id}/restore", tags=["Paroisse"])
 async def restore_paroisse(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
@@ -234,7 +234,7 @@ async def restore_paroisse(
 
 
 
-@paroisse_router.delete("/{id}")
+@paroisse_router.delete("/{id}", tags=["Paroisse"])
 async def delete_paroisse(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
@@ -261,7 +261,7 @@ async def delete_paroisse(
 # ADRESSE ENDPOINTS
 # ============================================================================
 
-@paroisse_router.get("/{id}/adresse")
+@paroisse_router.get("/{id}/adresse", tags=["Paroisse - Adresse"])
 async def get_paroisse_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
@@ -284,7 +284,7 @@ async def get_paroisse_adresse(
     return send200(projected_response)
 
 
-@paroisse_router.put("/{id}/adresse")
+@paroisse_router.put("/{id}/adresse", tags=["Paroisse - Adresse"])
 async def update_paroisse_adresse(
     adresse_data: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -341,7 +341,7 @@ async def update_paroisse_adresse(
     return send200(projected_response)
 
 
-@paroisse_router.delete("/{id}/adresse")
+@paroisse_router.delete("/{id}/adresse", tags=["Paroisse - Adresse"])
 async def delete_paroisse_adresse(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
@@ -372,7 +372,7 @@ async def delete_paroisse_adresse(
 # CONTACT ENDPOINTS
 # ============================================================================
 
-@paroisse_router.get("/{id}/contact")
+@paroisse_router.get("/{id}/contact", tags=["Paroisse - Contact"])
 async def get_paroisse_contact(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
@@ -398,7 +398,7 @@ async def get_paroisse_contact(
     return send200(projected_response)
 
 
-@paroisse_router.put("/{id}/contact")
+@paroisse_router.put("/{id}/contact", tags=["Paroisse - Contact"])
 async def update_paroisse_contact(
     contact_data: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -459,7 +459,7 @@ async def update_paroisse_contact(
     return send200(projected_response)
 
 
-@paroisse_router.delete("/{id}/contact")
+@paroisse_router.delete("/{id}/contact", tags=["Paroisse - Contact"])
 async def delete_paroisse_contact(
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
