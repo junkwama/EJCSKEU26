@@ -226,7 +226,7 @@ CREATE TABLE direction_fonction (
     id_fonction INT NOT NULL,
     date_debut DATE NOT NULL,
     date_fin DATE DEFAULT NULL,
-    est_actif TINYINT(1) DEFAULT 1,
+    est_actif TINYINT(1) DEFAULT 1, -- Actif (encours) si date_fin est NULL ou dans le futur 
     est_suspendu TINYINT(1) DEFAULT 0,
     est_supprimee TINYINT(1) DEFAULT 0,
     date_suppression TIMESTAMP NULL,
