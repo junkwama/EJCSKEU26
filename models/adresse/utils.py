@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 # Local modules
 from models.constants.types import DocumentTypeEnum
-from utils.utils import PydanticField, SQLModelField
+from utils.utils import PydanticField
 
 # ---- NATION FIELDS CONFIG -----#
 NATION_FIELDS_CONFIG = {
@@ -22,28 +22,31 @@ NATION_FIELDS_CONFIG = {
 # ---- NATION BASE MODEL -----#
 class NationBase(SQLModel):
     """Modèle de base pour créer une nation"""
-    id_continent: int = SQLModelField(..., **NATION_FIELDS_CONFIG["id_continent"], foreign_key="continent.id")
+    id_continent: int = PydanticField(..., **NATION_FIELDS_CONFIG["id_continent"])
     nom: str = PydanticField(..., **NATION_FIELDS_CONFIG["nom"])
 
 # ---- NATION UPDATE MODEL -----#
 class NationUpdate(BaseModel):
     """Modèle pour les mises à jour de nation (tous les champs optionnels)"""
-    id_continent: int | None = SQLModelField(None, **NATION_FIELDS_CONFIG["id_continent"], foreign_key="continent.id")
+    id_continent: int | None = PydanticField(None, **NATION_FIELDS_CONFIG["id_continent"])
     nom: str | None = PydanticField(None, **NATION_FIELDS_CONFIG["nom"])
 
 # ---- ADRESSE FIELDS CONFIG -----#
 ADRESSE_FIELDS_CONFIG = {
     "id_document_type": {
         "ge": 1,
+        "examples": [1],
         "description": "Type de document (1=FIDELE, 2=PAROISSE, 3=STRUCTURE)",
     },
     "id_document": {
         "ge": 1,
+        "examples": [1],
         "description": "ID du document (fidele, paroisse, structure)",
     },
     "id_nation": {
         "ge": 1,
-        "le": 231,
+        "le": 231, # Nombre total de nations dans la base de données
+        "examples": [170],
         "description": "Identifiant de la nation. Ex: 170 pour la RDC",
     },
     "province_etat": {
@@ -82,9 +85,9 @@ ADRESSE_FIELDS_CONFIG = {
 # ---- ADRESSE BASE MODEL -----#
 class AdresseBase(SQLModel):
     """Modèle de base pour créer une adresse"""
-    id_document_type: DocumentTypeEnum = PydanticField(..., **ADRESSE_FIELDS_CONFIG["id_document_type"], foreign_key="document_type.id")
+    id_document_type: DocumentTypeEnum = PydanticField(..., **ADRESSE_FIELDS_CONFIG["id_document_type"])
     id_document: int = PydanticField(..., **ADRESSE_FIELDS_CONFIG["id_document"])
-    id_nation: int = SQLModelField(..., **ADRESSE_FIELDS_CONFIG["id_nation"], foreign_key="nation.id")
+    id_nation: int = PydanticField(..., **ADRESSE_FIELDS_CONFIG["id_nation"])
     province_etat: str = PydanticField(..., **ADRESSE_FIELDS_CONFIG["province_etat"])
     ville: str = PydanticField(..., **ADRESSE_FIELDS_CONFIG["ville"])
     commune: str | None = PydanticField(None, **ADRESSE_FIELDS_CONFIG["commune"])

@@ -24,6 +24,7 @@ class Adresse(AdresseBase, BaseModelClass, table=True):
     """Modèle de la table Adresse - Addresses avec support multi-document"""
 
     # ovveriride to avoid enum type issues for mysql
+    id_nation: int = SQLModelField(..., foreign_key="nation.id")
     id_document_type: int = SQLModelField(..., foreign_key="document_type.id")
     
     nation: Nation = Relationship()
