@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from core.db import get_session
-from models.constants import Structure
+from models.constants import Structure, StructureType
 from models.constants.utils import StructureBase, StructureUpdate
 from models.constants.projections import StructureProjFlat, StructureProjShallow
 from routers.dependencies import check_resource_exists
@@ -77,6 +77,10 @@ async def create_structure(
     Returns:
         La structure créée
     """
+    await check_resource_exists(
+        StructureType, session, filters={"id": int(structure_data.id_structure_type)}
+    )
+
     structure = Structure.model_validate(structure_data, from_attributes=True)
     session.add(structure)
     await session.commit()
@@ -113,6 +117,11 @@ async def update_structure(
         La structure mise à jour
     """
     update_data = structure_data.model_dump(mode="json", exclude_unset=True)
+
+    if "id_structure_type" in update_data and update_data["id_structure_type"] is not None:
+        await check_resource_exists(
+            StructureType, session, filters={"id": int(update_data["id_structure_type"]) }
+        )
     for field, value in update_data.items():
         setattr(structure, field, value)
 

@@ -20,11 +20,20 @@ from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
 from routers.fidele.utils import required_fidele
+from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
+from models.constants import DocumentType, FideleType, Grade
+from models.paroisse import Paroisse
 
 fidele_router = APIRouter()
+
+
+async def get_fidele_any_by_id(fidele_id: int, session: AsyncSession) -> Fidele | None:
+    statement = select(Fidele).where(Fidele.id == fidele_id)
+    result = await session.exec(statement)
+    return result.first()
 
 async def get_fidele_complete_data_by_id(
     id: int, session: AsyncSession, proj: ProjDepth = ProjDepth.SHALLOW
@@ -80,6 +89,13 @@ async def create_fidele(
     ARGS:
         fidele_data (FideleBase): Les données du fidele à créer
     """
+    await check_resource_exists(Grade, session, filters={"id": int(fidele_data.id_grade)})
+    await check_resource_exists(
+        FideleType, session, filters={"id": int(fidele_data.id_fidele_type)}
+    )
+    if fidele_data.id_paroisse is not None:
+        await check_resource_exists(Paroisse, session, filters={"id": fidele_data.id_paroisse})
+
     # Create new fidele instance
     fidele = Fidele(**fidele_data.model_dump(mode="json"))
 
@@ -158,8 +174,19 @@ async def update_fidele(
         fidele_data (FideleUpdate): Les données mises à jour du fidele
     """
 
-    # Update fields (only provided fields)
     update_data = fidele_data.model_dump(mode="json", exclude_unset=True)
+
+    if "id_grade" in update_data and update_data["id_grade"] is not None:
+        await check_resource_exists(Grade, session, filters={"id": int(update_data["id_grade"])})
+    if "id_fidele_type" in update_data and update_data["id_fidele_type"] is not None:
+        await check_resource_exists(
+            FideleType, session, filters={"id": int(update_data["id_fidele_type"]) }
+        )
+    if "id_paroisse" in update_data:
+        if update_data["id_paroisse"] is not None:
+            await check_resource_exists(Paroisse, session, filters={"id": update_data["id_paroisse"]})
+
+    # Update fields (only provided fields)
     for field, value in update_data.items():
         setattr(fidele, field, value)
 
@@ -181,8 +208,8 @@ async def update_fidele(
 
 @fidele_router.put("/{id}/restore", tags=["Fidele"])
 async def restore_fidele(
+    id: Annotated[int, Path(..., description="Fidele's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
-    fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> FideleProjShallow | FideleProjFlat:
     """
@@ -192,7 +219,11 @@ async def restore_fidele(
         id (int): L'Id du fidele à restaurer
     """
 
-    # If already is deleted, retore
+    fidele = await get_fidele_any_by_id(id, session)
+    if not fidele:
+        return send404(["path", "id"], "Fidele non trouvé")
+
+    # If already is deleted, restore
     if fidele.est_supprimee:
 
         fidele.est_supprimee = False
@@ -276,6 +307,11 @@ async def update_fidele_adresse(
     adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session, proj)
 
     if not adresse:
+        if adresse_data.id_nation is not None:
+            await check_resource_exists(Nation, session, filters={"id": adresse_data.id_nation})
+        await check_resource_exists(
+            DocumentType, session, filters={"id": DocumentTypeEnum.FIDELE.value}
+        )
         # Create new adresse if not found
         new_adresse = Adresse(
             id_document_type=DocumentTypeEnum.FIDELE.value,
@@ -296,6 +332,8 @@ async def update_fidele_adresse(
     update_data = adresse_data.model_dump(
         mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"}
     )
+    if "id_nation" in update_data and update_data["id_nation"] is not None:
+        await check_resource_exists(Nation, session, filters={"id": update_data["id_nation"]})
     for field, value in update_data.items():
         setattr(adresse, field, value)
 
@@ -398,6 +436,9 @@ async def update_fidele_contact(
     contact = contact_result.first()
 
     if not contact:
+        await check_resource_exists(
+            DocumentType, session, filters={"id": DocumentTypeEnum.FIDELE.value}
+        )
         # Create new contact if not found
         new_contact = Contact(
             id_document_type=DocumentTypeEnum.FIDELE.value,

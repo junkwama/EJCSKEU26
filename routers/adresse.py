@@ -10,6 +10,7 @@ from core.db import get_session
 from models.adresse import Adresse, Nation
 from models.adresse.utils import AdresseBase, AdresseUpdate
 from models.adresse.projection import AdresseProjFlat, AdresseProjShallow
+from models.constants import DocumentType
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200
 from routers.dependencies import check_resource_exists
@@ -55,6 +56,9 @@ async def create_adresse(
     
     Body: AdresseBase (contient id_document_type, id_document et autres champs)
     """
+    await check_resource_exists(Nation, session, filters={"id": adresse_data.id_nation})
+    await check_resource_exists(DocumentType, session, filters={"id": int(adresse_data.id_document_type)})
+
     # Create adresse
     adresse = Adresse(**adresse_data.model_dump(mode='json'))
     
@@ -108,8 +112,12 @@ async def update_adresse(
     """
     Modifier une adresse existante
     """
-    # Update fields
     update_data = adresse_data.model_dump(mode='json', exclude_unset=True)
+
+    if "id_nation" in update_data and update_data["id_nation"] is not None:
+        await check_resource_exists(Nation, session, filters={"id": update_data["id_nation"]})
+
+    # Update fields
     for field, value in update_data.items():
         setattr(adresse, field, value)
     

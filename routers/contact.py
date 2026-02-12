@@ -9,6 +9,7 @@ from core.db import get_session
 from models.contact import Contact
 from models.contact.utils import ContactBase, ContactUpdate
 from models.contact.projection import ContactProjFlat
+from models.constants import DocumentType
 from routers.utils.http_utils import send200, send404
 from routers.dependencies import check_resource_exists
 
@@ -49,6 +50,10 @@ async def create_contact(
 
     Body: ContactBase (contient id_document_type, id_document et autres champs)
     """
+    await check_resource_exists(
+        DocumentType, session, filters={"id": int(contact_data.id_document_type)}
+    )
+
     # Create contact
     contact = Contact(**contact_data.model_dump(mode="json"))
 

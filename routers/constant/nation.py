@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from core.db import get_session
-from models.adresse import Nation
+from models.adresse import Continent, Nation
 from models.adresse.utils import NationBase, NationUpdate
 from models.adresse.projection import NationProjFlat, NationProjShallow
 from routers.dependencies import check_resource_exists
@@ -89,6 +89,8 @@ async def create_nation(
     Returns:
         La nation créée avec ses relations
     """
+    await check_resource_exists(Continent, session, filters={"id": nation_data.id_continent})
+
     nation = Nation.model_validate(nation_data, from_attributes=True)
     session.add(nation)
     await session.commit()
@@ -120,6 +122,8 @@ async def update_nation(
         La nation mise à jour avec ses relations
     """
     update_data = nation_data.model_dump(mode="json", exclude_unset=True)
+    if "id_continent" in update_data and update_data["id_continent"] is not None:
+        await check_resource_exists(Continent, session, filters={"id": update_data["id_continent"]})
     for field, value in update_data.items():
         setattr(nation, field, value)
 

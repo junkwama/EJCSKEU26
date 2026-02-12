@@ -25,6 +25,7 @@ from models.contact.projection import ContactProjFlat, ContactProjShallow
 
 from utils.constants import ProjDepth
 from models.constants.types import DocumentTypeEnum
+from models.constants import DocumentType
 
 from routers.dependencies import check_resource_exists
 from routers.utils import apply_projection
@@ -34,6 +35,12 @@ from routers.utils.http_utils import send200, send404
 # ROUTER SETUP
 # ============================================================================
 paroisse_router = APIRouter()
+
+
+async def get_paroisse_any_by_id(paroisse_id: int, session: AsyncSession) -> Paroisse | None:
+    statement = select(Paroisse).where(Paroisse.id == paroisse_id)
+    result = await session.exec(statement)
+    return result.first()
 
 async def required_paroisse(
     id: Annotated[int, Path(..., description="Paroisse's ID")],
@@ -204,8 +211,8 @@ async def update_paroisse(
 
 @paroisse_router.put("/{id}/restore", tags=["Paroisse"])
 async def restore_paroisse(
+    id: Annotated[int, Path(..., description="Paroisse's Id")],
     session: Annotated[AsyncSession, Depends(get_session)],
-    paroisse: Annotated[Paroisse, Depends(required_paroisse)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjShallow | ParoisseProjFlat:
     """
@@ -215,7 +222,11 @@ async def restore_paroisse(
         id (int): L'Id de la paroisse à restaurer
     """
 
-    # If already is deleted, retore
+    paroisse = await get_paroisse_any_by_id(id, session)
+    if not paroisse:
+        return send404(["path", "id"], "Paroisse non trouvée")
+
+    # If already is deleted, restore
     if paroisse.est_supprimee:
         paroisse.est_supprimee = False
         paroisse.date_suppression = None
@@ -303,6 +314,11 @@ async def update_paroisse_adresse(
     adresse = await get_paroisse_adresse_complete_data_by_id(paroisse.id, session, proj)
 
     if not adresse:
+        if adresse_data.id_nation is not None:
+            await check_resource_exists(Nation, session, filters={"id": adresse_data.id_nation})
+        await check_resource_exists(
+            DocumentType, session, filters={"id": DocumentTypeEnum.PAROISSE.value}
+        )
         # Create new adresse if not found
         new_adresse = Adresse(
             id_document_type=DocumentTypeEnum.PAROISSE.value,
@@ -321,6 +337,8 @@ async def update_paroisse_adresse(
 
     # Update fields (exclude document identifiers)
     update_data = adresse_data.model_dump(mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"})
+    if "id_nation" in update_data and update_data["id_nation"] is not None:
+        await check_resource_exists(Nation, session, filters={"id": update_data["id_nation"]})
     for field, value in update_data.items():
         setattr(adresse, field, value)
 
@@ -423,6 +441,9 @@ async def update_paroisse_contact(
     contact = contact_result.first()
 
     if not contact:
+        await check_resource_exists(
+            DocumentType, session, filters={"id": DocumentTypeEnum.PAROISSE.value}
+        )
         # Create new contact if not found
         new_contact = Contact(
             id_document_type=DocumentTypeEnum.PAROISSE.value,
