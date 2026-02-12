@@ -82,9 +82,7 @@ async def get_directions(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
     limit: int = Query(
-        Config.PREVIEW_LIST_ITEM_NUMBER.value, 
-        ge=1, 
-        le=Config.MAX_ITEMS_PER_PAGE.value
+        Config.PREVIEW_LIST_ITEM_NUMBER.value, ge=1, le=Config.MAX_ITEMS_PER_PAGE.value
     ),
 ) -> List[DirectionProjFlat]:
     """Lister les directions (soft-delete filtré)."""
