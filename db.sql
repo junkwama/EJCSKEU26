@@ -522,9 +522,19 @@ INSERT INTO nation (nom, id_continent) VALUES ('Zambie', 1);
 INSERT INTO nation (nom, id_continent) VALUES ('Zimbabwe', 1);
 
 -- Types de structure
+INSERT INTO structure_type (nom) VALUES ('Direction Ecclésiastique');
 INSERT INTO structure_type (nom) VALUES ('Mouvement');
 INSERT INTO structure_type (nom) VALUES ('Association');
 INSERT INTO structure_type (nom) VALUES ('Service');
+
+-- Structures (pré-insertion)
+INSERT INTO structure (nom, code, description, id_structure_type)
+VALUES (
+    "Bureau Paroissiale",
+    "DIRECTION_ECCLESIASTIQUE",
+    "Organe chargé de l’administration des fidèles à un échelon géographique donné (paroissial, provincial, national, etc.)",
+    1
+);
 
 -- Types de fidèles
 INSERT INTO fidele_type (nom) VALUES ('Pratiquant');
