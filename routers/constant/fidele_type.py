@@ -51,19 +51,19 @@ async def get_fidele_types(
 
 @fidele_type_router.post("")
 async def create_fidele_type(
-    fidele_type_data: FideleTypeBase,
+    body: FideleTypeBase,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> FideleTypeProjFlat:
     """
     Créer un nouveau type de fidèle
 
     Args:
-        fidele_type_data: Les données du type de fidèle à créer
+        body: Les données du type de fidèle à créer
 
     Returns:
         Le type de fidèle créé
     """
-    fidele_type = FideleType.model_validate(fidele_type_data, from_attributes=True)
+    fidele_type = FideleType.model_validate(body, from_attributes=True)
     session.add(fidele_type)
     await session.commit()
     await session.refresh(fidele_type)
@@ -73,7 +73,7 @@ async def create_fidele_type(
 
 @fidele_type_router.put("/{id}")
 async def update_fidele_type(
-    fidele_type_data: FideleTypeUpdate,
+    body: FideleTypeUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele_type: Annotated[FideleType, Depends(required_fidele_type)],
 ) -> FideleTypeProjFlat:
@@ -82,14 +82,14 @@ async def update_fidele_type(
 
     Args:
         id: ID du type de fidèle à mettre à jour
-        fidele_type_data: Les nouvelles données du type de fidèle
+        body: Les nouvelles données du type de fidèle
 
     Returns:
         Le type de fidèle mis à jour
     """
 
     # Update fields (only provided fields)
-    update_data = fidele_type_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
     for field, value in update_data.items():
         setattr(fidele_type, field, value)
 

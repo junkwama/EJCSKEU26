@@ -51,19 +51,19 @@ async def get_fonctions(
 
 @fonction_router.post("")
 async def create_fonction(
-    fonction_data: FonctionBase,
+    body: FonctionBase,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> FonctionProjFlat:
     """
     Créer une nouvelle fonction
 
     Args:
-        fonction_data: Les données de la fonction à créer
+        body: Les données de la fonction à créer
 
     Returns:
         La fonction créée
     """
-    fonction = Fonction.model_validate(fonction_data, from_attributes=True)
+    fonction = Fonction.model_validate(body, from_attributes=True)
     session.add(fonction)
     await session.commit()
     await session.refresh(fonction)
@@ -73,7 +73,7 @@ async def create_fonction(
 
 @fonction_router.put("/{id}")
 async def update_fonction(
-    fonction_data: FonctionUpdate,
+    body: FonctionUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fonction: Annotated[Fonction, Depends(required_fonction)],
 ) -> FonctionProjFlat:
@@ -82,12 +82,12 @@ async def update_fonction(
 
     Args:
         id: ID de la fonction à mettre à jour
-        fonction_data: Les nouvelles données de la fonction
+        body: Les nouvelles données de la fonction
 
     Returns:
         La fonction mise à jour
     """
-    update_data = fonction_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
     for field, value in update_data.items():
         setattr(fonction, field, value)
 

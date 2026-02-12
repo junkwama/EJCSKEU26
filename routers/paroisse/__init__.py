@@ -92,7 +92,7 @@ async def get_paroisse_adresse_complete_data_by_id(
 # ============================================================================
 @paroisse_router.post("", tags=["Paroisse"])
 async def create_paroisse(
-    paroisse_data: ParoisseBase,
+    body: ParoisseBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjFlat | ParoisseProjShallow:
@@ -100,11 +100,11 @@ async def create_paroisse(
     Créer une nouvelle paroisse
 
     ARGS:
-        paroisse_data (ParoisseBase): Les données de la paroisse à créer
+        body (ParoisseBase): Les données de la paroisse à créer
         proj (str): Projection type 'flat' or 'shallow' (default: shallow)
     """
     # Create new paroisse instance
-    paroisse = Paroisse(**paroisse_data.model_dump(mode='json'))
+    paroisse = Paroisse(**body.model_dump(mode='json'))
 
     # Add to session and commit
     session.add(paroisse)
@@ -175,7 +175,7 @@ async def get_paroisse(
 
 @paroisse_router.put("/{id}", tags=["Paroisse"])
 async def update_paroisse(
-    paroisse_data: ParoisseUpdate,
+    body: ParoisseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -185,11 +185,11 @@ async def update_paroisse(
 
     ARGS:
         id (int): L'Id de la paroisse à modifier
-        paroisse_data (ParoisseUpdate): Les données mises à jour de la paroisse
+        body (ParoisseUpdate): Les données mises à jour de la paroisse
         proj (str): Projection type 'flat' or 'shallow' (default: shallow)
     """
     # Update fields (only provided fields)
-    update_data = paroisse_data.model_dump(mode='json', exclude_unset=True)
+    update_data = body.model_dump(mode='json', exclude_unset=True)
     for field, value in update_data.items():
         setattr(paroisse, field, value)
     
@@ -297,7 +297,7 @@ async def get_paroisse_adresse(
 
 @paroisse_router.put("/{id}/adresse", tags=["Paroisse - Adresse"])
 async def update_paroisse_adresse(
-    adresse_data: AdresseUpdate,
+    body: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -307,15 +307,15 @@ async def update_paroisse_adresse(
 
     ARGS:
         id (int): L'Id du fidele
-        adresse_data (AdresseUpdate): Les données mises à jour de l'adresse
+        body (AdresseUpdate): Les données mises à jour de l'adresse
     """
 
     # Query adresse by document type (PAROISSE=3) and paroisse id
     adresse = await get_paroisse_adresse_complete_data_by_id(paroisse.id, session, proj)
 
     if not adresse:
-        if adresse_data.id_nation is not None:
-            await check_resource_exists(Nation, session, filters={"id": adresse_data.id_nation})
+        if body.id_nation is not None:
+            await check_resource_exists(Nation, session, filters={"id": body.id_nation})
         await check_resource_exists(
             DocumentType, session, filters={"id": DocumentTypeEnum.PAROISSE.value}
         )
@@ -323,7 +323,7 @@ async def update_paroisse_adresse(
         new_adresse = Adresse(
             id_document_type=DocumentTypeEnum.PAROISSE.value,
             id_document=paroisse.id,
-            **adresse_data.model_dump(mode="json", exclude_unset=True)
+            **body.model_dump(mode="json", exclude_unset=True)
         )
         session.add(new_adresse)
         await session.commit()
@@ -336,7 +336,7 @@ async def update_paroisse_adresse(
         return send200(projected_response)
 
     # Update fields (exclude document identifiers)
-    update_data = adresse_data.model_dump(mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"})
+    update_data = body.model_dump(mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"})
     if "id_nation" in update_data and update_data["id_nation"] is not None:
         await check_resource_exists(Nation, session, filters={"id": update_data["id_nation"]})
     for field, value in update_data.items():
@@ -418,7 +418,7 @@ async def get_paroisse_contact(
 
 @paroisse_router.put("/{id}/contact", tags=["Paroisse - Contact"])
 async def update_paroisse_contact(
-    contact_data: ContactUpdate,
+    body: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     paroisse: Annotated[Paroisse, Depends(required_paroisse)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -428,7 +428,7 @@ async def update_paroisse_contact(
 
     ARGS:
         id (int): L'Id du paroisse
-        contact_data (ContactUpdate): Les données mises à jour du contact
+        body (ContactUpdate): Les données mises à jour du contact
     """
 
     # Query contact by document type (PAROISSE=3) and paroisse id
@@ -448,7 +448,7 @@ async def update_paroisse_contact(
         new_contact = Contact(
             id_document_type=DocumentTypeEnum.PAROISSE.value,
             id_document=paroisse.id,
-            **contact_data.model_dump(mode="json", exclude_unset=True)
+            **body.model_dump(mode="json", exclude_unset=True)
         )
         session.add(new_contact)
         await session.commit()
@@ -457,7 +457,7 @@ async def update_paroisse_contact(
         return send200(projected_response)
 
     # Update fields (exclude document identifiers)
-    update_data = contact_data.model_dump(
+    update_data = body.model_dump(
         mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"}
     )
     for field, value in update_data.items():

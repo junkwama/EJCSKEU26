@@ -51,19 +51,19 @@ async def get_document_types(
 
 @document_type_router.post("")
 async def create_document_type(
-    document_type_data: DocumentTypeBase,
+    body: DocumentTypeBase,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> DocumentTypeProjFlat:
     """
     Créer un nouveau type de document
 
     Args:
-        document_type_data: Les données du type de document à créer
+        body: Les données du type de document à créer
 
     Returns:
         Le type de document créé
     """
-    document_type = DocumentType.model_validate(document_type_data, from_attributes=True)
+    document_type = DocumentType.model_validate(body, from_attributes=True)
     session.add(document_type)
     await session.commit()
     await session.refresh(document_type)
@@ -73,7 +73,7 @@ async def create_document_type(
 
 @document_type_router.put("/{id}")
 async def update_document_type(
-    document_type_data: DocumentTypeUpdate,
+    body: DocumentTypeUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     document_type: Annotated[DocumentType, Depends(required_document_type)],
 ) -> DocumentTypeProjFlat:
@@ -82,13 +82,13 @@ async def update_document_type(
 
     Args:
         id: ID du type de document à mettre à jour
-        document_type_data: Les nouvelles données du type de document
+        body: Les nouvelles données du type de document
 
     Returns:
         Le type de document mis à jour
     """
     # Update fields (only provided fields)
-    update_data = document_type_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
     for field, value in update_data.items():
         setattr(document_type, field, value)
 

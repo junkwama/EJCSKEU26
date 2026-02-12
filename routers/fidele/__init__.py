@@ -79,7 +79,7 @@ async def get_fidele_adresse_complete_data_by_id(
 
 @fidele_router.post("", tags=["Fidele"])
 async def create_fidele(
-    fidele_data: FideleBase,
+    body: FideleBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> FideleProjShallow | FideleProjFlat:
@@ -87,17 +87,17 @@ async def create_fidele(
     Créer un nouveau fidele
 
     ARGS:
-        fidele_data (FideleBase): Les données du fidele à créer
+        body (FideleBase): Les données du fidele à créer
     """
-    await check_resource_exists(Grade, session, filters={"id": int(fidele_data.id_grade)})
+    await check_resource_exists(Grade, session, filters={"id": int(body.id_grade)})
     await check_resource_exists(
-        FideleType, session, filters={"id": int(fidele_data.id_fidele_type)}
+        FideleType, session, filters={"id": int(body.id_fidele_type)}
     )
-    if fidele_data.id_paroisse is not None:
-        await check_resource_exists(Paroisse, session, filters={"id": fidele_data.id_paroisse})
+    if body.id_paroisse is not None:
+        await check_resource_exists(Paroisse, session, filters={"id": body.id_paroisse})
 
     # Create new fidele instance
-    fidele = Fidele(**fidele_data.model_dump(mode="json"))
+    fidele = Fidele(**body.model_dump(mode="json"))
 
     # Add to session and commit
     session.add(fidele)
@@ -161,7 +161,7 @@ async def get_fidele(
 
 @fidele_router.put("/{id}", tags=["Fidele"])
 async def update_fidele(
-    fidele_data: FideleUpdate,
+    body: FideleUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -171,10 +171,10 @@ async def update_fidele(
 
     ARGS:
         id (int): L'Id du fidele à modifier
-        fidele_data (FideleUpdate): Les données mises à jour du fidele
+        body (FideleUpdate): Les données mises à jour du fidele
     """
 
-    update_data = fidele_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
 
     if "id_grade" in update_data and update_data["id_grade"] is not None:
         await check_resource_exists(Grade, session, filters={"id": int(update_data["id_grade"])})
@@ -290,7 +290,7 @@ async def get_fidele_adresse(
 
 @fidele_router.put("/{id}/adresse", tags=["Fidele - Adresse"])
 async def update_fidele_adresse(
-    adresse_data: AdresseUpdate,
+    body: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -300,15 +300,15 @@ async def update_fidele_adresse(
 
     ARGS:
         id (int): L'Id du fidele
-        adresse_data (AdresseUpdate): Les données mises à jour de l'adresse
+        body (AdresseUpdate): Les données mises à jour de l'adresse
     """
 
     # Query adresse by document type (FIDELE=1) and fidele id
     adresse = await get_fidele_adresse_complete_data_by_id(fidele.id, session, proj)
 
     if not adresse:
-        if adresse_data.id_nation is not None:
-            await check_resource_exists(Nation, session, filters={"id": adresse_data.id_nation})
+        if body.id_nation is not None:
+            await check_resource_exists(Nation, session, filters={"id": body.id_nation})
         await check_resource_exists(
             DocumentType, session, filters={"id": DocumentTypeEnum.FIDELE.value}
         )
@@ -316,7 +316,7 @@ async def update_fidele_adresse(
         new_adresse = Adresse(
             id_document_type=DocumentTypeEnum.FIDELE.value,
             id_document=fidele.id,
-            **adresse_data.model_dump(mode="json", exclude_unset=True)
+            **body.model_dump(mode="json", exclude_unset=True)
         )
         session.add(new_adresse)
         await session.commit()
@@ -329,7 +329,7 @@ async def update_fidele_adresse(
         return send200(projected_response)
 
     # Update fields (exclude document identifiers)
-    update_data = adresse_data.model_dump(
+    update_data = body.model_dump(
         mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"}
     )
     if "id_nation" in update_data and update_data["id_nation"] is not None:
@@ -414,7 +414,7 @@ async def get_fidele_contact(
 
 @fidele_router.put("/{id}/contact", tags=["Fidele - Contact"])
 async def update_fidele_contact(
-    contact_data: ContactUpdate,
+    body: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -424,7 +424,7 @@ async def update_fidele_contact(
 
     ARGS:
         id (int): L'Id du fidele
-        contact_data (ContactUpdate): Les données mises à jour du contact
+        body (ContactUpdate): Les données mises à jour du contact
     """
 
     # Query contact by document type (FIDELE=1) and fidele id
@@ -443,7 +443,7 @@ async def update_fidele_contact(
         new_contact = Contact(
             id_document_type=DocumentTypeEnum.FIDELE.value,
             id_document=fidele.id,
-            **contact_data.model_dump(mode="json", exclude_unset=True)
+            **body.model_dump(mode="json", exclude_unset=True)
         )
         session.add(new_contact)
         await session.commit()
@@ -452,7 +452,7 @@ async def update_fidele_contact(
         return send200(projected_response)
 
     # Update fields (exclude document identifiers)
-    update_data = contact_data.model_dump(
+    update_data = body.model_dump(
         mode="json", exclude_unset=True, exclude={"id_document_type", "id_document"}
     )
     for field, value in update_data.items():

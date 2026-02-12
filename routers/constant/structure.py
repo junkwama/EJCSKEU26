@@ -64,7 +64,7 @@ async def get_structures(
 
 @structure_router.post("")
 async def create_structure(
-    structure_data: StructureBase,
+    body: StructureBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> StructureProjFlat | StructureProjShallow:
@@ -72,16 +72,16 @@ async def create_structure(
     Créer une nouvelle structure
 
     Args:
-        structure_data: Les données de la structure à créer
+        body: Les données de la structure à créer
 
     Returns:
         La structure créée
     """
     await check_resource_exists(
-        StructureType, session, filters={"id": int(structure_data.id_structure_type)}
+        StructureType, session, filters={"id": int(body.id_structure_type)}
     )
 
-    structure = Structure.model_validate(structure_data, from_attributes=True)
+    structure = Structure.model_validate(body, from_attributes=True)
     session.add(structure)
     await session.commit()
     await session.refresh(structure)
@@ -101,7 +101,7 @@ async def create_structure(
 
 @structure_router.put("/{id}")
 async def update_structure(
-    structure_data: StructureUpdate,
+    body: StructureUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     structure: Annotated[Structure, Depends(required_structure)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -111,12 +111,12 @@ async def update_structure(
 
     Args:
         id: ID de la structure à mettre à jour
-        structure_data: Les nouvelles données de la structure
+        body: Les nouvelles données de la structure
 
     Returns:
         La structure mise à jour
     """
-    update_data = structure_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
 
     if "id_structure_type" in update_data and update_data["id_structure_type"] is not None:
         await check_resource_exists(

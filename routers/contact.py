@@ -42,7 +42,7 @@ async def get_contact_complete_data_by_id(id: int, session: AsyncSession) -> Con
 # ============================================================================
 @contact_router.post("")
 async def create_contact(
-    contact_data: ContactBase,
+    body: ContactBase,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> ContactProjFlat: 
     """
@@ -52,12 +52,12 @@ async def create_contact(
     """
     await check_document_reference_exists(
         session,
-        id_document_type=contact_data.id_document_type,
-        id_document=contact_data.id_document,
+        id_document_type=body.id_document_type,
+        id_document=body.id_document,
     )
 
     # Create contact
-    contact = Contact(**contact_data.model_dump(mode="json"))
+    contact = Contact(**body.model_dump(mode="json"))
 
     session.add(contact)
     await session.commit()
@@ -85,7 +85,7 @@ async def get_contact(
 
 @contact_router.put("/{id}")
 async def update_contact(
-    contact_data: ContactUpdate,
+    body: ContactUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     contact: Annotated[Contact, Depends(contact_required)],
 ) -> ContactProjFlat:
@@ -93,7 +93,7 @@ async def update_contact(
     Modifier un contact existant
     """
     # Update fields (exclude document identifiers - they shouldn't be changed)
-    update_data = contact_data.model_dump(
+    update_data = body.model_dump(
         mode="json",
         exclude_unset=True,
         exclude={"id_document_type", "id_document"},

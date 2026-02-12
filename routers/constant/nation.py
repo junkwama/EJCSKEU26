@@ -76,7 +76,7 @@ async def get_nations(
 
 @nation_router.post("")
 async def create_nation(
-    nation_data: NationBase,
+    body: NationBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> NationProjShallow | NationProjFlat:
@@ -84,14 +84,14 @@ async def create_nation(
     Créer une nouvelle nation
 
     Args:
-        nation_data: Les données de la nation à créer
+        body: Les données de la nation à créer
 
     Returns:
         La nation créée avec ses relations
     """
-    await check_resource_exists(Continent, session, filters={"id": nation_data.id_continent})
+    await check_resource_exists(Continent, session, filters={"id": body.id_continent})
 
-    nation = Nation.model_validate(nation_data, from_attributes=True)
+    nation = Nation.model_validate(body, from_attributes=True)
     session.add(nation)
     await session.commit()
     
@@ -106,7 +106,7 @@ async def create_nation(
 
 @nation_router.put("/{id}")
 async def update_nation(
-    nation_data: NationUpdate,
+    body: NationUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     nation: Annotated[Nation, Depends(required_nation)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -116,12 +116,12 @@ async def update_nation(
 
     Args:
         id: ID de la nation à mettre à jour
-        nation_data: Les nouvelles données de la nation
+        body: Les nouvelles données de la nation
 
     Returns:
         La nation mise à jour avec ses relations
     """
-    update_data = nation_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
     if "id_continent" in update_data and update_data["id_continent"] is not None:
         await check_resource_exists(Continent, session, filters={"id": update_data["id_continent"]})
     for field, value in update_data.items():

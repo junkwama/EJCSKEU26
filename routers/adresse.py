@@ -46,7 +46,7 @@ async def get_adresse_complete_data_by_id(id: int, session: AsyncSession) -> Adr
 # ============================================================================
 @adresse_router.post("")
 async def create_adresse(
-    adresse_data: AdresseBase,
+    body: AdresseBase,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> AdresseProjShallow | AdresseProjFlat:
@@ -55,15 +55,15 @@ async def create_adresse(
     
     Body: AdresseBase (contient id_document_type, id_document et autres champs)
     """
-    await check_resource_exists(Nation, session, filters={"id": adresse_data.id_nation})
+    await check_resource_exists(Nation, session, filters={"id": body.id_nation})
     await check_document_reference_exists(
         session,
-        id_document_type=adresse_data.id_document_type,
-        id_document=adresse_data.id_document,
+        id_document_type=body.id_document_type,
+        id_document=body.id_document,
     )
 
     # Create adresse
-    adresse = Adresse(**adresse_data.model_dump(mode='json'))
+    adresse = Adresse(**body.model_dump(mode='json'))
     
     session.add(adresse)
     await session.commit()
@@ -107,7 +107,7 @@ async def get_adresse(
 
 @adresse_router.put("/{id}")
 async def update_adresse(
-    adresse_data: AdresseUpdate,
+    body: AdresseUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     adresse: Annotated[Adresse, Depends(address_required)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
@@ -115,7 +115,7 @@ async def update_adresse(
     """
     Modifier une adresse existante
     """
-    update_data = adresse_data.model_dump(mode='json', exclude_unset=True)
+    update_data = body.model_dump(mode='json', exclude_unset=True)
 
     if "id_nation" in update_data and update_data["id_nation"] is not None:
         await check_resource_exists(Nation, session, filters={"id": update_data["id_nation"]})

@@ -51,19 +51,19 @@ async def get_grades(
 
 @grade_router.post("")
 async def create_grade(
-    grade_data: GradeBase,
+    body: GradeBase,
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> GradeProjFlat:
     """
     Créer un nouveau grade ecclésiastique
 
     Args:
-        grade_data: Les données du grade à créer
+        body: Les données du grade à créer
 
     Returns:
         Le grade créé
     """
-    grade = Grade.model_validate(grade_data, from_attributes=True)
+    grade = Grade.model_validate(body, from_attributes=True)
     session.add(grade)
     await session.commit()
     await session.refresh(grade)
@@ -73,7 +73,7 @@ async def create_grade(
 
 @grade_router.put("/{id}")
 async def update_grade(
-    grade_data: GradeUpdate,
+    body: GradeUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     grade: Annotated[Grade, Depends(required_grade)],
 ) -> GradeProjFlat:
@@ -82,12 +82,12 @@ async def update_grade(
 
     Args:
         id: ID du grade à mettre à jour
-        grade_data: Les nouvelles données du grade
+        body: Les nouvelles données du grade
 
     Returns:
         Le grade mis à jour
     """
-    update_data = grade_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
     for field, value in update_data.items():
         setattr(grade, field, value)
 

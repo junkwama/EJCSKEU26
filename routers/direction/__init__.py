@@ -52,20 +52,20 @@ async def get_direction_complete_data_by_id(
 
 @direction_router.post("")
 async def create_direction(
-    direction_data: DirectionBase,
+    body: DirectionBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> DirectionProjShallow | DirectionProjFlat:
     """Créer une direction."""
 
-    await check_resource_exists(Structure, session, filters={"id": direction_data.id_structure})
+    await check_resource_exists(Structure, session, filters={"id": body.id_structure})
     await check_document_reference_exists(
         session,
-        id_document_type=direction_data.id_document_type,
-        id_document=direction_data.id_document,
+        id_document_type=body.id_document_type,
+        id_document=body.id_document,
     )
 
-    direction = Direction(**direction_data.model_dump(mode="json"))
+    direction = Direction(**body.model_dump(mode="json"))
 
     session.add(direction)
     await session.commit()
@@ -119,14 +119,14 @@ async def get_direction(
 
 @direction_router.put("/{id}")
 async def update_direction(
-    direction_data: DirectionUpdate,
+    body: DirectionUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
     direction: Annotated[Direction, Depends(required_direction)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> DirectionProjShallow | DirectionProjFlat:
     """Modifier une direction existante."""
 
-    update_data = direction_data.model_dump(mode="json", exclude_unset=True)
+    update_data = body.model_dump(mode="json", exclude_unset=True)
 
     # Validate foreign keys when present
     if "id_structure" in update_data and update_data["id_structure"] is not None:
