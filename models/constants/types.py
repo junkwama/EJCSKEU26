@@ -7,12 +7,13 @@ from enum import Enum
 class DocumentTypeEnum(int, Enum):
     """Enum pour les types de documents"""
     FIDELE = 1
-    PAROISSE = 2
-    VILLE = 3
-    PROVINCE = 4
-    NATION = 5
-    CONTINENT = 6
-    GENERALE = 7
+    STRUCTURE = 2 # Bureau ecclésiastique, Mouvement, Association, Service
+    PAROISSE = 3
+    VILLE = 4
+    PROVINCE = 5
+    NATION = 6
+    CONTINENT = 7
+    GENERALE = 8
 
 
 # ============================================================================

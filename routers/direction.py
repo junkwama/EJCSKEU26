@@ -8,12 +8,12 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.config import Config
 from core.db import get_session
-from models.constants import DocumentType, Structure
+from models.constants import Structure
 from models.direction import Direction
 from models.direction.projection import DirectionProjFlat, DirectionProjShallow
 from models.direction.utils import DirectionBase, DirectionUpdate
 from routers.dependencies import check_resource_exists
-from routers.utils import apply_projection
+from routers.utils import apply_projection, check_document_reference_exists
 from routers.utils.http_utils import send200, send404
 from utils.constants import ProjDepth
 
@@ -58,8 +58,10 @@ async def create_direction(
     """Créer une direction."""
 
     await check_resource_exists(Structure, session, filters={"id": direction_data.id_structure})
-    await check_resource_exists(
-        DocumentType, session, filters={"id": direction_data.id_document_type}
+    await check_document_reference_exists(
+        session,
+        id_document_type=direction_data.id_document_type,
+        id_document=direction_data.id_document,
     )
 
     direction = Direction(**direction_data.model_dump(mode="json"))
@@ -131,9 +133,14 @@ async def update_direction(
     if "id_structure" in update_data and update_data["id_structure"] is not None:
         await check_resource_exists(Structure, session, filters={"id": update_data["id_structure"]})
 
-    if "id_document_type" in update_data and update_data["id_document_type"] is not None:
-        await check_resource_exists(
-            DocumentType, session, filters={"id": update_data["id_document_type"]}
+    # Validate polymorphic document reference if either component changes
+    if ("id_document_type" in update_data) or ("id_document" in update_data):
+        new_id_document_type = update_data.get("id_document_type", direction.id_document_type)
+        new_id_document = update_data.get("id_document", direction.id_document)
+        await check_document_reference_exists(
+            session,
+            id_document_type=new_id_document_type,
+            id_document=new_id_document,
         )
 
     for field, value in update_data.items():
