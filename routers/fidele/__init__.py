@@ -509,3 +509,9 @@ async def delete_fidele_contact(
 from routers.fidele.structures import fidele_structures_router
 
 fidele_router.include_router(fidele_structures_router)
+
+
+# ========================== FONCTIONS VIEW ENDPOINTS ==========================
+from routers.fidele.fonctions import fidele_fonctions_router
+
+fidele_router.include_router(fidele_fonctions_router)

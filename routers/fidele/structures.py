@@ -14,7 +14,7 @@ from models.fidele import Fidele, FideleStructure
 from models.fidele.utils import FideleStructureUpdate, FideleStructureCreate
 from models.fidele.projection import (
     FideleStructureProjFlat,
-    FideleStructureProjShallowWithStructureData,
+    FideleStructureProjShallowWithoutFideleData,
 )
 from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send400
@@ -56,7 +56,7 @@ async def add_fidele_structure(
     body: FideleStructureCreate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-) -> FideleStructureProjShallowWithStructureData:
+) -> FideleStructureProjShallowWithoutFideleData:
     """Ajouter une structure à un fidèle (crée une adhésion dans fidele_structure)."""
 
     # Ensure structure exists
@@ -92,7 +92,7 @@ async def add_fidele_structure(
 
         existing = await get_fidele_structure_complete_data_by_id(existing.id, session)
 
-        return send200(FideleStructureProjShallowWithStructureData.model_validate(existing))
+        return send200(FideleStructureProjShallowWithoutFideleData.model_validate(existing))
 
     fidele_structure = FideleStructure(
         id_fidele=fidele.id,
@@ -107,14 +107,14 @@ async def add_fidele_structure(
 
     fidele_structure = await get_fidele_structure_complete_data_by_id(fidele_structure.id, session)
 
-    return send200(FideleStructureProjShallowWithStructureData.model_validate(fidele_structure))
+    return send200(FideleStructureProjShallowWithoutFideleData.model_validate(fidele_structure))
 
 
 @fidele_structures_router.get("")
 async def list_fidele_structures(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
-) -> List[FideleStructureProjShallowWithStructureData]:
+) -> List[FideleStructureProjShallowWithoutFideleData]:
     """Lister les structures (adhésions) d'un fidèle."""
 
     statement = (
@@ -128,7 +128,7 @@ async def list_fidele_structures(
     result = await session.exec(statement)
     items = result.all()
 
-    return send200([FideleStructureProjShallowWithStructureData.model_validate(i) for i in items])
+    return send200([FideleStructureProjShallowWithoutFideleData.model_validate(i) for i in items])
 
 
 @fidele_structures_router.put("/{id_structure}")

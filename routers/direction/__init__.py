@@ -12,6 +12,7 @@ from models.constants import Structure
 from models.direction import Direction
 from models.direction.projection import DirectionProjFlat, DirectionProjShallow
 from models.direction.utils import DirectionBase, DirectionUpdate
+from models.direction.fonction import DirectionFonction
 from routers.dependencies import check_resource_exists
 from routers.utils import apply_projection, check_document_reference_exists
 from routers.utils.http_utils import send200, send404
@@ -194,7 +195,28 @@ async def delete_direction(
     direction.date_suppression = datetime.now(timezone.utc)
     direction.date_modification = datetime.now(timezone.utc)
 
+    # Cascade soft-delete: toutes les affectations (direction_fonction) de cette direction
+    statement = select(DirectionFonction).where(
+        (DirectionFonction.id_direction == direction.id)
+        & (DirectionFonction.est_supprimee == False)
+    )
+    result = await session.exec(statement)
+    items = result.all()
+    now = datetime.now(timezone.utc)
+    for item in items:
+        item.est_supprimee = True
+        item.date_suppression = now
+        item.date_modification = now
+        item.est_actif = False
+        session.add(item)
+
     session.add(direction)
     await session.commit()
 
     return send200(DirectionProjFlat.model_validate(direction))
+
+
+# ========================== DIRECTION_FONCTION ENDPOINTS ==========================
+from routers.direction.fonctions import direction_fonctions_router
+
+direction_router.include_router(direction_fonctions_router)

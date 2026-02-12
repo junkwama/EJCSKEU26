@@ -99,14 +99,14 @@ class FideleStructureProjShallow(FideleStructureProjFlat):
     class Config:
         from_attributes = True
 
-class FideleStructureProjShallowWithFideleData(FideleStructureProjFlat):
+class FideleStructureProjShallowWithoutStructureData(FideleStructureProjFlat):
     """Projection shallow de FideleStructure - Contenant Fidele"""
     fidele: FideleProjFlat
 
     class Config:
         from_attributes = True
 
-class FideleStructureProjShallowWithStructureData(FideleStructureProjFlat):
+class FideleStructureProjShallowWithoutFideleData(FideleStructureProjFlat):
     """Projection shallow de FideleStructure - Contenant Structure"""
     structure: StructureProjFlat
 
