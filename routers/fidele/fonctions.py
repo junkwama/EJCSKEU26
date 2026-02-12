@@ -16,7 +16,7 @@ from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200
 
 
-fidele_fonctions_router = APIRouter(prefix="/{id}/fonctions", tags=["Fidele - Fonctions"])
+fidele_fonctions_router = APIRouter(prefix="/{id}/fonction", tags=["Fidele - Fonctions"])
 
 
 @fidele_fonctions_router.get("")

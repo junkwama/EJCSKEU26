@@ -23,7 +23,7 @@ from routers.utils.http_utils import send200, send400, send404
 from sqlalchemy.orm import selectinload
 
 
-direction_fonctions_router = APIRouter(prefix="/{id}/fonctions", tags=["Direction - Fonctions"])
+direction_fonctions_router = APIRouter(prefix="/{id}/fonctions")
 
 
 def are_mandate_dates_valid(date_debut: date, date_fin: date | None) -> bool:

@@ -19,7 +19,7 @@ from routers.utils.http_utils import send200, send404
 from utils.constants import ProjDepth
 
 
-direction_router = APIRouter(tags=["Direction"])
+direction_router = APIRouter()
 
 
 async def required_direction(
@@ -50,7 +50,7 @@ async def get_direction_complete_data_by_id(
     return result.first()
 
 
-@direction_router.post("")
+@direction_router.post("", tags=["Direction"])
 async def create_direction(
     body: DirectionBase,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -78,7 +78,7 @@ async def create_direction(
     return send200(projected)
 
 
-@direction_router.get("")
+@direction_router.get("", tags=["Direction"])
 async def get_directions(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
@@ -101,7 +101,7 @@ async def get_directions(
     return send200(projected_directions)
 
 
-@direction_router.get("/{id}")
+@direction_router.get("/{id}", tags=["Direction"])
 async def get_direction(
     id: Annotated[int, Path(..., description="Direction ID")],
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -157,7 +157,7 @@ async def update_direction(
     return send200(projected)
 
 
-@direction_router.put("/{id}/restore")
+@direction_router.put("/{id}/restore", tags=["Direction"])
 async def restore_direction(
     id: Annotated[int, Path(..., description="Direction ID")],
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -184,7 +184,7 @@ async def restore_direction(
     return send200(projected)
 
 
-@direction_router.delete("/{id}")
+@direction_router.delete("/{id}", tags=["Direction"])
 async def delete_direction(
     session: Annotated[AsyncSession, Depends(get_session)],
     direction: Annotated[Direction, Depends(required_direction)],
@@ -219,4 +219,4 @@ async def delete_direction(
 # ========================== DIRECTION_FONCTION ENDPOINTS ==========================
 from routers.direction.fonctions import direction_fonctions_router
 
-direction_router.include_router(direction_fonctions_router)
+direction_router.include_router(direction_fonctions_router, tags=["Direction - Fonctions"])
