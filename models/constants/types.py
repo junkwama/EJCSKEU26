@@ -44,7 +44,7 @@ class FideleTypeEnum(int, Enum):
 
 class StructureTypeEnum(int, Enum):
     """Enum pour les types de structures"""
-    DIRECTION_ECCLESIASTIQUE = 1
+    BUREAU_ECCLESIASTIQUE = 1
     MOUVEMENT = 2
     ASSOCIATION = 3
     SERVICE = 4

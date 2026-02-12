@@ -530,8 +530,8 @@ INSERT INTO structure_type (nom) VALUES ('Service');
 -- Structures (pré-insertion)
 INSERT INTO structure (nom, code, description, id_structure_type)
 VALUES (
-    "Bureau Paroissiale",
-    "DIRECTION_ECCLESIASTIQUE",
+    "Bureau Ecclésiastique",
+    "BUREAU_ECCLESIASTIQUE",
     "Organe chargé de l’administration des fidèles à un échelon géographique donné (paroissial, provincial, national, etc.)",
     1
 );
