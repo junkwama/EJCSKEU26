@@ -27,6 +27,8 @@ class DocumentType(DocumentTypeBase, BaseModelClass, table=True):
 class Grade(GradeBase, BaseModelClass, table=True):
     """Modèle de la table Grade"""
 
+    __tablename__ = "grade"
+
     __table_args__ = (
         UniqueConstraint("nom", name="uq_grade_nom"),
     )

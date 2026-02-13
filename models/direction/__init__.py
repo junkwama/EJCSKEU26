@@ -11,6 +11,8 @@ from models.constants import Structure
 class Direction(DirectionBase, BaseModelClass, table=True):
     """Modèle de la table direction"""
 
+    __tablename__ = "direction"
+
     id_structure: int = SQLModelField(
         sa_column=Column(
             Integer,

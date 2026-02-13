@@ -17,6 +17,9 @@ if TYPE_CHECKING:
 
 class Fidele(FideleBase, BaseModelClass, table=True):
     """Modèle de la table Fidele"""
+
+    __tablename__ = "fidele"
+
     # OVERWRITTING TO AVOID ENUM TYPE ISSUES
     id_grade: int = SQLModelField(
         sa_column=Column(

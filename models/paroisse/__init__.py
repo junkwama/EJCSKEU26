@@ -16,6 +16,8 @@ from models.constants.types import DocumentTypeEnum
 class Paroisse(ParoisseBase, BaseModelClass, table=True):
     """Modèle de la table Paroisse - Paroisses"""
 
+    __tablename__ = "paroisse"
+
     __table_args__ = (
         UniqueConstraint("nom", name="uq_paroisse_nom"),
     )

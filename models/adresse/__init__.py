@@ -7,6 +7,8 @@ from utils.utils import PydanticField, SQLModelField
 
 class Continent(BaseModelClass, table=True):
     """Continent de base pour adresse projection"""
+    __tablename__ = "continent"
+
     nom: str = PydanticField(..., max_length=100, description="Nom du continent")
 
     __table_args__ = (
@@ -18,6 +20,8 @@ class Continent(BaseModelClass, table=True):
 
 class Nation(BaseModelClass, table=True):
     """Nation de base pour adresse projection"""
+    __tablename__ = "nation"
+
     id_continent: int = SQLModelField(
         sa_column=Column(
             Integer,
@@ -38,6 +42,8 @@ class Nation(BaseModelClass, table=True):
 
 class Adresse(AdresseBase, BaseModelClass, table=True):
     """Modèle de la table Adresse - Addresses avec support multi-document"""
+
+    __tablename__ = "adresse"
 
     # ovveriride to avoid enum type issues for mysql
     id_nation: int = SQLModelField(
