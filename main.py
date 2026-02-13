@@ -9,9 +9,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-# core
-from core.db import init_db
-
 # Routers utils
 from routers.utils.http_utils import (
     send200,
@@ -34,9 +31,8 @@ from routers.constant import constant_router
 # Lifespan event handler
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup code: init the db and create tables if necessary
+    # Startup code
     print("Starting up...")
-    await init_db() 
     yield
     # Shutdown code 
     print("Shutting down...")

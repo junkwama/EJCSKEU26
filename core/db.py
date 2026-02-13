@@ -1,24 +1,31 @@
 import os
-from sqlmodel import SQLModel
 from typing import AsyncGenerator
-from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-MYSQL_DB_URL = os.getenv("MYSQL_DB_URL")
-engine: AsyncEngine = create_async_engine(MYSQL_DB_URL, echo=True)
+"""Database engine + session utilities.
 
-SessionLocal = sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+Schema management is handled by Alembic migrations (see alembic/).
+"""
 
-# db initializator
-async def init_db() -> None:
-    async with engine.begin() as connection:
-        await connection.run_sync(SQLModel.metadata.create_all)
+_engine: AsyncEngine | None = None
+
+
+def get_engine() -> AsyncEngine:
+    global _engine
+    if _engine is not None:
+        return _engine
+
+    db_url = os.getenv("MYSQL_DB_ASYNC_URL")
+    if not db_url:
+        raise RuntimeError("MYSQL_DB_ASYNC_URL environment variable is not set")
+
+    _engine = create_async_engine(db_url, echo=True)
+    return _engine
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    engine = get_engine()
+    SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with SessionLocal() as session:
         yield session

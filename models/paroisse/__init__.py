@@ -1,4 +1,5 @@
 from typing import List
+from sqlalchemy import Index, UniqueConstraint
 from sqlmodel import Relationship
 from sqlalchemy import and_
 from sqlalchemy.orm import relationship
@@ -14,6 +15,10 @@ from models.constants.types import DocumentTypeEnum
 
 class Paroisse(ParoisseBase, BaseModelClass, table=True):
     """Modèle de la table Paroisse - Paroisses"""
+
+    __table_args__ = (
+        UniqueConstraint("nom", name="uq_paroisse_nom"),
+    )
     
     # Relationships
     fideles: List[Fidele] | None = Relationship(back_populates="paroisse")

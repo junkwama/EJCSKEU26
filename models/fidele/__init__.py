@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, List, Optional
 from sqlmodel import Relationship
+from sqlalchemy import Column, ForeignKey, Index, Integer, UniqueConstraint
 from sqlalchemy import and_
 from sqlalchemy.orm import relationship
 
@@ -17,9 +18,35 @@ if TYPE_CHECKING:
 class Fidele(FideleBase, BaseModelClass, table=True):
     """Modèle de la table Fidele"""
     # OVERWRITTING TO AVOID ENUM TYPE ISSUES
-    id_grade: int = SQLModelField(..., foreign_key="grade.id")
-    id_fidele_type: int = SQLModelField(..., foreign_key="fidele_type.id")
-    id_paroisse: int | None = SQLModelField(None, foreign_key="paroisse.id")
+    id_grade: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("grade.id", ondelete="RESTRICT"),
+            nullable=False,
+        )
+    )
+    id_fidele_type: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele_type.id", ondelete="RESTRICT"),
+            nullable=False,
+        )
+    )
+    id_paroisse: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("paroisse.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
+
+    __table_args__ = (
+        UniqueConstraint("numero_carte", name="uq_fidele_numero_carte"),
+        Index("idx_fidele_nom", "nom"),
+        Index("idx_fidele_grade", "id_grade"),
+        Index("idx_fidele_est_supprimee", "est_supprimee"),
+    )
 
     # Relationships
     grade: Grade = Relationship()
@@ -60,8 +87,26 @@ class FideleStructure(FideleStructureBase,BaseModelClass,  table=True):
     """Modèle de la table FideleStructure - Table dell'Association entre fidele et structure"""
     __tablename__ = "fidele_structure"
 
-    id_fidele: int = SQLModelField(..., foreign_key="fidele.id")
-    id_structure: int = SQLModelField(..., foreign_key="structure.id")
+    id_fidele: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    id_structure: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("structure.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+
+    __table_args__ = (
+        Index("idx_fidele_structure_fidele", "id_fidele"),
+        Index("idx_fidele_structure_structure", "id_structure"),
+        Index("idx_fidele_structure_est_supprimee", "est_supprimee"),
+    )
 
     # Relationships
     fidele: Fidele = Relationship(back_populates="structures")

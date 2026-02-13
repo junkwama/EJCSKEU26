@@ -1,0 +1,8 @@
+Alembic migrations for EJCSK.
+
+- Schema and seed data are managed through Alembic from now on.
+- DB URL is read from MYSQL_DB_ASYNC_URL environment variable.
+
+Common commands:
+- alembic upgrade head
+- alembic revision -m "message" --autogenerate
