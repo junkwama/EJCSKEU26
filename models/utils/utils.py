@@ -4,28 +4,44 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
-from utils.utils import PydanticField, SQLModelField
+from sqlalchemy import text
+
+from utils.utils import SQLModelField
 
 from modules.oauth2.utils import password_context
 
 class BaseModelClass(SQLModel):
     """Base class with soft delete support"""
     id: int | None = SQLModelField(default=None, primary_key=True)
-    est_supprimee: bool = PydanticField(
-        default=False, 
-        description="Est supprimée (soft delete)"
+
+    est_supprimee: bool = SQLModelField(
+        default=False,
+        nullable=False,
+        sa_column_kwargs={"server_default": text("0")},
+        description="Est supprimée (soft delete)",
     )
-    date_suppression: Optional[datetime] = PydanticField(
-        default=None, 
-        description="Date de suppression logique"
+
+    date_suppression: Optional[datetime] = SQLModelField(
+        default=None,
+        nullable=True,
+        description="Date de suppression logique",
     )
-    date_creation: datetime = PydanticField(
+
+    date_creation: datetime = SQLModelField(
         default_factory=lambda: datetime.now(timezone.utc),
-        description="Date de création"
+        nullable=False,
+        sa_column_kwargs={"server_default": text("CURRENT_TIMESTAMP")},
+        description="Date de création",
     )
-    date_modification: datetime = PydanticField(
+
+    date_modification: datetime = SQLModelField(
         default_factory=lambda: datetime.now(timezone.utc),
-        description="Date de modification"
+        nullable=False,
+        sa_column_kwargs={
+            "server_default": text("CURRENT_TIMESTAMP"),
+            "server_onupdate": text("CURRENT_TIMESTAMP"),
+        },
+        description="Date de modification",
     )
 
     class Config:
