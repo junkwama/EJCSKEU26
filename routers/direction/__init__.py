@@ -156,7 +156,7 @@ async def get_direction(
     return send200(projected)
 
 
-@direction_router.put("/{id}")
+@direction_router.put("/{id}", tags=["Direction"])
 async def update_direction(
     body: DirectionUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
