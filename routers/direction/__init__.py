@@ -15,7 +15,12 @@ from models.direction.utils import DirectionBase, DirectionUpdate
 from models.direction.fonction import DirectionFonction
 from routers.dependencies import check_resource_exists
 from routers.direction.docs import DIRECTION_CREATE_DESCRIPTION
-from routers.utils import apply_projection, check_document_reference_exists
+from routers.utils import (
+    apply_projection,
+    check_document_reference_exists,
+    resolve_document_reference,
+    resolve_document_references_batch,
+)
 from routers.utils.http_utils import send200, send404
 from utils.constants import ProjDepth
 
@@ -81,29 +86,50 @@ async def create_direction(
         direction = await get_direction_complete_data_by_id(direction.id, session, proj)
 
     projected = apply_projection(direction, DirectionProjFlat, DirectionProjShallow, proj)
+    if proj == ProjDepth.SHALLOW and direction is not None:
+        projected.document = await resolve_document_reference(
+            session,
+            id_document_type=direction.id_document_type,
+            id_document=direction.id_document,
+        )
+
     return send200(projected)
 
 
 @direction_router.get("", tags=["Direction"])
 async def get_directions(
     session: Annotated[AsyncSession, Depends(get_session)],
+    proj: Annotated[ProjDepth, Query()] = ProjDepth.FLAT,
     offset: int = 0,
     limit: int = Query(
         Config.PREVIEW_LIST_ITEM_NUMBER.value, ge=1, le=Config.MAX_ITEMS_PER_PAGE.value
     ),
-) -> List[DirectionProjFlat]:
+) -> List[DirectionProjFlat] | List[DirectionProjShallow]:
     """Lister les directions (soft-delete filtré)."""
 
-    statement = (
-        select(Direction)
-        .where(Direction.est_supprimee == False)
-        .offset(offset)
-        .limit(limit)
-    )
+    statement = select(Direction).where(Direction.est_supprimee == False)
+    if proj == ProjDepth.SHALLOW:
+        statement = statement.options(
+            selectinload(Direction.structure).selectinload(Structure.structure_type)
+        )
+
+    statement = statement.offset(offset).limit(limit)
     result = await session.exec(statement)
     directions = result.all()
 
-    projected_directions = [DirectionProjFlat.model_validate(d) for d in directions]
+    projected_directions = [
+        apply_projection(d, DirectionProjFlat, DirectionProjShallow, proj)
+        for d in directions
+    ]
+
+    if proj == ProjDepth.SHALLOW:
+        refs = [(d.id_document_type, d.id_document) for d in directions]
+        docs = await resolve_document_references_batch(session, refs)
+        for d, projected in zip(directions, projected_directions):
+            key = (int(d.id_document_type), int(d.id_document))
+            if hasattr(projected, "document"):
+                projected.document = docs.get(key)
+
     return send200(projected_directions)
 
 
@@ -120,6 +146,13 @@ async def get_direction(
         direction = await get_direction_complete_data_by_id(id, session, proj)
 
     projected = apply_projection(direction, DirectionProjFlat, DirectionProjShallow, proj)
+    if proj == ProjDepth.SHALLOW and direction is not None:
+        projected.document = await resolve_document_reference(
+            session,
+            id_document_type=direction.id_document_type,
+            id_document=direction.id_document,
+        )
+
     return send200(projected)
 
 
@@ -160,6 +193,13 @@ async def update_direction(
         direction = await get_direction_complete_data_by_id(direction.id, session, proj)
 
     projected = apply_projection(direction, DirectionProjFlat, DirectionProjShallow, proj)
+    if proj == ProjDepth.SHALLOW and direction is not None:
+        projected.document = await resolve_document_reference(
+            session,
+            id_document_type=direction.id_document_type,
+            id_document=direction.id_document,
+        )
+    
     return send200(projected)
 
 
@@ -187,6 +227,13 @@ async def restore_direction(
         direction = await get_direction_complete_data_by_id(direction.id, session, proj)
 
     projected = apply_projection(direction, DirectionProjFlat, DirectionProjShallow, proj)
+    if proj == ProjDepth.SHALLOW and direction is not None:
+        projected.document = await resolve_document_reference(
+            session,
+            id_document_type=direction.id_document_type,
+            id_document=direction.id_document,
+        )
+
     return send200(projected)
 
 

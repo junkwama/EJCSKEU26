@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Iterable, Type, TypeVar
 
 from fastapi import HTTPException
 from pydantic import BaseModel
@@ -10,7 +10,29 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from routers.dependencies import check_resource_exists
 from utils.constants import ProjDepth
 
+if TYPE_CHECKING:
+    from models.constants.types import DocumentTypeEnum
+
 P = TypeVar('P', bound=BaseModel)
+
+
+def _coerce_document_type(raw_document_type: Any) -> DocumentTypeEnum | None:
+    """Coerce a raw document type value into DocumentTypeEnum.
+
+    Accepts either an enum instance or something int-castable.
+    Returns None when the value is invalid/unsupported.
+
+    Kept as a helper to avoid repeating the same coercion logic in multiple resolvers.
+    """
+
+    from models.constants.types import DocumentTypeEnum
+
+    try:
+        if isinstance(raw_document_type, DocumentTypeEnum):
+            return raw_document_type
+        return DocumentTypeEnum(int(raw_document_type))
+    except Exception:
+        return None
 
 def apply_projection(
     data: object,
@@ -48,26 +70,18 @@ async def check_document_reference_exists(
     - Existence is checked with ONE query via `check_resource_exists()`.
     """
 
-    # Lazy import to avoid circular imports
-    from models.constants.types import DocumentTypeEnum
-
-    try:
-        doc_type = (
-            id_document_type
-            if isinstance(id_document_type, DocumentTypeEnum)
-            else DocumentTypeEnum(int(id_document_type))
-        )
-    except Exception as e:  # noqa: BLE001
+    document_type = _coerce_document_type(id_document_type)
+    if document_type is None:
         raise HTTPException(
             status_code=422,
             detail=f"Invalid id_document_type={id_document_type!r}",
-        ) from e
+        )
 
-    model = _model_for_document_type(doc_type)
+    model = _model_for_document_type(document_type)
     if model is None:
         raise HTTPException(
             status_code=422,
-            detail=f"Unsupported document type: {doc_type.name}({int(doc_type)})",
+            detail=f"Unsupported document type: {document_type.name}({int(document_type)})",
         )
 
     try:
@@ -78,39 +92,152 @@ async def check_document_reference_exists(
         raise HTTPException(
             status_code=404,
             detail=(
-                f"Target document not found: type={doc_type.name}({int(doc_type)}), id={id_document}"
+                f"Target document not found: type={document_type.name}({int(document_type)}), id={id_document}"
             ),
         ) from e
 
 
-def _model_for_document_type(doc_type: Any) -> type[SQLModel] | None:
+def _model_for_document_type(document_type: Any) -> type[SQLModel] | None:
     """Map DocumentTypeEnum to its SQLModel class."""
 
     from models.constants.types import DocumentTypeEnum
 
-    if doc_type == DocumentTypeEnum.FIDELE:
+    if document_type == DocumentTypeEnum.FIDELE:
         from models.fidele import Fidele
 
         return Fidele
 
-    if doc_type == DocumentTypeEnum.PAROISSE:
+    if document_type == DocumentTypeEnum.PAROISSE:
         from models.paroisse import Paroisse
 
         return Paroisse
 
-    if doc_type == DocumentTypeEnum.STRUCTURE:
+    if document_type == DocumentTypeEnum.STRUCTURE:
         from models.constants import Structure
 
         return Structure
 
-    if doc_type == DocumentTypeEnum.NATION:
+    if document_type == DocumentTypeEnum.NATION:
         from models.adresse import Nation
 
         return Nation
 
-    if doc_type == DocumentTypeEnum.CONTINENT:
+    if document_type == DocumentTypeEnum.CONTINENT:
         from models.adresse import Continent
 
         return Continent
 
     return None
+
+
+def _document_to_projection(document_type: Any, data: SQLModel) -> BaseModel:
+    """Convert a resolved document entity to its projection model.
+
+    This matches your preference: if the document is a paroisse, return a Paroisse projection;
+    if it's a fidèle, return a Fidele projection; etc.
+    """
+
+    from models.constants.types import DocumentTypeEnum
+
+    if document_type == DocumentTypeEnum.PAROISSE:
+        from models.paroisse.projection import ParoisseProjFlat
+
+        return ParoisseProjFlat.model_validate(data)
+
+    if document_type == DocumentTypeEnum.NATION:
+        from models.adresse.projection import NationProjFlat
+
+        return NationProjFlat.model_validate(data)
+
+    if document_type == DocumentTypeEnum.CONTINENT:
+        from models.adresse.projection import ContinentProjFlat
+
+        return ContinentProjFlat.model_validate(data)
+
+    if document_type == DocumentTypeEnum.STRUCTURE:
+        from models.constants.projections import StructureProjFlat
+
+        return StructureProjFlat.model_validate(data)
+
+    if document_type == DocumentTypeEnum.FIDELE:
+        from models.fidele.projection import FideleProjFlat
+
+        return FideleProjFlat.model_validate(data)
+
+    # Fallback: expose at least the ID if a new type is added but projections aren't wired yet.
+    class _FallbackDoc(BaseModel):
+        id: int | None = None
+
+    return _FallbackDoc.model_validate({"id": getattr(data, "id", None)})
+
+
+async def resolve_document_reference(
+    session: AsyncSession,
+    *,
+    id_document_type: Any,
+    id_document: int,
+) -> BaseModel | None:
+    """Resolve a polymorphic (id_document_type, id_document) reference.
+
+    Returns a small generic dict with the resolved entity fields, or None if unsupported/not found.
+    """
+
+    document_type = _coerce_document_type(id_document_type)
+    if document_type is None:
+        return None
+
+    model = _model_for_document_type(document_type)
+    if model is None:
+        return None
+
+    from sqlmodel import select
+
+    statement = select(model).where(getattr(model, "id") == id_document)
+    if hasattr(model, "est_supprimee"):
+        statement = statement.where(getattr(model, "est_supprimee") == False)
+
+    result = await session.exec(statement)
+    data = result.first()
+    if not data:
+        return None
+
+    return _document_to_projection(document_type, data)
+
+
+async def resolve_document_references_batch(
+    session: AsyncSession,
+    refs: Iterable[tuple[Any, int]],
+) -> dict[tuple[int, int], BaseModel]:
+    """Batch-resolve polymorphic document references.
+
+    This avoids the N+1 query problem by doing:
+    - 1 query per document type present in the input refs
+
+    Returns a mapping: (id_document_type, id_document) -> resolved payload.
+    """
+
+    from sqlmodel import select
+
+    ids_by_type: dict[Any, set[int]] = {}
+    for raw_document_type, id_document in refs:
+        document_type = _coerce_document_type(raw_document_type)
+        if document_type is None:
+            continue
+        ids_by_type.setdefault(document_type, set()).add(int(id_document))
+
+    resolved: dict[tuple[int, int], BaseModel] = {}
+    for document_type, ids in ids_by_type.items():
+        model = _model_for_document_type(document_type)
+        if model is None:
+            continue
+
+        statement = select(model).where(getattr(model, "id").in_(ids))
+        if hasattr(model, "est_supprimee"):
+            statement = statement.where(getattr(model, "est_supprimee") == False)
+
+        result = await session.exec(statement)
+        for data in result.all():
+            key = (int(document_type), int(getattr(data, "id")))
+            resolved[key] = _document_to_projection(document_type, data)
+
+    return resolved
