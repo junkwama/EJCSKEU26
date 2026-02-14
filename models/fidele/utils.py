@@ -107,18 +107,18 @@ class FideleUpdate(BaseModel):
 class FideleStructureBase(SQLModel):
     id_fidele: int = PydanticField(...)
     id_structure: int = PydanticField(...)
-    date_adhesion: date | None = PydanticField(None, description="Date d'adhésion")
-    date_sortie: date | None = PydanticField(None, description="Date de sortie")
+    date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
+    date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
 
     class Config:
         from_attributes = True
 
 class FideleStructureUpdate(BaseModel):
-    date_adhesion: date | None = PydanticField(None, description="Date d'adhésion")
-    date_sortie: date | None = PydanticField(None, description="Date de sortie")
+    date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
+    date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
 
     class Config:
         from_attributes = True
 
 class FideleStructureCreate(FideleStructureUpdate):
-    id_structure: int
+    id_structure: int = PydanticField(..., examples=[1], description="Identifiant de la structure à laquelle le fidèle adhère")

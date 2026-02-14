@@ -59,6 +59,15 @@ async def add_fidele_structure(
 ) -> FideleStructureProjShallowWithoutFideleData:
     """Ajouter une structure à un fidèle (crée une adhésion dans fidele_structure)."""
 
+    # Structure id=1 is the "bureau ecclésiatique": no generic membership allowed.
+    # Access is managed via direction mandats (/direction/{id}/fonctions) instead.
+    if int(body.id_structure) == 1:
+        return send400(
+            ["body", "id_structure"],
+            "Adhésion interdite: la structure 'Bureau ecclésiatique' (id=1) n'a pas de membres génériques. "
+            "Utilisez plutôt les mandats/fonctions (direction_fonction).",
+        )
+
     # Ensure structure exists
     await check_resource_exists(Structure, session, filters={"id": body.id_structure})
 
@@ -77,6 +86,12 @@ async def add_fidele_structure(
         return send400(["body", "id_structure"], "Ce fidèle appartient déjà à cette structure")
 
     if existing and existing.est_supprimee == True:
+        if int(body.id_structure) == 1:
+            return send400(
+                ["body", "id_structure"],
+                "Restauration interdite: la structure 'Bureau ecclésiatique' (id=1) n'a pas de membres génériques. "
+                "Utilisez plutôt les mandats/fonctions (direction_fonction).",
+            )
         if not are_membership_dates_valid(body.date_adhesion, body.date_sortie):
             return send400(["body"], "Dates d'adhésion/sortie invalides")
 
