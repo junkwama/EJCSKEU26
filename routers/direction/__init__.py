@@ -14,6 +14,7 @@ from models.direction.projection import DirectionProjFlat, DirectionProjShallow
 from models.direction.utils import DirectionBase, DirectionUpdate
 from models.direction.fonction import DirectionFonction
 from routers.dependencies import check_resource_exists
+from routers.direction.docs import DIRECTION_CREATE_DESCRIPTION
 from routers.utils import apply_projection, check_document_reference_exists
 from routers.utils.http_utils import send200, send404
 from utils.constants import ProjDepth
@@ -50,7 +51,12 @@ async def get_direction_complete_data_by_id(
     return result.first()
 
 
-@direction_router.post("", tags=["Direction"])
+@direction_router.post(
+    "",
+    tags=["Direction"],
+    summary="Créer une direction (instance dirigeante d'une structure)",
+    description=DIRECTION_CREATE_DESCRIPTION,
+)
 async def create_direction(
     body: DirectionBase,
     session: Annotated[AsyncSession, Depends(get_session)],
