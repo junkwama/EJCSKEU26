@@ -17,6 +17,7 @@ from models.fidele.projection import (
     FideleStructureProjShallowWithoutFideleData,
 )
 from routers.dependencies import check_resource_exists
+from routers.fidele.docs import FIDELE_ADD_STRUCTURE_DESCRIPTION
 from routers.utils.http_utils import send200, send400
 from routers.fidele.utils import required_fidele
 
@@ -51,7 +52,11 @@ async def required_fidele_structure(
         "id_structure": id_structure
     })
 
-@fidele_structures_router.post("")
+@fidele_structures_router.post(
+    "",
+    summary="Ajouter une structure à un fidèle (adhésion)",
+    description=FIDELE_ADD_STRUCTURE_DESCRIPTION,
+)
 async def add_fidele_structure(
     body: FideleStructureCreate,
     session: Annotated[AsyncSession, Depends(get_session)],
