@@ -9,6 +9,7 @@ from models.constants.projections import (
     StructureProjFlat,
     NiveauEtudesProjFlat,
     ProfessionProjFlat,
+    EtatCivileProjFlat,
 )
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
@@ -50,6 +51,9 @@ class FideleProjFlat(BaseModel):
 
     id_grade: GradeEnum 
     id_fidele_type: FideleTypeEnum
+    id_fidele_recenseur: int | None = None
+    id_nation_nationalite: int | None = None
+    id_etat_civile: int | None = None
 
     est_supprimee: bool
     date_suppression: datetime | None = None
@@ -68,6 +72,9 @@ class FideleProjShallow(FideleProjFlat):
     # Flat versions of related fields (with their nested fields)
     grade: GradeProjFlat
     fidele_type: FideleTypeProjFlat
+    fidele_recenseur: Optional["FideleProjFlat"] = None
+    nation_nationalite: NationProjFlat | None = None
+    etat_civile: EtatCivileProjFlat | None = None
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None
     structures: List["FideleStructureProjShallow"] = []

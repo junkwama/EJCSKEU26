@@ -32,7 +32,7 @@ from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
-from models.constants import DocumentType, FideleType, Grade
+from models.constants import DocumentType, FideleType, Grade, EtatCivile
 
 fidele_router = APIRouter()
 
@@ -50,12 +50,11 @@ async def get_fidele_complete_data_by_id(
         statement = statement.options(
             selectinload(Fidele.grade),
             selectinload(Fidele.fidele_type),
+            selectinload(Fidele.fidele_recenseur),
+            selectinload(Fidele.nation_nationalite),
+            selectinload(Fidele.etat_civile),
             selectinload(Fidele.contact),
-            (
-                selectinload(Fidele.adresse)
-                .selectinload(Adresse.nation)
-                .selectinload(Nation.continent)
-            ),
+            selectinload(Fidele.adresse).selectinload(Adresse.nation).selectinload(Nation.continent),
             selectinload(Fidele.structures).selectinload(FideleStructure.structure),
             selectinload(Fidele.paroisses).selectinload(FideleParoisse.paroisse),
             selectinload(Fidele.bapteme).selectinload(FideleBapteme.paroisse),
@@ -105,6 +104,12 @@ async def create_fidele(
     await check_resource_exists(
         FideleType, session, filters={"id": int(body.id_fidele_type)}
     )
+    if body.id_fidele_recenseur is not None:
+        await check_resource_exists(Fidele, session, filters={"id": body.id_fidele_recenseur})
+    if body.id_nation_nationalite is not None:
+        await check_resource_exists(Nation, session, filters={"id": body.id_nation_nationalite})
+    if body.id_etat_civile is not None:
+        await check_resource_exists(EtatCivile, session, filters={"id": body.id_etat_civile})
 
     # Create new fidele instance
     fidele = Fidele(**body.model_dump(mode="json"))
@@ -192,6 +197,12 @@ async def update_fidele(
         await check_resource_exists(
             FideleType, session, filters={"id": int(update_data["id_fidele_type"]) }
         )
+    if "id_fidele_recenseur" in update_data and update_data["id_fidele_recenseur"] is not None:
+        await check_resource_exists(Fidele, session, filters={"id": update_data["id_fidele_recenseur"]})
+    if "id_nation_nationalite" in update_data and update_data["id_nation_nationalite"] is not None:
+        await check_resource_exists(Nation, session, filters={"id": update_data["id_nation_nationalite"]})
+    if "id_etat_civile" in update_data and update_data["id_etat_civile"] is not None:
+        await check_resource_exists(EtatCivile, session, filters={"id": update_data["id_etat_civile"]})
 
     # Update fields (only provided fields)
     for field, value in update_data.items():

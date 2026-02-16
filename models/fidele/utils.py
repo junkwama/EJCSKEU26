@@ -61,6 +61,18 @@ FIDELE_FIELDS_CONFIG = {
         "examples": [1, 2, 3],
         "description": "L'id du type du fidele."
     },
+    "id_fidele_recenseur": {
+        "examples": [2],
+        "description": "L'id du fidèle recenseur (ayant recensé ou confirmé ce fidèle)."
+    },
+    "id_nation_nationalite": {
+        "examples": [1],
+        "description": "L'id de la nation représentant la nationalité du fidèle."
+    },
+    "id_etat_civile": {
+        "examples": [1],
+        "description": "L'id de l'état civile du fidèle."
+    },
     "tel": {
         "pattern": Regex.PHONE.value,
         "examples": ["+243812345678"],
@@ -80,6 +92,9 @@ class FideleBase(SQLModel):
     numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
     id_grade: GradeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_fidele_type"])
+    id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
+    id_nation_nationalite: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
+    id_etat_civile: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_etat_civile"])
     tel: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["tel"])
     password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)
 
@@ -96,6 +111,9 @@ class FideleUpdate(BaseModel):
     numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
     id_grade: GradeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_type"])
+    id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
+    id_nation_nationalite: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
+    id_etat_civile: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_etat_civile"])
 
 
 class FideleStructureBase(SQLModel):
@@ -112,7 +130,7 @@ class FideleStructureUpdate(BaseModel):
         from_attributes = True
 
 class FideleStructureCreate(FideleStructureUpdate):
-    id_structure: int = PydanticField(..., examples=[1], description="Identifiant de la structure à laquelle le fidèle adhère")
+    id_structure: int = PydanticField(..., examples=[1], description="Identifiant de la structure.")
 
 
 class FideleParoisseBase(SQLModel):
@@ -143,7 +161,7 @@ class _FideleBaptemeCommonFields:
 
 
 class FideleBaptemeBase(SQLModel, _FideleBaptemeCommonFields):
-    id_fidele: int = PydanticField(...)
+    id_fidele: int = PydanticField(..., examples=[1], description="Identifiant du fidèle")
 
     class Config:
         from_attributes = True
@@ -163,7 +181,7 @@ class _FideleFamilleCommonFields:
 
 
 class FideleFamilleBase(SQLModel, _FideleFamilleCommonFields):
-    id_fidele: int = PydanticField(...)
+    id_fidele: int = PydanticField(..., examples=[1], description="Identifiant du fidèle")
 
     class Config:
         from_attributes = True
@@ -186,7 +204,7 @@ class _FideleOrigineCommonFields:
 
 
 class FideleOrigineBase(SQLModel, _FideleOrigineCommonFields):
-    id_fidele: int = PydanticField(...)
+    id_fidele: int = PydanticField(..., examples=[1], description="Identifiant du fidèle")
 
     class Config:
         from_attributes = True

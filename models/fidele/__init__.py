@@ -17,7 +17,7 @@ from models.fidele.utils import (
     FideleOrigineBase,
     FideleOccupationBase,
 )
-from models.constants import FideleType, Grade, Structure, Profession, NiveauEtudes
+from models.constants import FideleType, Grade, Structure, Profession, NiveauEtudes, EtatCivile
 from models.utils.utils import BaseModelClass
 
 if TYPE_CHECKING:
@@ -44,6 +44,30 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             nullable=False,
         )
     )
+    id_fidele_recenseur: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
+    id_nation_nationalite: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("nation.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
+    id_etat_civile: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("etat_civile.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
     __table_args__ = (
         UniqueConstraint("numero_carte", name="uq_fidele_numero_carte"),
         Index("idx_fidele_nom", "nom"),
@@ -54,7 +78,17 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     # Relationships
     grade: Grade = Relationship()
     fidele_type: FideleType = Relationship()
-    contact: Contact | None = Relationship(
+    fidele_recenseur: "Fidele" = Relationship(
+        sa_relationship=relationship(
+            "Fidele",
+            remote_side="Fidele.id",
+            foreign_keys="Fidele.id_fidele_recenseur",
+            uselist=False,
+        )
+    )
+    nation_nationalite: "Nation" = Relationship()
+    etat_civile: EtatCivile = Relationship()
+    contact: Contact = Relationship(
         sa_relationship=relationship(
             "Contact",
             primaryjoin=lambda: and_(
@@ -66,7 +100,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
         )
     )
     
-    adresse: Adresse | None = Relationship(
+    adresse: Adresse = Relationship(
         sa_relationship=relationship(
             "Adresse",
             primaryjoin=lambda: and_(
