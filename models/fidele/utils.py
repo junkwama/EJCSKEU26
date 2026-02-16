@@ -117,8 +117,7 @@ class FideleUpdate(BaseModel):
 
 
 class FideleStructureBase(SQLModel):
-    id_fidele: int = PydanticField(...)
-    id_structure: int = PydanticField(...)
+    pass
 
     class Config:
         from_attributes = True
@@ -134,8 +133,6 @@ class FideleStructureCreate(FideleStructureUpdate):
 
 
 class FideleParoisseBase(SQLModel):
-    id_fidele: int = PydanticField(...)
-    id_paroisse: int = PydanticField(..., examples=[1], description="Identifiant de la paroisse")
     date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
     date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
 
@@ -155,45 +152,72 @@ class FideleParoisseCreate(FideleParoisseUpdate):
     id_paroisse: int = PydanticField(..., examples=[1], description="Identifiant de la paroisse")
 
 
-class _FideleBaptemeCommonFields:
+class FideleBaptemeBase(SQLModel):
+    date_bapteme: date | None = PydanticField(None, examples=["2015-06-15"], description="Date de baptême")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleBaptemeCreate(BaseModel):
     date_bapteme: date | None = PydanticField(None, examples=["2015-06-15"], description="Date de baptême")
     id_paroisse: int | None = PydanticField(None, examples=[1], description="Paroisse du baptême")
 
+    class Config:
+        from_attributes = True
 
-class FideleBaptemeBase(SQLModel, _FideleBaptemeCommonFields):
-    id_fidele: int = PydanticField(..., examples=[1], description="Identifiant du fidèle")
+
+class FideleBaptemeUpdate(BaseModel):
+    date_bapteme: date | None = PydanticField(None, examples=["2015-06-15"], description="Date de baptême")
+    id_paroisse: int | None = PydanticField(None, examples=[1], description="Paroisse du baptême")
 
     class Config:
         from_attributes = True
 
 
-class FideleBaptemeUpdate(BaseModel, _FideleBaptemeCommonFields):
-
-    class Config:
-        from_attributes = True
-
-
-class _FideleFamilleCommonFields:
+class FideleFamilleBase(SQLModel):
     nom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Kasongo"], description="Nom du conjoint")
     postnom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Mbuyi"], description="Postnom du conjoint")
     prenom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Marie"], description="Prénom du conjoint")
     nombre_enfants: int | None = PydanticField(None, ge=0, examples=[3], description="Nombre d'enfants")
 
+    class Config:
+        from_attributes = True
 
-class FideleFamilleBase(SQLModel, _FideleFamilleCommonFields):
-    id_fidele: int = PydanticField(..., examples=[1], description="Identifiant du fidèle")
+
+class FideleFamilleCreate(BaseModel):
+    nom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Kasongo"], description="Nom du conjoint")
+    postnom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Mbuyi"], description="Postnom du conjoint")
+    prenom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Marie"], description="Prénom du conjoint")
+    nombre_enfants: int | None = PydanticField(None, ge=0, examples=[3], description="Nombre d'enfants")
 
     class Config:
         from_attributes = True
 
 
-class FideleFamilleUpdate(BaseModel, _FideleFamilleCommonFields):
+class FideleFamilleUpdate(BaseModel):
+    nom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Kasongo"], description="Nom du conjoint")
+    postnom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Mbuyi"], description="Postnom du conjoint")
+    prenom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Marie"], description="Prénom du conjoint")
+    nombre_enfants: int | None = PydanticField(None, ge=0, examples=[3], description="Nombre d'enfants")
 
     class Config:
         from_attributes = True
 
 
-class _FideleOrigineCommonFields:
+class FideleOrigineBase(SQLModel):
+    village: str | None = PydanticField(None, max_length=120, examples=["Kisantu"], description="Village d'origine")
+    groupement: str | None = PydanticField(None, max_length=120, examples=["Ngidinga"], description="Groupement d'origine")
+    secteur: str | None = PydanticField(None, max_length=120, examples=["Lukunga"], description="Secteur d'origine")
+    territoire: str | None = PydanticField(None, max_length=120, examples=["Madimba"], description="Territoire d'origine")
+    district: str | None = PydanticField(None, max_length=120, examples=["Mont-Amba"], description="District d'origine")
+    province: str | None = PydanticField(None, max_length=120, examples=["Kongo Central"], description="Province d'origine")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOrigineCreate(BaseModel):
     village: str | None = PydanticField(None, max_length=120, examples=["Kisantu"], description="Village d'origine")
     groupement: str | None = PydanticField(None, max_length=120, examples=["Ngidinga"], description="Groupement d'origine")
     secteur: str | None = PydanticField(None, max_length=120, examples=["Lukunga"], description="Secteur d'origine")
@@ -202,21 +226,36 @@ class _FideleOrigineCommonFields:
     province: str | None = PydanticField(None, max_length=120, examples=["Kongo Central"], description="Province d'origine")
     id_nation: int | None = PydanticField(None, examples=[1], description="Nation d'origine")
 
+    class Config:
+        from_attributes = True
 
-class FideleOrigineBase(SQLModel, _FideleOrigineCommonFields):
-    id_fidele: int = PydanticField(..., examples=[1], description="Identifiant du fidèle")
+
+class FideleOrigineUpdate(BaseModel):
+    village: str | None = PydanticField(None, max_length=120, examples=["Kisantu"], description="Village d'origine")
+    groupement: str | None = PydanticField(None, max_length=120, examples=["Ngidinga"], description="Groupement d'origine")
+    secteur: str | None = PydanticField(None, max_length=120, examples=["Lukunga"], description="Secteur d'origine")
+    territoire: str | None = PydanticField(None, max_length=120, examples=["Madimba"], description="Territoire d'origine")
+    district: str | None = PydanticField(None, max_length=120, examples=["Mont-Amba"], description="District d'origine")
+    province: str | None = PydanticField(None, max_length=120, examples=["Kongo Central"], description="Province d'origine")
+    id_nation: int | None = PydanticField(None, examples=[1], description="Nation d'origine")
 
     class Config:
         from_attributes = True
 
 
-class FideleOrigineUpdate(BaseModel, _FideleOrigineCommonFields):
+class FideleOccupationBase(SQLModel):
+    ecole_universite_employeur: str | None = PydanticField(
+        None,
+        max_length=150,
+        examples=["Université de Kinshasa"],
+        description="École, université ou employeur actuel",
+    )
 
     class Config:
         from_attributes = True
 
 
-class _FideleOccupationCommonFields:
+class FideleOccupationCreate(BaseModel):
     id_niveau_etude: int = PydanticField(..., examples=[1], description="Niveau d'étude du fidèle")
     id_profession: int = PydanticField(..., examples=[1], description="Profession du fidèle")
     ecole_universite_employeur: str | None = PydanticField(
@@ -226,15 +265,19 @@ class _FideleOccupationCommonFields:
         description="École, université ou employeur actuel",
     )
 
-
-class FideleOccupationBase(SQLModel, _FideleOccupationCommonFields):
-    id_fidele: int = PydanticField(...)
-
     class Config:
         from_attributes = True
 
 
-class FideleOccupationUpdate(BaseModel, _FideleOccupationCommonFields):
+class FideleOccupationUpdate(BaseModel):
+    id_niveau_etude: int = PydanticField(..., examples=[1], description="Niveau d'étude du fidèle")
+    id_profession: int = PydanticField(..., examples=[1], description="Profession du fidèle")
+    ecole_universite_employeur: str | None = PydanticField(
+        None,
+        max_length=150,
+        examples=["Université de Kinshasa"],
+        description="École, université ou employeur actuel",
+    )
 
     class Config:
         from_attributes = True

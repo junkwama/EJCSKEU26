@@ -10,7 +10,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from core.db import get_session
 from models.fidele import Fidele, FideleFamille
 from models.fidele.projection import FideleFamilleProjFlat
-from models.fidele.utils import FideleFamilleBase, FideleFamilleUpdate
+from models.fidele.utils import FideleFamilleCreate, FideleFamilleUpdate
 from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200, send400, send404
 
@@ -29,7 +29,7 @@ async def get_fidele_famille_by_fidele_id(fidele_id: int, session: AsyncSession)
 
 @fidele_famille_router.post("")
 async def create_fidele_famille(
-    body: FideleFamilleBase,
+    body: FideleFamilleCreate,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
 ) -> FideleFamilleProjFlat:
