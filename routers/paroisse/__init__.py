@@ -509,3 +509,9 @@ async def delete_paroisse_contact(
     await session.commit()
 
     return send200(contact_proj)
+
+
+# ========================== FIDELES VIEW ENDPOINTS ==========================
+from routers.paroisse.fideles import paroisse_fideles_router
+
+paroisse_router.include_router(paroisse_fideles_router)
