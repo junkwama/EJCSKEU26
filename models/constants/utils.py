@@ -42,6 +42,54 @@ FIDELE_TYPE_FIELDS_CONFIG = {
 
 
 # ============================================================================
+# PROFESSION FIELDS CONFIG
+# ============================================================================
+PROFESSION_FIELDS_CONFIG = {
+    "nom": {
+        "max_length": 150,
+        "examples": ["Élève/Étudiant"],
+        "description": "Nom de la profession",
+    },
+    "description": {
+        "examples": ["Profession principale du fidèle"],
+        "description": "Description de la profession (optionnelle)",
+    },
+}
+
+
+# ============================================================================
+# NIVEAU ETUDES FIELDS CONFIG
+# ============================================================================
+NIVEAU_ETUDES_FIELDS_CONFIG = {
+    "nom": {
+        "max_length": 150,
+        "examples": ["Secondaire"],
+        "description": "Niveau d'études",
+    },
+    "description": {
+        "examples": ["Niveau d'études de base"],
+        "description": "Description du niveau d'études (optionnelle)",
+    },
+}
+
+
+# ============================================================================
+# ETAT CIVILE FIELDS CONFIG
+# ============================================================================
+ETAT_CIVILE_FIELDS_CONFIG = {
+    "nom": {
+        "max_length": 100,
+        "examples": ["Célibataire"],
+        "description": "État civil",
+    },
+    "description": {
+        "examples": ["Situation matrimoniale"],
+        "description": "Description de l'état civil (optionnelle)",
+    },
+}
+
+
+# ============================================================================
 # STRUCTURE TYPE FIELDS CONFIG
 # ============================================================================
 STRUCTURE_TYPE_FIELDS_CONFIG = {
@@ -140,6 +188,45 @@ class FideleTypeBase(SQLModel):
 
 class FideleTypeUpdate(BaseModel):
     nom: str | None = PydanticField(None, **FIDELE_TYPE_FIELDS_CONFIG["nom"])
+
+
+# ============================================================================
+# PROFESSION BASE & UPDATE
+# ============================================================================
+class ProfessionBase(SQLModel):
+    nom: str = PydanticField(..., **PROFESSION_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **PROFESSION_FIELDS_CONFIG["description"])
+
+
+class ProfessionUpdate(BaseModel):
+    nom: str | None = PydanticField(None, **PROFESSION_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **PROFESSION_FIELDS_CONFIG["description"])
+
+
+# ============================================================================
+# NIVEAU ETUDES BASE & UPDATE
+# ============================================================================
+class NiveauEtudesBase(SQLModel):
+    nom: str = PydanticField(..., **NIVEAU_ETUDES_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **NIVEAU_ETUDES_FIELDS_CONFIG["description"])
+
+
+class NiveauEtudesUpdate(BaseModel):
+    nom: str | None = PydanticField(None, **NIVEAU_ETUDES_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **NIVEAU_ETUDES_FIELDS_CONFIG["description"])
+
+
+# ============================================================================
+# ETAT CIVILE BASE & UPDATE
+# ============================================================================
+class EtatCivileBase(SQLModel):
+    nom: str = PydanticField(..., **ETAT_CIVILE_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **ETAT_CIVILE_FIELDS_CONFIG["description"])
+
+
+class EtatCivileUpdate(BaseModel):
+    nom: str | None = PydanticField(None, **ETAT_CIVILE_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **ETAT_CIVILE_FIELDS_CONFIG["description"])
 
 
 # ============================================================================

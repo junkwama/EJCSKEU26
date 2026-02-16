@@ -274,6 +274,52 @@ INSERT IGNORE INTO grade (id, nom) VALUES
   (4, 'Sielo'),
   (5, 'Pasteur');
 
+-- Professions (common values; first one must be Eleve/Etudiant)
+INSERT IGNORE INTO profession (id, nom, description) VALUES
+  (1, 'Eleve/Etudiant', 'En formation scolaire ou universitaire'),
+  (2, 'Fonctionnaire', 'Agent de l''administration publique'),
+  (3, 'Enseignant', 'Profession de l''enseignement'),
+  (4, 'Commerçant', 'Activité commerciale indépendante ou structurée'),
+  (5, 'Entrepreneur', 'Créateur ou gestionnaire d''entreprise'),
+  (6, 'Artisan', 'Métier manuel qualifié'),
+  (7, 'Agriculteur', 'Activité agricole et/ou élevage'),
+  (8, 'Avocat', 'Profession juridique'),
+  (9, 'Médecin', 'Profession médicale'),
+  (10, 'Infirmier', 'Profession des soins infirmiers'),
+  (11, 'Pharmacien', 'Profession de pharmacie'),
+  (12, 'Ingénieur', 'Profession de l''ingénierie'),
+  (13, 'Informaticien', 'Profession des systèmes informatiques et numériques'),
+  (14, 'Comptable', 'Gestion comptable et financière'),
+  (15, 'Banquier', 'Secteur bancaire et services financiers'),
+  (16, 'Journaliste', 'Profession des médias et de l''information'),
+  (17, 'Chauffeur', 'Transport de personnes ou de marchandises'),
+  (18, 'Mécanicien', 'Maintenance et réparation mécanique'),
+  (19, 'Électricien', 'Installation et maintenance électrique'),
+  (20, 'Maçon', 'Travaux de construction'),
+  (21, 'Menuisier', 'Travaux de menuiserie'),
+  (22, 'Couturier', 'Confection et couture'),
+  (23, 'Coiffeur', 'Soins capillaires et coiffure'),
+  (24, 'Militaire', 'Forces armées'),
+  (25, 'Policier', 'Forces de l''ordre et sécurité publique'),
+  (26, 'Retraité', 'Ancien professionnel en retraite'),
+  (27, 'Sans emploi', 'Actuellement sans activité professionnelle'),
+  (28, 'Autre', 'Profession non presente sur la liste.');
+
+-- Niveaux d'études (base courante)
+INSERT IGNORE INTO niveau_etudes (id, nom, description) VALUES
+  (1, 'Aucun', 'Sans niveau scolaire formel'),
+  (2, 'Primaire', 'Niveau d''enseignement primaire'),
+  (3, 'Secondaire', 'Niveau d''enseignement secondaire'),
+  (4, 'Technique/Professionnel', 'Formation technique ou professionnelle'),
+  (5, 'Universitaire', 'Niveau licence/master/doctorat');
+
+-- États civils de base
+INSERT IGNORE INTO etat_civile (id, nom, description) VALUES
+  (1, 'Célibataire', 'Personne non mariée'),
+  (2, 'Marié', 'Personne mariée'),
+  (3, 'Divorcé', 'Personne divorcée'),
+  (4, 'Veuf', 'Conjoint décédé');
+
 -- Fonctions (idempotent even if nom isn't UNIQUE)
 INSERT INTO fonction_list (nom)
 SELECT 'Pasteur Responsable' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Pasteur Responsable');

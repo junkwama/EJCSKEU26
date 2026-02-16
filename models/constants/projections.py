@@ -41,6 +41,54 @@ class FideleTypeProjFlat(BaseModel):
     class Config:
         from_attributes = True
 
+
+# ============================================================================
+# PROFESSION PROJECTIONS
+# ============================================================================
+
+class ProfessionProjFlat(BaseModel):
+    """Projection plate de Profession - sans relations"""
+    id: int
+    nom: str
+    description: str | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================================
+# NIVEAU ETUDES PROJECTIONS
+# ============================================================================
+
+class NiveauEtudesProjFlat(BaseModel):
+    """Projection plate de NiveauEtudes - sans relations"""
+    id: int
+    nom: str
+    description: str | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================================
+# ETAT CIVILE PROJECTIONS
+# ============================================================================
+
+class EtatCivileProjFlat(BaseModel):
+    """Projection plate de EtatCivile - sans relations"""
+    id: int
+    nom: str
+    description: str | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+
+    class Config:
+        from_attributes = True
+
 # ============================================================================
 # STRUCTURE TYPE PROJECTIONS
 # ============================================================================

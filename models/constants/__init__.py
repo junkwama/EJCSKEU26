@@ -5,7 +5,8 @@ from models.utils.utils import BaseModelClass
 from utils.utils import SQLModelField
 from models.constants.utils import (
     DocumentTypeBase, GradeBase, FideleTypeBase,
-    StructureBase, FonctionBase, StructureTypeBase
+    StructureBase, FonctionBase, StructureTypeBase,
+    ProfessionBase, NiveauEtudesBase, EtatCivileBase,
 )
 
 if TYPE_CHECKING:
@@ -45,6 +46,45 @@ class FideleType(FideleTypeBase, BaseModelClass, table=True):
         UniqueConstraint("nom", name="uq_fidele_type_nom"),
     )
     
+    class Config:
+        from_attributes = True
+
+
+class Profession(ProfessionBase, BaseModelClass, table=True):
+    """Modèle de la table Profession"""
+    __tablename__ = "profession"
+
+    __table_args__ = (
+        UniqueConstraint("nom", name="uq_profession_nom"),
+        Index("idx_profession_est_supprimee", "est_supprimee"),
+    )
+
+    class Config:
+        from_attributes = True
+
+
+class NiveauEtudes(NiveauEtudesBase, BaseModelClass, table=True):
+    """Modèle de la table NiveauEtudes"""
+    __tablename__ = "niveau_etudes"
+
+    __table_args__ = (
+        UniqueConstraint("nom", name="uq_niveau_etudes_nom"),
+        Index("idx_niveau_etudes_est_supprimee", "est_supprimee"),
+    )
+
+    class Config:
+        from_attributes = True
+
+
+class EtatCivile(EtatCivileBase, BaseModelClass, table=True):
+    """Modèle de la table EtatCivile"""
+    __tablename__ = "etat_civile"
+
+    __table_args__ = (
+        UniqueConstraint("nom", name="uq_etat_civile_nom"),
+        Index("idx_etat_civile_est_supprimee", "est_supprimee"),
+    )
+
     class Config:
         from_attributes = True
 

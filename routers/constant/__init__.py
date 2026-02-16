@@ -6,6 +6,9 @@ from routers.constant.structure_type import structure_type_router
 from routers.constant.nation import nation_router
 from routers.constant.structure import structure_router
 from routers.constant.fonction import fonction_router
+from routers.constant.profession import profession_router
+from routers.constant.niveau_etudes import niveau_etudes_router
+from routers.constant.etat_civile import etat_civile_router
 
 # ============================================================================
 # CONSTANTS ROUTER AGGREGATOR
@@ -20,3 +23,6 @@ constant_router.include_router(structure_type_router)
 constant_router.include_router(nation_router)
 constant_router.include_router(structure_router)
 constant_router.include_router(fonction_router)
+constant_router.include_router(profession_router)
+constant_router.include_router(niveau_etudes_router)
+constant_router.include_router(etat_civile_router)
