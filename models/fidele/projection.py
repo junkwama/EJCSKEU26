@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, computed_field
 from datetime import date, datetime
 
-from models.adresse.projection import AdresseProjShallow
+from models.adresse.projection import AdresseProjShallow, NationProjFlat
 from models.constants.projections import FideleTypeProjFlat, GradeProjFlat, StructureProjFlat
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
@@ -51,7 +51,7 @@ class FideleProjFlat(BaseModel):
     date_creation: datetime
     date_modification: datetime
 
-    class Config:
+    class Config: 
         from_attributes = True
 
 class FideleProjShallow(FideleProjFlat):
@@ -66,12 +66,15 @@ class FideleProjShallow(FideleProjFlat):
     adresse: AdresseProjShallow | None = None
     structures: List["FideleStructureProjShallow"] = []
     paroisses: List["FideleParoisseProjShallowWithoutFideleData"] = []
+    bapteme: Optional["FideleBaptemeProjShallowWithoutFideleData"] = None
+    famille: Optional["FideleFamilleProjFlat"] = None
+    origine: Optional["FideleOrigineProjShallowWithoutFideleData"] = None
     
     class Config:
         from_attributes = True
 
 ## ============================================================================
-## FIDELE-STRUCTURE PROJECTIONS
+## SUB DATA PROJECTIONS
 ## ============================================================================
 
 class FideleStructureProjFlat(BaseModel):
@@ -148,6 +151,69 @@ class FideleParoisseProjShallowWithoutParoisseData(FideleParoisseProjFlat):
 class FideleParoisseProjShallowWithoutFideleData(FideleParoisseProjFlat):
     """Projection shallow de FideleParoisse - Contenant Paroisse"""
     paroisse: ParoisseProjFlat
+
+    class Config:
+        from_attributes = True
+
+
+class FideleBaptemeProjFlat(BaseModel):
+    id: int
+    id_fidele: int
+    date_bapteme: date | None
+    id_paroisse: int | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FideleBaptemeProjShallowWithoutFideleData(FideleBaptemeProjFlat):
+    paroisse: ParoisseProjFlat | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class FideleFamilleProjFlat(BaseModel):
+    id: int
+    id_fidele: int
+    nom_conjoint: str | None
+    postnom_conjoint: str | None
+    prenom_conjoint: str | None
+    nombre_enfants: int | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOrigineProjFlat(BaseModel):
+    id: int
+    id_fidele: int
+    village: str | None
+    groupement: str | None
+    secteur: str | None
+    territoire: str | None
+    district: str | None
+    province: str | None
+    id_nation: int | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOrigineProjShallowWithoutFideleData(FideleOrigineProjFlat):
+    nation: NationProjFlat | None = None
 
     class Config:
         from_attributes = True

@@ -8,11 +8,19 @@ from models.constants.types import DocumentTypeEnum
 from utils.utils import SQLModelField
 from models.adresse import Adresse
 from models.contact import Contact
-from models.fidele.utils import FideleBase, FideleStructureBase, FideleParoisseBase
+from models.fidele.utils import (
+    FideleBase,
+    FideleStructureBase,
+    FideleParoisseBase,
+    FideleBaptemeBase,
+    FideleFamilleBase,
+    FideleOrigineBase,
+)
 from models.constants import FideleType, Grade, Structure
 from models.utils.utils import BaseModelClass
 
 if TYPE_CHECKING:
+    from models.adresse import Nation
     from models.paroisse import Paroisse
 
 class Fidele(FideleBase, BaseModelClass, table=True):
@@ -72,6 +80,9 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     # N-N relationship with Structure through FideleStructure
     structures: List["FideleStructure"] = Relationship(back_populates="fidele")
     paroisses: List["FideleParoisse"] = Relationship(back_populates="fidele")
+    bapteme: "FideleBapteme" = Relationship(back_populates="fidele")
+    famille: "FideleFamille" = Relationship(back_populates="fidele")
+    origine: "FideleOrigine" = Relationship(back_populates="fidele")
 
     class Config:
         from_attributes = True
@@ -139,6 +150,101 @@ class FideleParoisse(FideleParoisseBase, BaseModelClass, table=True):
 
     fidele: Fidele = Relationship(back_populates="paroisses")
     paroisse: "Paroisse" = Relationship(back_populates="fidele_paroisses")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleBapteme(FideleBaptemeBase, BaseModelClass, table=True):
+    """Informations de baptême d'un fidèle."""
+
+    __tablename__ = "fidele_bapteme"
+
+    id_fidele: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    id_paroisse: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("paroisse.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
+
+    __table_args__ = (
+        UniqueConstraint("id_fidele", name="uq_fidele_bapteme_fidele"),
+        Index("idx_fidele_bapteme_fidele", "id_fidele"),
+        Index("idx_fidele_bapteme_paroisse", "id_paroisse"),
+        Index("idx_fidele_bapteme_est_supprimee", "est_supprimee"),
+    )
+
+    fidele: Fidele = Relationship(back_populates="bapteme")
+    paroisse: "Paroisse" = Relationship()
+
+    class Config:
+        from_attributes = True
+
+
+class FideleFamille(FideleFamilleBase, BaseModelClass, table=True):
+    """Informations familiales d'un fidèle."""
+
+    __tablename__ = "fidele_famille"
+
+    id_fidele: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+
+    __table_args__ = (
+        UniqueConstraint("id_fidele", name="uq_fidele_famille_fidele"),
+        Index("idx_fidele_famille_fidele", "id_fidele"),
+        Index("idx_fidele_famille_est_supprimee", "est_supprimee"),
+    )
+
+    fidele: Fidele = Relationship(back_populates="famille")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOrigine(FideleOrigineBase, BaseModelClass, table=True):
+    """Informations sur le lieu d'origine d'un fidèle."""
+
+    __tablename__ = "fidele_origine"
+
+    id_fidele: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    id_nation: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("nation.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
+
+    __table_args__ = (
+        UniqueConstraint("id_fidele", name="uq_fidele_origine_fidele"),
+        Index("idx_fidele_origine_fidele", "id_fidele"),
+        Index("idx_fidele_origine_nation", "id_nation"),
+        Index("idx_fidele_origine_est_supprimee", "est_supprimee"),
+    )
+
+    fidele: Fidele = Relationship(back_populates="origine")
+    nation: "Nation" = Relationship()
 
     class Config:
         from_attributes = True

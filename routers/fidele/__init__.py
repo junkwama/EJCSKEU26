@@ -9,7 +9,14 @@ from datetime import datetime, timezone
 # Local modules
 from core.config import Config
 from models.constants.types import DocumentTypeEnum
-from models.fidele import Fidele, FideleStructure, FideleParoisse
+from models.fidele import (
+    Fidele,
+    FideleStructure,
+    FideleParoisse,
+    FideleBapteme,
+    FideleFamille,
+    FideleOrigine,
+)
 from models.fidele.utils import FideleBase, FideleUpdate
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
 from models.adresse import Adresse, Nation
@@ -50,6 +57,9 @@ async def get_fidele_complete_data_by_id(
             ),
             selectinload(Fidele.structures).selectinload(FideleStructure.structure),
             selectinload(Fidele.paroisses).selectinload(FideleParoisse.paroisse),
+            selectinload(Fidele.bapteme).selectinload(FideleBapteme.paroisse),
+            selectinload(Fidele.famille),
+            selectinload(Fidele.origine).selectinload(FideleOrigine.nation),
         )
 
     result = await session.exec(statement)
@@ -509,6 +519,24 @@ fidele_router.include_router(fidele_structures_router)
 from routers.fidele.paroisses import fidele_paroisses_router
 
 fidele_router.include_router(fidele_paroisses_router)
+
+
+# ========================== BAPTEME ENDPOINTS ==========================
+from routers.fidele.bapteme import fidele_bapteme_router
+
+fidele_router.include_router(fidele_bapteme_router)
+
+
+# ========================== FAMILLE ENDPOINTS ==========================
+from routers.fidele.famille import fidele_famille_router
+
+fidele_router.include_router(fidele_famille_router)
+
+
+# ========================== ORIGINE ENDPOINTS ==========================
+from routers.fidele.origine import fidele_origine_router
+
+fidele_router.include_router(fidele_origine_router)
 
 
 # ========================== FONCTIONS VIEW ENDPOINTS ==========================
