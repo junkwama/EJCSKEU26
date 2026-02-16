@@ -11,7 +11,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from core.db import get_session
 from models.fidele import Fidele, FideleBapteme
 from models.fidele.projection import FideleBaptemeProjFlat, FideleBaptemeProjShallowWithoutFideleData
-from models.fidele.utils import FideleBaptemeUpdate
+from models.fidele.utils import FideleBaptemeBase, FideleBaptemeUpdate
 from models.paroisse import Paroisse
 from routers.dependencies import check_resource_exists
 from routers.fidele.utils import required_fidele
@@ -40,7 +40,7 @@ async def get_fidele_bapteme_complete_data_by_fidele_id(
 
 @fidele_bapteme_router.post("")
 async def create_fidele_bapteme(
-    body: FideleBaptemeUpdate,
+    body: FideleBaptemeBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,

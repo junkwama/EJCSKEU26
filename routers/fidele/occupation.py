@@ -15,7 +15,7 @@ from models.fidele.projection import (
     FideleOccupationProjFlat,
     FideleOccupationProjShallowWithoutFideleData,
 )
-from models.fidele.utils import FideleOccupationUpdate
+from models.fidele.utils import FideleOccupationBase, FideleOccupationUpdate
 from routers.dependencies import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils import apply_projection
@@ -47,7 +47,7 @@ async def get_fidele_occupation_complete_data_by_fidele_id(
 
 @fidele_occupation_router.post("")
 async def create_fidele_occupation(
-    body: FideleOccupationUpdate,
+    body: FideleOccupationBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,

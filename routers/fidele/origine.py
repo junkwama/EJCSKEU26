@@ -12,7 +12,7 @@ from core.db import get_session
 from models.adresse import Nation
 from models.fidele import Fidele, FideleOrigine
 from models.fidele.projection import FideleOrigineProjFlat, FideleOrigineProjShallowWithoutFideleData
-from models.fidele.utils import FideleOrigineUpdate
+from models.fidele.utils import FideleOrigineBase, FideleOrigineUpdate
 from routers.dependencies import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils import apply_projection
@@ -40,7 +40,7 @@ async def get_fidele_origine_complete_data_by_fidele_id(
 
 @fidele_origine_router.post("")
 async def create_fidele_origine(
-    body: FideleOrigineUpdate,
+    body: FideleOrigineBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
