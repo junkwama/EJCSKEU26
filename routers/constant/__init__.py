@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from routers.constant.document_type import document_type_router
+from routers.constant.document_statut import document_statut_router
 from routers.constant.grade import grade_router
 from routers.constant.fidele_type import fidele_type_router
 from routers.constant.structure_type import structure_type_router
@@ -17,6 +18,7 @@ constant_router = APIRouter()
 
 # Include all sub-routers
 constant_router.include_router(document_type_router)
+constant_router.include_router(document_statut_router)
 constant_router.include_router(grade_router)
 constant_router.include_router(fidele_type_router)
 constant_router.include_router(structure_type_router)

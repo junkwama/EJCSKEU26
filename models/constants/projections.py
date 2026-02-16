@@ -13,6 +13,19 @@ class DocumentTypeProjFlat(BaseModel):
     class Config:
         from_attributes = True
 
+
+class DocumentStatutProjFlat(BaseModel):
+    """Projection plate de DocumentStatut - sans relations"""
+    id: int
+    nom: str
+    description: str | None
+    id_document_type: int | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+
+    class Config:
+        from_attributes = True
+
 # ============================================================================
 # GRADE PROJECTIONS
 # ============================================================================

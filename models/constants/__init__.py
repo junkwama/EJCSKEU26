@@ -7,6 +7,7 @@ from models.constants.utils import (
     DocumentTypeBase, GradeBase, FideleTypeBase,
     StructureBase, FonctionBase, StructureTypeBase,
     ProfessionBase, NiveauEtudesBase, EtatCivileBase,
+    DocumentStatutBase,
 )
 
 if TYPE_CHECKING:
@@ -23,6 +24,28 @@ class DocumentType(DocumentTypeBase, BaseModelClass, table=True):
 
     class Config:
         from_attributes = True  
+
+
+class DocumentStatut(DocumentStatutBase, BaseModelClass, table=True):
+    """Modèle de la table DocumentStatut"""
+    __tablename__ = "document_statut"
+
+    id_document_type: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("document_type.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
+
+    __table_args__ = (
+        UniqueConstraint("nom", "id_document_type", name="uq_document_statut_nom_doc_type"),
+        Index("idx_document_statut_est_supprimee", "est_supprimee"),
+    )
+
+    class Config:
+        from_attributes = True
 
 
 class Grade(GradeBase, BaseModelClass, table=True):

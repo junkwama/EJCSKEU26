@@ -358,3 +358,8 @@ INSERT IGNORE INTO document_type (id, nom, document_key) VALUES
   (6, 'NATION', 'NATION'),
   (7, 'CONTINENT', 'CONTINENT'),
   (8, 'GENERALE', 'GENERALE');
+
+-- Document statuts
+INSERT IGNORE INTO document_statut (id, nom, description, id_document_type) VALUES
+  (1, 'En attente', 'Document en attente de traitement/validation', NULL),
+  (2, 'Validé', 'Document validé', NULL);

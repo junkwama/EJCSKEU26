@@ -18,6 +18,27 @@ DOCUMENT_TYPE_FIELDS_CONFIG = {
 
 
 # ============================================================================
+# DOCUMENT STATUT FIELDS CONFIG
+# ============================================================================
+DOCUMENT_STATUT_FIELDS_CONFIG = {
+    "nom": {
+        "max_length": 120,
+        "examples": ["En attente"],
+        "description": "Nom du statut du document",
+    },
+    "description": {
+        "examples": ["Document en attente de validation"],
+        "description": "Description du statut (optionnelle)",
+    },
+    "id_document_type": {
+        "ge": 1,
+        "examples": [1],
+        "description": "Type de document concerné (optionnel)",
+    },
+}
+
+
+# ============================================================================
 # GRADE FIELDS CONFIG
 # ============================================================================
 GRADE_FIELDS_CONFIG = {
@@ -166,6 +187,21 @@ class DocumentTypeBase(SQLModel):
 class DocumentTypeUpdate(BaseModel):
     nom: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["nom"])
     document_key: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["document_key"])
+
+
+# ============================================================================
+# DOCUMENT STATUT BASE & UPDATE
+# ============================================================================
+class DocumentStatutBase(SQLModel):
+    nom: str = PydanticField(..., **DOCUMENT_STATUT_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **DOCUMENT_STATUT_FIELDS_CONFIG["description"])
+    id_document_type: int | None = PydanticField(None, **DOCUMENT_STATUT_FIELDS_CONFIG["id_document_type"])
+
+
+class DocumentStatutUpdate(BaseModel):
+    nom: str | None = PydanticField(None, **DOCUMENT_STATUT_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **DOCUMENT_STATUT_FIELDS_CONFIG["description"])
+    id_document_type: int | None = PydanticField(None, **DOCUMENT_STATUT_FIELDS_CONFIG["id_document_type"])
 
 
 # ============================================================================
