@@ -15,8 +15,9 @@ from models.fidele.utils import (
     FideleBaptemeBase,
     FideleFamilleBase,
     FideleOrigineBase,
+    FideleOccupationBase,
 )
-from models.constants import FideleType, Grade, Structure
+from models.constants import FideleType, Grade, Structure, Profession, NiveauEtudes
 from models.utils.utils import BaseModelClass
 
 if TYPE_CHECKING:
@@ -83,6 +84,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     bapteme: "FideleBapteme" = Relationship(back_populates="fidele")
     famille: "FideleFamille" = Relationship(back_populates="fidele")
     origine: "FideleOrigine" = Relationship(back_populates="fidele")
+    occupation: "FideleOccupation" = Relationship(back_populates="fidele")
 
     class Config:
         from_attributes = True
@@ -245,6 +247,49 @@ class FideleOrigine(FideleOrigineBase, BaseModelClass, table=True):
 
     fidele: Fidele = Relationship(back_populates="origine")
     nation: "Nation" = Relationship()
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOccupation(FideleOccupationBase, BaseModelClass, table=True):
+    """Informations d'occupation (études/profession) d'un fidèle."""
+
+    __tablename__ = "fidele_occupation"
+
+    id_fidele: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    id_niveau_etude: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("niveau_etudes.id", ondelete="RESTRICT"),
+            nullable=False,
+        )
+    )
+    id_profession: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("profession.id", ondelete="RESTRICT"),
+            nullable=False,
+        )
+    )
+
+    __table_args__ = (
+        UniqueConstraint("id_fidele", name="uq_fidele_occupation_fidele"),
+        Index("idx_fidele_occupation_fidele", "id_fidele"),
+        Index("idx_fidele_occupation_niveau", "id_niveau_etude"),
+        Index("idx_fidele_occupation_profession", "id_profession"),
+        Index("idx_fidele_occupation_est_supprimee", "est_supprimee"),
+    )
+
+    fidele: Fidele = Relationship(back_populates="occupation")
+    niveau_etude: NiveauEtudes = Relationship()
+    profession: Profession = Relationship()
 
     class Config:
         from_attributes = True

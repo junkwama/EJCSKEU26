@@ -3,7 +3,13 @@ from pydantic import BaseModel, computed_field
 from datetime import date, datetime
 
 from models.adresse.projection import AdresseProjShallow, NationProjFlat
-from models.constants.projections import FideleTypeProjFlat, GradeProjFlat, StructureProjFlat
+from models.constants.projections import (
+    FideleTypeProjFlat,
+    GradeProjFlat,
+    StructureProjFlat,
+    NiveauEtudesProjFlat,
+    ProfessionProjFlat,
+)
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
 from utils.utils import PydanticField
@@ -69,6 +75,7 @@ class FideleProjShallow(FideleProjFlat):
     bapteme: Optional["FideleBaptemeProjShallowWithoutFideleData"] = None
     famille: Optional["FideleFamilleProjFlat"] = None
     origine: Optional["FideleOrigineProjShallowWithoutFideleData"] = None
+    occupation: Optional["FideleOccupationProjShallowWithoutFideleData"] = None
     
     class Config:
         from_attributes = True
@@ -214,6 +221,29 @@ class FideleOrigineProjFlat(BaseModel):
 
 class FideleOrigineProjShallowWithoutFideleData(FideleOrigineProjFlat):
     nation: NationProjFlat | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOccupationProjFlat(BaseModel):
+    id: int
+    id_fidele: int
+    id_niveau_etude: int
+    id_profession: int
+    ecole_universite_employeur: str | None
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOccupationProjShallowWithoutFideleData(FideleOccupationProjFlat):
+    niveau_etude: NiveauEtudesProjFlat
+    profession: ProfessionProjFlat
 
     class Config:
         from_attributes = True

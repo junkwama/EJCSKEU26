@@ -16,6 +16,7 @@ from models.fidele import (
     FideleBapteme,
     FideleFamille,
     FideleOrigine,
+    FideleOccupation,
 )
 from models.fidele.utils import FideleBase, FideleUpdate
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
@@ -60,6 +61,8 @@ async def get_fidele_complete_data_by_id(
             selectinload(Fidele.bapteme).selectinload(FideleBapteme.paroisse),
             selectinload(Fidele.famille),
             selectinload(Fidele.origine).selectinload(FideleOrigine.nation),
+            selectinload(Fidele.occupation).selectinload(FideleOccupation.niveau_etude),
+            selectinload(Fidele.occupation).selectinload(FideleOccupation.profession),
         )
 
     result = await session.exec(statement)
@@ -509,37 +512,26 @@ async def delete_fidele_contact(
     return send200(contact_proj)
 
 
-# ========================== STRUCTURE ENDPOINTS ==========================
+# ========================== SUB DATA ENDPOINTS ==========================
 from routers.fidele.structures import fidele_structures_router
 
 fidele_router.include_router(fidele_structures_router)
-
-
-# ========================== PAROISSE HISTORY ENDPOINTS ==========================
 from routers.fidele.paroisses import fidele_paroisses_router
 
 fidele_router.include_router(fidele_paroisses_router)
-
-
-# ========================== BAPTEME ENDPOINTS ==========================
 from routers.fidele.bapteme import fidele_bapteme_router
 
 fidele_router.include_router(fidele_bapteme_router)
-
-
-# ========================== FAMILLE ENDPOINTS ==========================
 from routers.fidele.famille import fidele_famille_router
 
 fidele_router.include_router(fidele_famille_router)
 
-
-# ========================== ORIGINE ENDPOINTS ==========================
 from routers.fidele.origine import fidele_origine_router
-
 fidele_router.include_router(fidele_origine_router)
 
 
-# ========================== FONCTIONS VIEW ENDPOINTS ==========================
-from routers.fidele.fonctions import fidele_fonctions_router
+from routers.fidele.occupation import fidele_occupation_router
+fidele_router.include_router(fidele_occupation_router)
 
+from routers.fidele.fonctions import fidele_fonctions_router
 fidele_router.include_router(fidele_fonctions_router)

@@ -196,3 +196,27 @@ class FideleOrigineUpdate(BaseModel, _FideleOrigineCommonFields):
 
     class Config:
         from_attributes = True
+
+
+class _FideleOccupationCommonFields:
+    id_niveau_etude: int = PydanticField(..., examples=[1], description="Niveau d'étude du fidèle")
+    id_profession: int = PydanticField(..., examples=[1], description="Profession du fidèle")
+    ecole_universite_employeur: str | None = PydanticField(
+        None,
+        max_length=150,
+        examples=["Université de Kinshasa"],
+        description="École, université ou employeur actuel",
+    )
+
+
+class FideleOccupationBase(SQLModel, _FideleOccupationCommonFields):
+    id_fidele: int = PydanticField(...)
+
+    class Config:
+        from_attributes = True
+
+
+class FideleOccupationUpdate(BaseModel, _FideleOccupationCommonFields):
+
+    class Config:
+        from_attributes = True
