@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Path
@@ -11,7 +11,7 @@ from sqlalchemy.orm import selectinload
 from core.db import get_session
 from models.constants import Structure
 from models.fidele import Fidele, FideleStructure
-from models.fidele.utils import FideleStructureUpdate, FideleStructureCreate
+from models.fidele.utils import FideleStructureCreate
 from models.fidele.projection import (
     FideleStructureProjFlat,
     FideleStructureProjShallowWithoutFideleData,
@@ -22,12 +22,6 @@ from routers.utils.http_utils import send200, send400
 from routers.fidele.utils import required_fidele
 
 fidele_structures_router = APIRouter(prefix="/{id}/structure", tags=["Fidele - Structures"])
-
-
-def are_membership_dates_valid(date_adhesion: date | None, date_sortie: date | None) -> bool:
-    if date_adhesion and date_sortie and date_sortie < date_adhesion:
-        return False
-    return True
 
 
 async def get_fidele_structure_complete_data_by_id(
@@ -76,9 +70,6 @@ async def add_fidele_structure(
     # Ensure structure exists
     await check_resource_exists(Structure, session, filters={"id": body.id_structure})
 
-    if not are_membership_dates_valid(body.date_adhesion, body.date_sortie):
-        return send400(["body"], "Dates d'adhésion/sortie invalides")
-
     # Check existing membership (active or soft-deleted)
     existing_stmt = select(FideleStructure).where(
         (FideleStructure.id_fidele == fidele.id)
@@ -97,13 +88,9 @@ async def add_fidele_structure(
                 "Restauration interdite: la structure 'Bureau ecclésiatique' (id=1) n'a pas de membres génériques. "
                 "Utilisez plutôt les mandats/fonctions (direction_fonction).",
             )
-        if not are_membership_dates_valid(body.date_adhesion, body.date_sortie):
-            return send400(["body"], "Dates d'adhésion/sortie invalides")
 
         existing.est_supprimee = False
         existing.date_suppression = None
-        existing.date_adhesion = body.date_adhesion
-        existing.date_sortie = body.date_sortie
         existing.date_modification = datetime.now(timezone.utc)
 
         session.add(existing)
@@ -117,8 +104,6 @@ async def add_fidele_structure(
     fidele_structure = FideleStructure(
         id_fidele=fidele.id,
         id_structure=body.id_structure,
-        date_adhesion=body.date_adhesion,
-        date_sortie=body.date_sortie,
     )
 
     session.add(fidele_structure)
@@ -149,33 +134,6 @@ async def list_fidele_structures(
     items = result.all()
 
     return send200([FideleStructureProjShallowWithoutFideleData.model_validate(i) for i in items])
-
-
-@fidele_structures_router.put("/{id_structure}")
-async def update_fidele_structure(
-    body: FideleStructureUpdate,
-    session: Annotated[AsyncSession, Depends(get_session)],
-    fidele_structure: Annotated[FideleStructure, Depends(required_fidele_structure)],
-) -> FideleStructureProjFlat:
-    """Mettre à jour les dates d'adhésion/sortie d'un fidèle dans une structure."""
-
-    update_data = body.model_dump(mode="json", exclude_unset=True)
-
-    effective_date_adhesion = update_data.get("date_adhesion", fidele_structure.date_adhesion)
-    effective_date_sortie = update_data.get("date_sortie", fidele_structure.date_sortie)
-    if not are_membership_dates_valid(effective_date_adhesion, effective_date_sortie):
-        return send400(["body"], "Dates d'adhésion/sortie invalides")
-
-    for field, value in update_data.items():
-        setattr(fidele_structure, field, value)
-
-    fidele_structure.date_modification = datetime.now(timezone.utc)
-
-    session.add(fidele_structure)
-    await session.commit()
-    await session.refresh(fidele_structure)
-
-    return send200(FideleStructureProjFlat.model_validate(fidele_structure))
 
 
 @fidele_structures_router.delete("/{id_structure}")

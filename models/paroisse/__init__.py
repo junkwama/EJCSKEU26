@@ -1,16 +1,18 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 from sqlalchemy import Index, UniqueConstraint
 from sqlmodel import Relationship
 from sqlalchemy import and_
 from sqlalchemy.orm import relationship
 
-from models.fidele import Fidele  
 from models.adresse import Adresse
 from models.contact import Contact
 
 from models.paroisse.utils import ParoisseBase
 from models.utils.utils import BaseModelClass
 from models.constants.types import DocumentTypeEnum
+
+if TYPE_CHECKING:
+    from models.fidele import FideleParoisse
 
 
 class Paroisse(ParoisseBase, BaseModelClass, table=True):
@@ -23,7 +25,7 @@ class Paroisse(ParoisseBase, BaseModelClass, table=True):
     )
     
     # Relationships
-    fideles: List[Fidele] | None = Relationship(back_populates="paroisse")
+    fidele_paroisses: List["FideleParoisse"] | None = Relationship(back_populates="paroisse")
     contact: Contact | None = Relationship(
         sa_relationship=relationship(
             "Contact",

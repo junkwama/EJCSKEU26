@@ -61,10 +61,6 @@ FIDELE_FIELDS_CONFIG = {
         "examples": [1, 2, 3],
         "description": "L'id du type du fidele."
     },
-    "id_paroisse": {
-        "examples": [1, 2, 3],
-        "description": "L'id de la paroisse du fidele."
-    },
     "tel": {
         "pattern": Regex.PHONE.value,
         "examples": ["+243812345678"],
@@ -84,7 +80,6 @@ class FideleBase(SQLModel):
     numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
     id_grade: GradeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_fidele_type"])
-    id_paroisse: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_paroisse"])
     tel: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["tel"])
     password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)
 
@@ -101,24 +96,42 @@ class FideleUpdate(BaseModel):
     numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
     id_grade: GradeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_type"])
-    id_paroisse: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_paroisse"])
 
 
 class FideleStructureBase(SQLModel):
     id_fidele: int = PydanticField(...)
     id_structure: int = PydanticField(...)
-    date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
-    date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
 
     class Config:
         from_attributes = True
 
 class FideleStructureUpdate(BaseModel):
-    date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
-    date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
+    pass
 
     class Config:
         from_attributes = True
 
 class FideleStructureCreate(FideleStructureUpdate):
     id_structure: int = PydanticField(..., examples=[1], description="Identifiant de la structure à laquelle le fidèle adhère")
+
+
+class FideleParoisseBase(SQLModel):
+    id_fidele: int = PydanticField(...)
+    id_paroisse: int = PydanticField(..., examples=[1], description="Identifiant de la paroisse")
+    date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
+    date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleParoisseUpdate(BaseModel):
+    date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
+    date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleParoisseCreate(FideleParoisseUpdate):
+    id_paroisse: int = PydanticField(..., examples=[1], description="Identifiant de la paroisse")

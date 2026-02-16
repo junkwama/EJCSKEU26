@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 # Local modules
 from core.config import Config
 from models.constants.types import DocumentTypeEnum
-from models.fidele import Fidele, FideleStructure
+from models.fidele import Fidele, FideleStructure, FideleParoisse
 from models.fidele.utils import FideleBase, FideleUpdate
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
 from models.adresse import Adresse, Nation
@@ -25,7 +25,6 @@ from routers.utils.http_utils import send200, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
 from models.constants import DocumentType, FideleType, Grade
-from models.paroisse import Paroisse
 
 fidele_router = APIRouter()
 
@@ -43,7 +42,6 @@ async def get_fidele_complete_data_by_id(
         statement = statement.options(
             selectinload(Fidele.grade),
             selectinload(Fidele.fidele_type),
-            selectinload(Fidele.paroisse),
             selectinload(Fidele.contact),
             (
                 selectinload(Fidele.adresse)
@@ -51,6 +49,7 @@ async def get_fidele_complete_data_by_id(
                 .selectinload(Nation.continent)
             ),
             selectinload(Fidele.structures).selectinload(FideleStructure.structure),
+            selectinload(Fidele.paroisses).selectinload(FideleParoisse.paroisse),
         )
 
     result = await session.exec(statement)
@@ -93,8 +92,6 @@ async def create_fidele(
     await check_resource_exists(
         FideleType, session, filters={"id": int(body.id_fidele_type)}
     )
-    if body.id_paroisse is not None:
-        await check_resource_exists(Paroisse, session, filters={"id": body.id_paroisse})
 
     # Create new fidele instance
     fidele = Fidele(**body.model_dump(mode="json"))
@@ -182,9 +179,6 @@ async def update_fidele(
         await check_resource_exists(
             FideleType, session, filters={"id": int(update_data["id_fidele_type"]) }
         )
-    if "id_paroisse" in update_data:
-        if update_data["id_paroisse"] is not None:
-            await check_resource_exists(Paroisse, session, filters={"id": update_data["id_paroisse"]})
 
     # Update fields (only provided fields)
     for field, value in update_data.items():
@@ -509,6 +503,12 @@ async def delete_fidele_contact(
 from routers.fidele.structures import fidele_structures_router
 
 fidele_router.include_router(fidele_structures_router)
+
+
+# ========================== PAROISSE HISTORY ENDPOINTS ==========================
+from routers.fidele.paroisses import fidele_paroisses_router
+
+fidele_router.include_router(fidele_paroisses_router)
 
 
 # ========================== FONCTIONS VIEW ENDPOINTS ==========================

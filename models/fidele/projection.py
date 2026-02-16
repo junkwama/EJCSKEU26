@@ -7,7 +7,7 @@ from models.constants.projections import FideleTypeProjFlat, GradeProjFlat, Stru
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
 from utils.utils import PydanticField
-from models.paroisse import Paroisse
+from models.paroisse.projection import ParoisseProjFlat
 
 class FideleProjFlat(BaseModel):
     """
@@ -44,7 +44,6 @@ class FideleProjFlat(BaseModel):
 
     id_grade: GradeEnum 
     id_fidele_type: FideleTypeEnum
-    id_paroisse: int | None = None
 
     est_supprimee: bool
     date_suppression: datetime | None = None
@@ -63,10 +62,10 @@ class FideleProjShallow(FideleProjFlat):
     # Flat versions of related fields (with their nested fields)
     grade: GradeProjFlat
     fidele_type: FideleTypeProjFlat
-    paroisse: Paroisse | None = None
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None
     structures: List["FideleStructureProjShallow"] = []
+    paroisses: List["FideleParoisseProjShallowWithoutFideleData"] = []
     
     class Config:
         from_attributes = True
@@ -80,8 +79,6 @@ class FideleStructureProjFlat(BaseModel):
     id: int
     id_fidele: int
     id_structure: int
-    date_adhesion: date | None
-    date_sortie: date | None
     est_supprimee: bool
     date_suppression: datetime | None
     date_creation: datetime
@@ -109,6 +106,48 @@ class FideleStructureProjShallowWithoutStructureData(FideleStructureProjFlat):
 class FideleStructureProjShallowWithoutFideleData(FideleStructureProjFlat):
     """Projection shallow de FideleStructure - Contenant Structure"""
     structure: StructureProjFlat
+
+    class Config:
+        from_attributes = True
+
+
+class FideleParoisseProjFlat(BaseModel):
+    """Projection plate de FideleParoisse - sans relations"""
+    id: int
+    id_fidele: int
+    id_paroisse: int
+    date_adhesion: date | None
+    date_sortie: date | None
+    est_actif: bool
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FideleParoisseProjShallow(FideleParoisseProjFlat):
+    """Projection shallow de FideleParoisse - avec les relations Fidele et Paroisse"""
+    fidele: FideleProjFlat
+    paroisse: ParoisseProjFlat
+
+    class Config:
+        from_attributes = True
+
+
+class FideleParoisseProjShallowWithoutParoisseData(FideleParoisseProjFlat):
+    """Projection shallow de FideleParoisse - Contenant Fidele"""
+    fidele: FideleProjFlat
+
+    class Config:
+        from_attributes = True
+
+
+class FideleParoisseProjShallowWithoutFideleData(FideleParoisseProjFlat):
+    """Projection shallow de FideleParoisse - Contenant Paroisse"""
+    paroisse: ParoisseProjFlat
 
     class Config:
         from_attributes = True

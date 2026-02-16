@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 from sqlmodel import Relationship
 from sqlalchemy import Column, ForeignKey, Index, Integer, UniqueConstraint
 from sqlalchemy import and_
@@ -8,7 +8,7 @@ from models.constants.types import DocumentTypeEnum
 from utils.utils import SQLModelField
 from models.adresse import Adresse
 from models.contact import Contact
-from models.fidele.utils import FideleBase, FideleStructureBase
+from models.fidele.utils import FideleBase, FideleStructureBase, FideleParoisseBase
 from models.constants import FideleType, Grade, Structure
 from models.utils.utils import BaseModelClass
 
@@ -35,15 +35,6 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             nullable=False,
         )
     )
-    id_paroisse: int | None = SQLModelField(
-        default=None,
-        sa_column=Column(
-            Integer,
-            ForeignKey("paroisse.id", ondelete="SET NULL"),
-            nullable=True,
-        ),
-    )
-
     __table_args__ = (
         UniqueConstraint("numero_carte", name="uq_fidele_numero_carte"),
         Index("idx_fidele_nom", "nom"),
@@ -54,7 +45,6 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     # Relationships
     grade: Grade = Relationship()
     fidele_type: FideleType = Relationship()
-    paroisse: Optional["Paroisse"] = Relationship(back_populates="fideles")
     contact: Contact | None = Relationship(
         sa_relationship=relationship(
             "Contact",
@@ -81,6 +71,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     
     # N-N relationship with Structure through FideleStructure
     structures: List["FideleStructure"] = Relationship(back_populates="fidele")
+    paroisses: List["FideleParoisse"] = Relationship(back_populates="fidele")
 
     class Config:
         from_attributes = True
@@ -114,6 +105,40 @@ class FideleStructure(FideleStructureBase,BaseModelClass,  table=True):
     # Relationships
     fidele: Fidele = Relationship(back_populates="structures")
     structure: Structure = Relationship(back_populates="fideles")
+
+    class Config:
+        from_attributes = True
+
+
+class FideleParoisse(FideleParoisseBase, BaseModelClass, table=True):
+    """Historique d'appartenance d'un fidèle à des paroisses."""
+
+    __tablename__ = "fidele_paroisse"
+
+    id_fidele: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    id_paroisse: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("paroisse.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    est_actif: bool = SQLModelField(default=True)
+
+    __table_args__ = (
+        Index("idx_fidele_paroisse_fidele", "id_fidele"),
+        Index("idx_fidele_paroisse_paroisse", "id_paroisse"),
+        Index("idx_fidele_paroisse_est_supprimee", "est_supprimee"),
+    )
+
+    fidele: Fidele = Relationship(back_populates="paroisses")
+    paroisse: "Paroisse" = Relationship(back_populates="fidele_paroisses")
 
     class Config:
         from_attributes = True
