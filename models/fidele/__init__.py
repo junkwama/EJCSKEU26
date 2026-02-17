@@ -8,6 +8,7 @@ from models.constants.types import DocumentTypeEnum
 from utils.utils import SQLModelField
 from models.adresse import Adresse
 from models.contact import Contact
+from modules.file.models import File
 from models.fidele.utils import (
     FideleBase,
     FideleStructureBase,
@@ -108,6 +109,18 @@ class Fidele(FideleBase, BaseModelClass, table=True):
                 Adresse.id_document_type == DocumentTypeEnum.FIDELE.value
             ),
             foreign_keys=lambda: [Adresse.id_document, Adresse.id_document_type],
+            uselist=False
+        )
+    )
+
+    photo: File = Relationship(
+        sa_relationship=relationship(
+            "File",
+            primaryjoin=lambda: and_(
+                Fidele.id == File.id_document,
+                File.id_document_type == DocumentTypeEnum.FIDELE.value
+            ),
+            foreign_keys=lambda: [File.id_document, File.id_document_type],
             uselist=False
         )
     )

@@ -13,6 +13,7 @@ from models.constants.projections import (
 )
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
+from modules.file.models import FileProjFlat
 from utils.utils import PydanticField
 from models.paroisse.projection import ParoisseProjFlat
 
@@ -77,6 +78,7 @@ class FideleProjShallow(FideleProjFlat):
     etat_civile: EtatCivileProjFlat | None = None
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None
+    photo: FileProjFlat | None = None
     structures: List["FideleStructureProjShallow"] = []
     paroisses: List["FideleParoisseProjShallowWithoutFideleData"] = []
     bapteme: Optional["FideleBaptemeProjShallowWithoutFideleData"] = None

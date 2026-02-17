@@ -55,6 +55,7 @@ async def get_fidele_complete_data_by_id(
             selectinload(Fidele.etat_civile),
             selectinload(Fidele.contact),
             selectinload(Fidele.adresse).selectinload(Adresse.nation).selectinload(Nation.continent),
+            selectinload(Fidele.photo),
             selectinload(Fidele.structures).selectinload(FideleStructure.structure),
             selectinload(Fidele.paroisses).selectinload(FideleParoisse.paroisse),
             selectinload(Fidele.bapteme).selectinload(FideleBapteme.paroisse),
@@ -524,22 +525,23 @@ async def delete_fidele_contact(
 
 
 # ========================== SUB DATA ENDPOINTS ==========================
+from routers.fidele.photo import fidele_photo_router
+fidele_router.include_router(fidele_photo_router)
+
 from routers.fidele.structures import fidele_structures_router
-
 fidele_router.include_router(fidele_structures_router)
+
 from routers.fidele.paroisses import fidele_paroisses_router
-
 fidele_router.include_router(fidele_paroisses_router)
+
 from routers.fidele.bapteme import fidele_bapteme_router
-
 fidele_router.include_router(fidele_bapteme_router)
-from routers.fidele.famille import fidele_famille_router
 
+from routers.fidele.famille import fidele_famille_router
 fidele_router.include_router(fidele_famille_router)
 
 from routers.fidele.origine import fidele_origine_router
 fidele_router.include_router(fidele_origine_router)
-
 
 from routers.fidele.occupation import fidele_occupation_router
 fidele_router.include_router(fidele_occupation_router)

@@ -45,6 +45,9 @@ import models.direction.fonction
 import models.fidele
 import models.paroisse
 
+#service modules
+from modules.file.models import File
+
 
 target_metadata = SQLModel.metadata
 
