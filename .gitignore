@@ -3,4 +3,5 @@
 __pycache__/
 prompts/
 *.prompt.txt
-todo.txt
+*.todo
+additional_fields_to_fidele_flat.py
