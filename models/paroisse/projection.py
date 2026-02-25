@@ -11,6 +11,7 @@ class ParoisseProjFlat(BaseModel):
     """
     id: int
     nom: str
+    code_matriculation: str | None = None
     
     est_supprimee: bool
     date_suppression: datetime | None = None

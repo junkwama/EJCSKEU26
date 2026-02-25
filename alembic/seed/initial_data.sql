@@ -243,6 +243,50 @@ INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Yémen', 5);
 INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Zambie', 1);
 INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Zimbabwe', 1);
 
+-- Hydratation du code ISO alpha-2 des nations
+-- 1) Valeur de base calculée automatiquement si absente
+UPDATE nation
+SET iso_alpha_2 = UPPER(
+  SUBSTRING(
+    REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(nom, ' ', ''), '-', ''), '''', ''), '(', ''), ')', ''),
+    1,
+    2
+  )
+)
+WHERE iso_alpha_2 IS NULL;
+
+-- 2) Corrections explicites (codes ISO officiels)
+UPDATE nation SET iso_alpha_2 = 'CD' WHERE nom = 'République Démocratique du Congo';
+UPDATE nation SET iso_alpha_2 = 'CG' WHERE nom = 'Congo';
+UPDATE nation SET iso_alpha_2 = 'FR' WHERE nom = 'France';
+UPDATE nation SET iso_alpha_2 = 'BE' WHERE nom = 'Belgique';
+UPDATE nation SET iso_alpha_2 = 'US' WHERE nom = 'États-Unis';
+UPDATE nation SET iso_alpha_2 = 'CA' WHERE nom = 'Canada';
+UPDATE nation SET iso_alpha_2 = 'ZA' WHERE nom = 'Afrique du Sud';
+UPDATE nation SET iso_alpha_2 = 'AO' WHERE nom = 'Angola';
+UPDATE nation SET iso_alpha_2 = 'BI' WHERE nom = 'Burundi';
+UPDATE nation SET iso_alpha_2 = 'RW' WHERE nom = 'Rwanda';
+UPDATE nation SET iso_alpha_2 = 'CM' WHERE nom = 'Cameroun';
+UPDATE nation SET iso_alpha_2 = 'CI' WHERE nom = 'Côte d''Ivoire';
+UPDATE nation SET iso_alpha_2 = 'GA' WHERE nom = 'Gabon';
+UPDATE nation SET iso_alpha_2 = 'KE' WHERE nom = 'Kenya';
+UPDATE nation SET iso_alpha_2 = 'NG' WHERE nom = 'Nigeria';
+UPDATE nation SET iso_alpha_2 = 'TZ' WHERE nom = 'Tanzanie';
+UPDATE nation SET iso_alpha_2 = 'UG' WHERE nom = 'Ouganda';
+UPDATE nation SET iso_alpha_2 = 'ZM' WHERE nom = 'Zambie';
+UPDATE nation SET iso_alpha_2 = 'ZW' WHERE nom = 'Zimbabwe';
+UPDATE nation SET iso_alpha_2 = 'GB' WHERE nom = 'Royaume-Uni';
+UPDATE nation SET iso_alpha_2 = 'IT' WHERE nom = 'Italie';
+UPDATE nation SET iso_alpha_2 = 'DE' WHERE nom = 'Allemagne';
+UPDATE nation SET iso_alpha_2 = 'ES' WHERE nom = 'Espagne';
+UPDATE nation SET iso_alpha_2 = 'PT' WHERE nom = 'Portugal';
+UPDATE nation SET iso_alpha_2 = 'BR' WHERE nom = 'Brésil';
+UPDATE nation SET iso_alpha_2 = 'AR' WHERE nom = 'Argentine';
+UPDATE nation SET iso_alpha_2 = 'MX' WHERE nom = 'Mexique';
+UPDATE nation SET iso_alpha_2 = 'CN' WHERE nom = 'Chine';
+UPDATE nation SET iso_alpha_2 = 'JP' WHERE nom = 'Japon';
+UPDATE nation SET iso_alpha_2 = 'IN' WHERE nom = 'Inde';
+
 -- Structure types (IDs fixed to match StructureTypeEnum)
 INSERT IGNORE INTO structure_type (id, nom) VALUES
   (1, 'Direction Ecclésiastique'),
@@ -349,17 +393,27 @@ INSERT INTO fonction_list (nom)
 SELECT 'Chef de partition' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Chef de partition');
 
 -- Document types (IDs fixed to match DocumentTypeEnum)
-INSERT IGNORE INTO document_type (id, nom, document_key) VALUES
-  (1, 'FIDELE', 'FIDELE'),
-  (2, 'STRUCTURE', 'STRUCTURE'),
-  (3, 'PAROISSE', 'PAROISSE'),
-  (4, 'VILLE', 'VILLE'),
-  (5, 'PROVINCE', 'PROVINCE'),
-  (6, 'NATION', 'NATION'),
-  (7, 'CONTINENT', 'CONTINENT'),
-  (8, 'GENERALE', 'GENERALE');
+INSERT IGNORE INTO document_type (id, nom, document_key, code) VALUES
+  (1, 'FIDELE', 'FIDELE', 'FDL'),
+  (2, 'STRUCTURE', 'STRUCTURE', 'STR'),
+  (3, 'PAROISSE', 'PAROISSE', 'PRS'),
+  (4, 'VILLE', 'VILLE', 'VLL'),
+  (5, 'PROVINCE', 'PROVINCE', 'PRV'),
+  (6, 'NATION', 'NATION', 'NTN'),
+  (7, 'CONTINENT', 'CONTINENT', 'CTN'),
+  (8, 'GENERALE', 'GENERALE', 'GNR');
+
+-- Backfill/align codes for existing rows
+UPDATE document_type SET code = 'FDL' WHERE id = 1;
+UPDATE document_type SET code = 'STR' WHERE id = 2;
+UPDATE document_type SET code = 'PRS' WHERE id = 3;
+UPDATE document_type SET code = 'VLL' WHERE id = 4;
+UPDATE document_type SET code = 'PRV' WHERE id = 5;
+UPDATE document_type SET code = 'NTN' WHERE id = 6;
+UPDATE document_type SET code = 'CTN' WHERE id = 7;
+UPDATE document_type SET code = 'GNR' WHERE id = 8;
 
 -- Document statuts
 INSERT IGNORE INTO document_statut (id, nom, description, id_document_type) VALUES
   (1, 'En attente', 'Document en attente de traitement/validation', NULL),
-  (2, 'Validé', 'Document validé', NULL);
+  (29, 'Validé', 'Document validé', NULL);

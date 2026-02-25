@@ -13,6 +13,11 @@ DOCUMENT_TYPE_FIELDS_CONFIG = {
     "document_key": {
         "max_length": 50,
         "description": "Clé unique du type de document (ex: FIDELE, PAROISSE, STRUCTURE)"
+    },
+    "code": {
+        "min_length": 3,
+        "max_length": 3,
+        "description": "Code court unique du type de document (ex: FDL, PRS, STR)"
     }
 }
 
@@ -182,11 +187,13 @@ FONCTION_FIELDS_CONFIG = {
 class DocumentTypeBase(SQLModel):
     nom: str = PydanticField(..., **DOCUMENT_TYPE_FIELDS_CONFIG["nom"])
     document_key: str = PydanticField(..., **DOCUMENT_TYPE_FIELDS_CONFIG["document_key"])
+    code: str = PydanticField(..., **DOCUMENT_TYPE_FIELDS_CONFIG["code"])
 
 
 class DocumentTypeUpdate(BaseModel):
     nom: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["nom"])
     document_key: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["document_key"])
+    code: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["code"])
 
 
 # ============================================================================

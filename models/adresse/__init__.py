@@ -30,6 +30,7 @@ class Nation(BaseModelClass, table=True):
         )
     )
     nom: str = PydanticField(..., max_length=100, description="Nom de la nation")
+    iso_alpha_2: str = PydanticField(..., min_length=2, max_length=2, description="Code ISO alpha-2")
 
     __table_args__ = (
         UniqueConstraint("nom", name="uq_nation_nom"),

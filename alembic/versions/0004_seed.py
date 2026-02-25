@@ -14,6 +14,7 @@ from pathlib import Path
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.exc import SQLAlchemyError
 
 # revision identifiers, used by Alembic.
 revision = "0004_seed"
@@ -47,7 +48,17 @@ def upgrade() -> None:
     sql_text = seed_path.read_text(encoding="utf-8")
     bind = op.get_bind()
     for stmt in _iter_sql_statements(sql_text):
-        bind.execute(sa.text(stmt))
+        try:
+            bind.execute(sa.text(stmt))
+        except SQLAlchemyError as exc:
+            msg = str(exc)
+            is_future_column_seed = (
+                "Unknown column" in msg
+                and ("iso_alpha_2" in msg or "document_type" in msg and "code" in msg)
+            )
+            if is_future_column_seed:
+                continue
+            raise
 
 
 def downgrade() -> None:

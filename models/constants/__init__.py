@@ -20,6 +20,7 @@ class DocumentType(DocumentTypeBase, BaseModelClass, table=True):
     __table_args__ = (
         UniqueConstraint("nom", name="uq_document_type_nom"),
         UniqueConstraint("document_key", name="uq_document_type_key"),
+        UniqueConstraint("code", name="uq_document_type_code"),
     )
 
     class Config:

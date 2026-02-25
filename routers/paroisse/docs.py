@@ -17,3 +17,14 @@ PAROISSE_LIST_FIDELES_DESCRIPTION = (
     "- `GET /paroisse/{id}/fidele?actif=false` → historique non actif.\n"
     "- `GET /paroisse/{id}/fidele?actif=` (None) → actifs + non actifs.\n"
 )
+
+
+PAROISSE_CREATE_DESCRIPTION = (
+    "Cet endpoint crée une paroisse et attribue automatiquement son code matriculation.\n\n"
+    "### Règle de génération\n"
+    "- Préfixe: `PRS` (code du `document_type` PAROISSE)\n"
+    "- Suffixe: `id_paroisse` sur 7 chiffres avec zero-padding\n"
+    "- Taille totale: 10 caractères\n\n"
+    "### Exemple\n"
+    "- Si l'id paroisse vaut `123`, le code généré est `PRS0000123`.\n"
+)

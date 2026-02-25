@@ -19,6 +19,7 @@ from models.fidele.utils import (
     FideleOccupationBase,
 )
 from models.constants import FideleType, Grade, Structure, Profession, NiveauEtudes, EtatCivile
+from models.constants import DocumentStatut
 from models.utils.utils import BaseModelClass
 
 if TYPE_CHECKING:
@@ -69,8 +70,18 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             nullable=True,
         ),
     )
+    id_document_statut: int = SQLModelField(
+        default=1,
+        sa_column=Column(
+            Integer,
+            ForeignKey("document_statut.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+    )
+    code_matriculation: str | None = SQLModelField(default=None, max_length=10)
     __table_args__ = (
         UniqueConstraint("numero_carte", name="uq_fidele_numero_carte"),
+        UniqueConstraint("code_matriculation", name="uq_fidele_code_matriculation"),
         Index("idx_fidele_nom", "nom"),
         Index("idx_fidele_grade", "id_grade"),
         Index("idx_fidele_est_supprimee", "est_supprimee"),
@@ -89,6 +100,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     )
     nation_nationalite: "Nation" = Relationship()
     etat_civile: EtatCivile = Relationship()
+    document_statut: DocumentStatut = Relationship()
     contact: Contact = Relationship(
         sa_relationship=relationship(
             "Contact",

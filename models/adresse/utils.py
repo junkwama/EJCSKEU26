@@ -17,6 +17,12 @@ NATION_FIELDS_CONFIG = {
         "examples": ["République Démocratique du Congo"],
         "description": "Nom de la nation",
     },
+    "iso_alpha_2": {
+        "min_length": 2,
+        "max_length": 2,
+        "examples": ["CD"],
+        "description": "Code ISO alpha-2 de la nation",
+    },
 }
 
 # ---- NATION BASE MODEL -----#
@@ -24,12 +30,14 @@ class NationBase(SQLModel):
     """Modèle de base pour créer une nation"""
     id_continent: int = PydanticField(..., **NATION_FIELDS_CONFIG["id_continent"])
     nom: str = PydanticField(..., **NATION_FIELDS_CONFIG["nom"])
+    iso_alpha_2: str = PydanticField(..., **NATION_FIELDS_CONFIG["iso_alpha_2"])
 
 # ---- NATION UPDATE MODEL -----#
 class NationUpdate(BaseModel):
     """Modèle pour les mises à jour de nation (tous les champs optionnels)"""
     id_continent: int | None = PydanticField(None, **NATION_FIELDS_CONFIG["id_continent"])
     nom: str | None = PydanticField(None, **NATION_FIELDS_CONFIG["nom"])
+    iso_alpha_2: str | None = PydanticField(None, **NATION_FIELDS_CONFIG["iso_alpha_2"])
 
 # ---- ADRESSE FIELDS CONFIG -----#
 ADRESSE_FIELDS_CONFIG = {

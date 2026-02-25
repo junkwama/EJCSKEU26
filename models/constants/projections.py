@@ -9,6 +9,7 @@ class DocumentTypeProjFlat(BaseModel):
     """Projection plate de DocumentType - sans relations"""
     id: int
     nom: str
+    code: str
 
     class Config:
         from_attributes = True

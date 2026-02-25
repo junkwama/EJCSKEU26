@@ -73,6 +73,16 @@ FIDELE_FIELDS_CONFIG = {
         "examples": [1],
         "description": "L'id de l'état civile du fidèle."
     },
+    "id_document_statut": {
+        "examples": [1],
+        "description": "L'id du statut de document du fidèle (ex: En attente, Validé)."
+    },
+    "code_matriculation": {
+        "min_length": 10,
+        "max_length": 10,
+        "examples": ["CD00000001"],
+        "description": "Code matriculation unique du fidèle (attribué après validation)."
+    },
     "tel": {
         "pattern": Regex.PHONE.value,
         "examples": ["+243812345678"],
@@ -95,6 +105,8 @@ class FideleBase(SQLModel):
     id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
     id_nation_nationalite: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
     id_etat_civile: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_etat_civile"])
+    id_document_statut: int = PydanticField(1, **FIDELE_FIELDS_CONFIG["id_document_statut"])
+    code_matriculation: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["code_matriculation"])
     tel: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["tel"])
     password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)
 
@@ -114,6 +126,13 @@ class FideleUpdate(BaseModel):
     id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
     id_nation_nationalite: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
     id_etat_civile: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_etat_civile"])
+    id_document_statut: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_document_statut"])
+    code_matriculation: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["code_matriculation"])
+
+
+class FideleStatutUpdate(BaseModel):
+    id_document_statut: int = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_document_statut"])
+    id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
 
 
 class FideleStructureBase(SQLModel):

@@ -22,6 +22,7 @@ class Paroisse(ParoisseBase, BaseModelClass, table=True):
 
     __table_args__ = (
         UniqueConstraint("nom", name="uq_paroisse_nom"),
+        UniqueConstraint("code_matriculation", name="uq_paroisse_code_matriculation"),
     )
     
     # Relationships

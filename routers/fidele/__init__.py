@@ -11,9 +11,6 @@ from core.config import Config
 from models.constants.types import DocumentTypeEnum
 from models.fidele import (
     Fidele,
-    FideleStructure,
-    FideleParoisse,
-    FideleBapteme,
     FideleFamille,
     FideleOrigine,
     FideleOccupation,
@@ -27,44 +24,18 @@ from models.contact import Contact
 from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
-from routers.fidele.utils import required_fidele
+from routers.fidele.utils import required_fidele, get_fidele_complete_data_by_id
 from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
-from models.constants import DocumentType, FideleType, Grade, EtatCivile
+from models.constants import DocumentType, FideleType, Grade, EtatCivile, DocumentStatut
 
 fidele_router = APIRouter()
 
 
 async def get_fidele_any_by_id(fidele_id: int, session: AsyncSession) -> Fidele | None:
     statement = select(Fidele).where(Fidele.id == fidele_id)
-    result = await session.exec(statement)
-    return result.first()
-
-async def get_fidele_complete_data_by_id(
-    id: int, session: AsyncSession, proj: ProjDepth = ProjDepth.SHALLOW
-) -> Fidele:
-    statement = select(Fidele).where(Fidele.id == id)
-    if proj == ProjDepth.SHALLOW:
-        statement = statement.options(
-            selectinload(Fidele.grade),
-            selectinload(Fidele.fidele_type),
-            selectinload(Fidele.fidele_recenseur),
-            selectinload(Fidele.nation_nationalite),
-            selectinload(Fidele.etat_civile),
-            selectinload(Fidele.contact),
-            selectinload(Fidele.adresse).selectinload(Adresse.nation).selectinload(Nation.continent),
-            selectinload(Fidele.photo),
-            selectinload(Fidele.structures).selectinload(FideleStructure.structure),
-            selectinload(Fidele.paroisses).selectinload(FideleParoisse.paroisse),
-            selectinload(Fidele.bapteme).selectinload(FideleBapteme.paroisse),
-            selectinload(Fidele.famille),
-            selectinload(Fidele.origine).selectinload(FideleOrigine.nation),
-            selectinload(Fidele.occupation).selectinload(FideleOccupation.niveau_etude),
-            selectinload(Fidele.occupation).selectinload(FideleOccupation.profession),
-        )
-
     result = await session.exec(statement)
     return result.first()
 
@@ -111,9 +82,11 @@ async def create_fidele(
         await check_resource_exists(Nation, session, filters={"id": body.id_nation_nationalite})
     if body.id_etat_civile is not None:
         await check_resource_exists(EtatCivile, session, filters={"id": body.id_etat_civile})
+    await check_resource_exists(DocumentStatut, session, filters={"id": int(body.id_document_statut)})
 
     # Create new fidele instance
     fidele = Fidele(**body.model_dump(mode="json"))
+    fidele.code_matriculation = None
 
     # Add to session and commit
     session.add(fidele)
@@ -204,6 +177,8 @@ async def update_fidele(
         await check_resource_exists(Nation, session, filters={"id": update_data["id_nation_nationalite"]})
     if "id_etat_civile" in update_data and update_data["id_etat_civile"] is not None:
         await check_resource_exists(EtatCivile, session, filters={"id": update_data["id_etat_civile"]})
+    if "id_document_statut" in update_data and update_data["id_document_statut"] is not None:
+        await check_resource_exists(DocumentStatut, session, filters={"id": update_data["id_document_statut"]})
 
     # Update fields (only provided fields)
     for field, value in update_data.items():
@@ -548,3 +523,6 @@ fidele_router.include_router(fidele_occupation_router)
 
 from routers.fidele.fonctions import fidele_fonctions_router
 fidele_router.include_router(fidele_fonctions_router)
+
+from routers.fidele.statut import fidele_statut_router
+fidele_router.include_router(fidele_statut_router)

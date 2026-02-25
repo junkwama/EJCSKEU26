@@ -30,11 +30,16 @@ from models.constants import DocumentType
 from routers.dependencies import check_resource_exists
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send404
+from routers.paroisse.docs import PAROISSE_CREATE_DESCRIPTION
 
 # ============================================================================
 # ROUTER SETUP
 # ============================================================================
 paroisse_router = APIRouter()
+
+
+def build_paroisse_code(document_type_code: str, paroisse_id: int) -> str:
+    return f"{document_type_code}{str(paroisse_id).zfill(7)}"
 
 
 async def get_paroisse_any_by_id(paroisse_id: int, session: AsyncSession) -> Paroisse | None:
@@ -90,14 +95,20 @@ async def get_paroisse_adresse_complete_data_by_id(
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
-@paroisse_router.post("", tags=["Paroisse"])
+@paroisse_router.post("", tags=["Paroisse"], description=PAROISSE_CREATE_DESCRIPTION)
 async def create_paroisse(
     body: ParoisseBase,
     session: Annotated[AsyncSession, Depends(get_session)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> ParoisseProjFlat | ParoisseProjShallow:
     """
-    Créer une nouvelle paroisse
+    Créer une nouvelle paroisse avec attribution automatique d'un code matriculation.
+
+    Le code est généré immédiatement après création avec le format:
+    - `PRS` (code du document_type PAROISSE)
+    - suivi de l'identifiant de la paroisse sur 7 chiffres (zero-padding)
+
+    Exemple: `PRS0000123`
 
     ARGS:
         body (ParoisseBase): Les données de la paroisse à créer
@@ -110,6 +121,16 @@ async def create_paroisse(
     session.add(paroisse)
     await session.commit()
     await session.refresh(paroisse)
+
+    document_type_paroisse = await check_resource_exists(
+        DocumentType,
+        session,
+        filters={"id": DocumentTypeEnum.PAROISSE.value},
+    )
+    paroisse.code_matriculation = build_paroisse_code(document_type_paroisse.code, paroisse.id)
+    session.add(paroisse)
+    await session.commit()
+
     if proj == ProjDepth.SHALLOW:
         paroisse = await get_paroisse_complete_data_by_id(paroisse.id, session, proj)
 

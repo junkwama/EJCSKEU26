@@ -6,6 +6,7 @@ from models.adresse.projection import AdresseProjShallow, NationProjFlat
 from models.constants.projections import (
     FideleTypeProjFlat,
     GradeProjFlat,
+    DocumentStatutProjFlat,
     StructureProjFlat,
     NiveauEtudesProjFlat,
     ProfessionProjFlat,
@@ -55,6 +56,8 @@ class FideleProjFlat(BaseModel):
     id_fidele_recenseur: int | None = None
     id_nation_nationalite: int | None = None
     id_etat_civile: int | None = None
+    id_document_statut: int
+    code_matriculation: str | None = None
 
     est_supprimee: bool
     date_suppression: datetime | None = None
@@ -76,6 +79,7 @@ class FideleProjShallow(FideleProjFlat):
     fidele_recenseur: Optional["FideleProjFlat"] = None
     nation_nationalite: NationProjFlat | None = None
     etat_civile: EtatCivileProjFlat | None = None
+    document_statut: DocumentStatutProjFlat
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None
     photo: FileProjFlat | None = None

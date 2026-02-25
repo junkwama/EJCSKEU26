@@ -14,6 +14,7 @@ class NationProjFlat(BaseModel):
     """Projection plate de nation"""
     id: int
     nom: str
+    iso_alpha_2: str
     id_continent: int
     class Config:
         from_attributes = True
