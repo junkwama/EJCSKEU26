@@ -1,6 +1,8 @@
 from enum import Enum
 
 class Config(Enum): 
+    ALLOWED_HOSTS = ["*"]
+    DEBUG = True
     DEFAULT_ITEMS_PER_PAGE = 10
     PREVIEW_LIST_ITEM_NUMBER = 5
     MAX_ITEMS_PER_PAGE = 100

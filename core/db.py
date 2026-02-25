@@ -4,6 +4,8 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from core.config import Config
+
 """Database engine + session utilities.
 
 Schema management is handled by Alembic migrations (see alembic/).
@@ -22,7 +24,7 @@ def get_engine() -> AsyncEngine:
     if not db_url:
         raise RuntimeError("MYSQL_DB_ASYNC_URL environment variable is not set")
 
-    _engine = create_async_engine(db_url, echo=True)
+    _engine = create_async_engine(db_url, echo=Config.DEBUG.value)
     return _engine
 
 

@@ -35,7 +35,7 @@ class Paroisse(ParoisseBase, BaseModelClass, table=True):
             ),
             foreign_keys=lambda: [Contact.id_document, Contact.id_document_type],
             uselist=False
-        )
+        ),
     )
     adresse: Adresse | None = Relationship(
         sa_relationship=relationship(
@@ -46,9 +46,8 @@ class Paroisse(ParoisseBase, BaseModelClass, table=True):
             ),
             foreign_keys=lambda: [Adresse.id_document, Adresse.id_document_type],
             uselist=False
-        )
+        ),
     )
     
     class Config:
         from_attributes = True
-

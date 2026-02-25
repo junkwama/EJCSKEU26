@@ -1,11 +1,13 @@
 # External modules
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pydantic import ValidationError
 
 # Loading critic stuff needed accross diff local modules
 from dotenv import load_dotenv
+from core.config import Config
 load_dotenv()
 
 
@@ -43,6 +45,14 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 ) # The app's fastweb instance
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins= Config.ALLOWED_HOSTS.value,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 401: Uncontroled or automatically generated
 @app.exception_handler(401)
