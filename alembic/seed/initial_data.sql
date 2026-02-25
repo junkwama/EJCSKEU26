@@ -2,7 +2,7 @@
 -- NOTE: Avoid DROP/CREATE DATABASE here.
 
 -- Continents (IDs not used by enums; set explicitly for stable FK in nations)
-INSERT IGNORE INTO continent (id, nom) VALUES
+INSERT INTO continent (id, nom) VALUES
   (1, 'Afrique'),
   (2, 'Amérique du Nord'),
   (3, 'Amérique du Sud'),
@@ -10,285 +10,241 @@ INSERT IGNORE INTO continent (id, nom) VALUES
   (5, 'Asie'),
   (6, 'Océanie');
 
--- Nations (keep as INSERT IGNORE to avoid duplicates)
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Afghanistan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Afrique du Sud', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Albanie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Algérie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Allemagne', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Andorre', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Angola', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Antigua-et-Barbuda', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Arabie Saoudite', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Arménie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Australie', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Autriche', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Azerbaïdjan', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bahamas', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bahreïn', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bangladesh', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Barbade', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Belgique', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Belize', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bénin', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bhoutan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Biélorussie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Birmanie', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bolivie', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bosnie-Herzégovine', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Botswana', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Brésil', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Brunei', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Bulgarie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Burkina Faso', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Burundi', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Cambodge', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Cameroun', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Canada', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Cap-Vert', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Chili', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Chine', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Chypre', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Chypre du Nord', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Colombie', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Comores', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Congo', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Corée du Nord', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Corée du Sud', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Costa Rica', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Côte d''Ivoire', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Croatie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Cuba', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Danemark', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Djibouti', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Dominique', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Égypte', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('El Salvador', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Émirats Arabes Unis', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Équateur', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Érythrée', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Espagne', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Estonie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Eswatini', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('États-Unis', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Éthiopie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Fidji', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Finlande', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('France', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Gabon', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Gambie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Géorgie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Géorgie du Sud-Ossétie', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Ghana', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Gibraltar', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Grèce', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Grenade', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Groenland', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guadeloupe', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guam', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guatemala', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guernesey', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guinée', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guinée équatoriale', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guinée-Bissau', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guyana', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Guyane française', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Haïti', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Honduras', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Hong Kong', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Hongrie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Île Bouvet', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Île Christmas', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Île Norfolk', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Îles Åland', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Îles Féroé', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Îles Heard et MacDonald', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Îles Mariannes du Nord', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Îles Pitcairn', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Inde', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Indonésie', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Irak', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Iran', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Irlande', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Islande', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Israël', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Italie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Jamaïque', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Japon', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Jersey', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Jordanie', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Kazakhstan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Kenya', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Kirghizistan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Kiribati', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Kosovo', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Koweït', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Laos', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Lesotho', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Lettonie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Liban', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Liberia', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Libye', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Liechtenstein', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Lituanie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Luxembourg', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Macao', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Macédoine du Nord', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Madagascar', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Malaisie', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Malawi', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Maldives', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Mali', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Malte', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Maroc', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Martinique', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Maurice', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Mauritanie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Mayotte', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Mexique', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Micronésie', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Moldavie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Mongolie', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Monténégro', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Montserrat', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Mozambique', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Namibie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Nauru', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Népal', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Nicaragua', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Niger', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Nigeria', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Niue', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Norvège', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Nouvelle-Calédonie', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Nouvelle-Zélande', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Oman', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Ouganda', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Ouzbékistan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Palaos', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Palestine', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Panama', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Papouasie-Nouvelle-Guinée', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Pakistan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Paraguay', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Pays-Bas', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Pérou', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Philippines', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Pologne', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Polynésie française', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Porto Rico', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Portugal', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Qatar', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('République Centrafricaine', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('République Démocratique du Congo', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('République Dominicaine', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('République Tchèque', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Réunion', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Roumanie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Royaume-Uni', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Russie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Rwanda', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sahara occidental', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Saint-Barthélemy', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sainte-Hélène', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sainte-Lucie', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Saint-Marin', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Saint-Martin', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Saint-Pierre-et-Miquelon', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Saint-Vincent-et-les-Grenadines', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Saint-Christophe-et-Niévès', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Samoa', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Samoa américaines', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sao Tomé-et-Principe', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sénégal', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Serbie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Seychelles', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sierra Leone', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Singapour', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sint Maarten', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Slovaquie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Slovénie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Somalie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Soudan', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Soudan du Sud', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Sri Lanka', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Suède', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Suisse', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Suriname', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Svalbard et Jan Mayen', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Syrie', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Tadjikistan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Taïwan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Tanzanie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Tchad', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Terres australes françaises', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Territoire britannique de l''océan Indien', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Thaïlande', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Timor oriental', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Togo', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Tokelau', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Tonga', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Trinité-et-Tobago', 2);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Tunisie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Turkménistan', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Turquie', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Tuvalu', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Ukraine', 4);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Uruguay', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Vanuatu', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Vénézuela', 3);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Viêt Nam', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Wallis-et-Futuna', 6);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Yémen', 5);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Zambie', 1);
-INSERT IGNORE INTO nation (nom, id_continent) VALUES ('Zimbabwe', 1);
-
--- Hydratation du code ISO alpha-2 des nations
--- 1) Valeur de base calculée automatiquement si absente
-UPDATE nation
-SET iso_alpha_2 = UPPER(
-  SUBSTRING(
-    REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(nom, ' ', ''), '-', ''), '''', ''), '(', ''), ')', ''),
-    1,
-    2
-  )
-)
-WHERE iso_alpha_2 IS NULL;
-
--- 2) Corrections explicites (codes ISO officiels)
-UPDATE nation SET iso_alpha_2 = 'CD' WHERE nom = 'République Démocratique du Congo';
-UPDATE nation SET iso_alpha_2 = 'CG' WHERE nom = 'Congo';
-UPDATE nation SET iso_alpha_2 = 'FR' WHERE nom = 'France';
-UPDATE nation SET iso_alpha_2 = 'BE' WHERE nom = 'Belgique';
-UPDATE nation SET iso_alpha_2 = 'US' WHERE nom = 'États-Unis';
-UPDATE nation SET iso_alpha_2 = 'CA' WHERE nom = 'Canada';
-UPDATE nation SET iso_alpha_2 = 'ZA' WHERE nom = 'Afrique du Sud';
-UPDATE nation SET iso_alpha_2 = 'AO' WHERE nom = 'Angola';
-UPDATE nation SET iso_alpha_2 = 'BI' WHERE nom = 'Burundi';
-UPDATE nation SET iso_alpha_2 = 'RW' WHERE nom = 'Rwanda';
-UPDATE nation SET iso_alpha_2 = 'CM' WHERE nom = 'Cameroun';
-UPDATE nation SET iso_alpha_2 = 'CI' WHERE nom = 'Côte d''Ivoire';
-UPDATE nation SET iso_alpha_2 = 'GA' WHERE nom = 'Gabon';
-UPDATE nation SET iso_alpha_2 = 'KE' WHERE nom = 'Kenya';
-UPDATE nation SET iso_alpha_2 = 'NG' WHERE nom = 'Nigeria';
-UPDATE nation SET iso_alpha_2 = 'TZ' WHERE nom = 'Tanzanie';
-UPDATE nation SET iso_alpha_2 = 'UG' WHERE nom = 'Ouganda';
-UPDATE nation SET iso_alpha_2 = 'ZM' WHERE nom = 'Zambie';
-UPDATE nation SET iso_alpha_2 = 'ZW' WHERE nom = 'Zimbabwe';
-UPDATE nation SET iso_alpha_2 = 'GB' WHERE nom = 'Royaume-Uni';
-UPDATE nation SET iso_alpha_2 = 'IT' WHERE nom = 'Italie';
-UPDATE nation SET iso_alpha_2 = 'DE' WHERE nom = 'Allemagne';
-UPDATE nation SET iso_alpha_2 = 'ES' WHERE nom = 'Espagne';
-UPDATE nation SET iso_alpha_2 = 'PT' WHERE nom = 'Portugal';
-UPDATE nation SET iso_alpha_2 = 'BR' WHERE nom = 'Brésil';
-UPDATE nation SET iso_alpha_2 = 'AR' WHERE nom = 'Argentine';
-UPDATE nation SET iso_alpha_2 = 'MX' WHERE nom = 'Mexique';
-UPDATE nation SET iso_alpha_2 = 'CN' WHERE nom = 'Chine';
-UPDATE nation SET iso_alpha_2 = 'JP' WHERE nom = 'Japon';
-UPDATE nation SET iso_alpha_2 = 'IN' WHERE nom = 'Inde';
+-- Nations (base courante; ISO codes added in later migration)
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Afghanistan', 5, 'AF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Afrique du Sud', 1, 'ZA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Albanie', 4, 'AL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Algérie', 1, 'DZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Allemagne', 4, 'DE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Andorre', 4, 'AD');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Angola', 1, 'AO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Antigua-et-Barbuda', 2, 'AG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Arabie Saoudite', 5, 'SA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Arménie', 4, 'AM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Australie', 6, 'AU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Autriche', 4, 'AT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Azerbaïdjan', 4, 'AZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bahamas', 2, 'BS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bahreïn', 5, 'BH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bangladesh', 5, 'BD');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Barbade', 2, 'BB');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Belgique', 4, 'BE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Belize', 2, 'BZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bénin', 1, 'BJ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bhoutan', 5, 'BT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Biélorussie', 4, 'BY');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Birmanie', 5, 'MM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bolivie', 3, 'BO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bosnie-Herzégovine', 4, 'BA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Botswana', 1, 'BW');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Brésil', 3, 'BR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Brunei', 5, 'BN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Bulgarie', 4, 'BG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Burkina Faso', 1, 'BF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Burundi', 1, 'BI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Cambodge', 5, 'KH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Cameroun', 1, 'CM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Canada', 2, 'CA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Cap-Vert', 1, 'CV');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Chili', 3, 'CL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Chine', 5, 'CN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Chypre', 4, 'CY');
+-- INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Chypre du Nord', 5, 'NULL'); -- No ISO Code
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Colombie', 3, 'CO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Comores', 1, 'KM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Congo', 1, 'CG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Corée du Nord', 5, 'KP');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Corée du Sud', 5, 'KR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Costa Rica', 2, 'CR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Côte d''Ivoire', 1, 'CI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Croatie', 4, 'HR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Cuba', 2, 'CU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Danemark', 4, 'DK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Djibouti', 1, 'DJ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Dominique', 2, 'DM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Égypte', 1, 'EG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('El Salvador', 2, 'SV');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Émirats Arabes Unis', 5, 'AE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Équateur', 3, 'EC');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Érythrée', 1, 'ER');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Espagne', 4, 'ES');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Estonie', 4, 'EE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Eswatini', 1, 'SZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('États-Unis', 2, 'US');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Éthiopie', 1, 'ET');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Fidji', 6, 'FJ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Finlande', 4, 'FI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('France', 4, 'FR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Gabon', 1, 'GA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Gambie', 1, 'GM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Géorgie', 4, 'GE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Géorgie du Sud-Ossétie', 5, 'GS'); -- Corrected to South Georgia code (GS)
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Ghana', 1, 'GH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Gibraltar', 4, 'GI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Grèce', 4, 'GR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Grenade', 2, 'GD');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Groenland', 4, 'GL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guadeloupe', 2, 'GP');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guam', 6, 'GU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guatemala', 2, 'GT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guernesey', 4, 'GG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guinée', 1, 'GN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guinée équatoriale', 1, 'GQ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guinée-Bissau', 1, 'GW');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guyana', 3, 'GY');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Guyane française', 3, 'GF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Haïti', 2, 'HT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Honduras', 2, 'HN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Hong Kong', 5, 'HK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Hongrie', 4, 'HU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Île Bouvet', 4, 'BV');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Île Christmas', 6, 'CX');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Île Norfolk', 6, 'NF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Îles Åland', 4, 'AX');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Îles Féroé', 4, 'FO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Îles Heard et MacDonald', 6, 'HM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Îles Mariannes du Nord', 6, 'MP');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Îles Pitcairn', 6, 'PN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Inde', 5, 'IN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Indonésie', 5, 'ID');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Irak', 5, 'IQ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Iran', 5, 'IR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Irlande', 4, 'IE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Islande', 4, 'IS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Israël', 5, 'IL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Italie', 4, 'IT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Jamaïque', 2, 'JM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Japon', 5, 'JP');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Jersey', 4, 'JE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Jordanie', 5, 'JO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Kazakhstan', 5, 'KZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Kenya', 1, 'KE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Kirghizistan', 5, 'KG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Kiribati', 6, 'KI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Kosovo', 4, 'XK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Koweït', 5, 'KW');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Laos', 5, 'LA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Lesotho', 1, 'LS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Lettonie', 4, 'LV');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Liban', 5, 'LB');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Liberia', 1, 'LR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Libye', 1, 'LY');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Liechtenstein', 4, 'LI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Lituanie', 4, 'LT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Luxembourg', 4, 'LU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Macao', 5, 'MO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Macédoine du Nord', 4, 'MK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Madagascar', 1, 'MG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Malaisie', 5, 'MY');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Malawi', 1, 'MW');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Maldives', 5, 'MV');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Mali', 1, 'ML');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Malte', 4, 'MT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Maroc', 1, 'MA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Martinique', 2, 'MQ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Maurice', 1, 'MU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Mauritanie', 1, 'MR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Mayotte', 1, 'YT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Mexique', 2, 'MX');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Micronésie', 6, 'FM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Moldavie', 4, 'MD');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Mongolie', 5, 'MN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Monténégro', 4, 'ME');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Montserrat', 2, 'MS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Mozambique', 1, 'MZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Namibie', 1, 'NA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Nauru', 6, 'NR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Népal', 5, 'NP');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Nicaragua', 2, 'NI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Niger', 1, 'NE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Nigeria', 1, 'NG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Niue', 6, 'NU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Norvège', 4, 'NO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Nouvelle-Calédonie', 6, 'NC');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Nouvelle-Zélande', 6, 'NZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Oman', 5, 'OM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Ouganda', 1, 'UG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Ouzbékistan', 5, 'UZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Palaos', 6, 'PW');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Palestine', 5, 'PS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Panama', 2, 'PA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Papouasie-Nouvelle-Guinée', 6, 'PG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Pakistan', 5, 'PK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Paraguay', 3, 'PY');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Pays-Bas', 4, 'NL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Pérou', 3, 'PE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Philippines', 5, 'PH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Pologne', 4, 'PL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Polynésie française', 6, 'PF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Porto Rico', 2, 'PR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Portugal', 4, 'PT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Qatar', 5, 'QA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('République Centrafricaine', 1, 'CF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('République Démocratique du Congo', 1, 'CD');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('République Dominicaine', 2, 'DO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('République Tchèque', 4, 'CZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Réunion', 1, 'RE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Roumanie', 4, 'RO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Royaume-Uni', 4, 'GB');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Russie', 4, 'RU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Rwanda', 1, 'RW');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sahara occidental', 1, 'EH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Saint-Barthélemy', 2, 'BL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sainte-Hélène', 1, 'SH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sainte-Lucie', 2, 'LC');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Saint-Marin', 2, 'SM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Saint-Martin', 2, 'MF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Saint-Pierre-et-Miquelon', 2, 'PM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Saint-Vincent-et-les-Grenadines', 2, 'VC');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Saint-Christophe-et-Niévès', 2, 'KN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Samoa', 6, 'WS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Samoa américaines', 6, 'AS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sao Tomé-et-Principe', 1, 'ST');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sénégal', 1, 'SN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Serbie', 4, 'RS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Seychelles', 1, 'SC');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sierra Leone', 1, 'SL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Singapour', 5, 'SG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sint Maarten', 2, 'SX');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Slovaquie', 4, 'SK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Slovénie', 4, 'SI');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Somalie', 1, 'SO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Soudan', 1, 'SD');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Soudan du Sud', 1, 'SS');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Sri Lanka', 5, 'LK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Suède', 4, 'SE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Suisse', 4, 'CH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Suriname', 3, 'SR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Svalbard et Jan Mayen', 4, 'SJ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Syrie', 5, 'SY');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Tadjikistan', 5, 'TJ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Taïwan', 5, 'TW');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Tanzanie', 1, 'TZ');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Tchad', 1, 'TD');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Terres australes françaises', 6, 'TF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Territoire britannique de l''océan Indien', 6, 'IO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Thaïlande', 5, 'TH');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Timor oriental', 5, 'TL');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Togo', 1, 'TG');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Tokelau', 6, 'TK');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Tonga', 6, 'TO');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Trinité-et-Tobago', 2, 'TT');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Tunisie', 1, 'TN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Turkménistan', 5, 'TM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Turquie', 4, 'TR');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Tuvalu', 6, 'TV');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Ukraine', 4, 'UA');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Uruguay', 3, 'UY');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Vanuatu', 6, 'VU');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Vénézuela', 3, 'VE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Viêt Nam', 5, 'VN');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Wallis-et-Futuna', 6, 'WF');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Yémen', 5, 'YE');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Zambie', 1, 'ZM');
+INSERT INTO nation (nom, id_continent, iso_alpha_2) VALUES ('Zimbabwe', 1, 'ZW');
 
 -- Structure types (IDs fixed to match StructureTypeEnum)
-INSERT IGNORE INTO structure_type (id, nom) VALUES
+INSERT INTO structure_type (id, nom) VALUES
   (1, 'Direction Ecclésiastique'),
   (2, 'Mouvement'),
   (3, 'Association'),
@@ -306,12 +262,12 @@ WHERE NOT EXISTS (
 );
 
 -- Fidele types (IDs fixed to match FideleTypeEnum)
-INSERT IGNORE INTO fidele_type (id, nom) VALUES
+INSERT INTO fidele_type (id, nom) VALUES
   (1, 'Pratiquant'),
   (2, 'Sympathisant');
 
 -- Grades (IDs fixed to match GradeEnum)
-INSERT IGNORE INTO grade (id, nom) VALUES
+INSERT INTO grade (id, nom) VALUES
   (1, 'Mondimi'),
   (2, 'Nkengi'),
   (3, 'Longi'),
@@ -319,7 +275,7 @@ INSERT IGNORE INTO grade (id, nom) VALUES
   (5, 'Pasteur');
 
 -- Professions (common values; first one must be Eleve/Etudiant)
-INSERT IGNORE INTO profession (id, nom, description) VALUES
+INSERT INTO profession (id, nom, description) VALUES
   (1, 'Eleve/Etudiant', 'En formation scolaire ou universitaire'),
   (2, 'Fonctionnaire', 'Agent de l''administration publique'),
   (3, 'Enseignant', 'Profession de l''enseignement'),
@@ -350,7 +306,7 @@ INSERT IGNORE INTO profession (id, nom, description) VALUES
   (28, 'Autre', 'Profession non presente sur la liste.');
 
 -- Niveaux d'études (base courante)
-INSERT IGNORE INTO niveau_etudes (id, nom, description) VALUES
+INSERT INTO niveau_etudes (id, nom, description) VALUES
   (1, 'Aucun', 'Sans niveau scolaire formel'),
   (2, 'Primaire', 'Niveau d''enseignement primaire'),
   (3, 'Secondaire', 'Niveau d''enseignement secondaire'),
@@ -358,7 +314,7 @@ INSERT IGNORE INTO niveau_etudes (id, nom, description) VALUES
   (5, 'Universitaire', 'Niveau licence/master/doctorat');
 
 -- États civils de base
-INSERT IGNORE INTO etat_civile (id, nom, description) VALUES
+INSERT INTO etat_civile (id, nom, description) VALUES
   (1, 'Célibataire', 'Personne non mariée'),
   (2, 'Marié', 'Personne mariée'),
   (3, 'Divorcé', 'Personne divorcée'),
@@ -393,7 +349,7 @@ INSERT INTO fonction_list (nom)
 SELECT 'Chef de partition' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Chef de partition');
 
 -- Document types (IDs fixed to match DocumentTypeEnum)
-INSERT IGNORE INTO document_type (id, nom, document_key, code) VALUES
+INSERT INTO document_type (id, nom, document_key, code) VALUES
   (1, 'FIDELE', 'FIDELE', 'FDL'),
   (2, 'STRUCTURE', 'STRUCTURE', 'STR'),
   (3, 'PAROISSE', 'PAROISSE', 'PRS'),
@@ -414,6 +370,6 @@ UPDATE document_type SET code = 'CTN' WHERE id = 7;
 UPDATE document_type SET code = 'GNR' WHERE id = 8;
 
 -- Document statuts
-INSERT IGNORE INTO document_statut (id, nom, description, id_document_type) VALUES
+INSERT INTO document_statut (id, nom, description, id_document_type) VALUES
   (1, 'En attente', 'Document en attente de traitement/validation', NULL),
   (29, 'Validé', 'Document validé', NULL);
