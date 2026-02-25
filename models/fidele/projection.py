@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, Field, computed_field
 from datetime import date, datetime
 
 from models.adresse.projection import AdresseProjShallow, NationProjFlat
@@ -96,7 +96,12 @@ class FideleProjShallow(FideleProjFlat):
 
 class FideleProjFlatWithPhoto(FideleProjFlat):
     """Projection plate enrichie avec photo_url (usage via include=photo_url)."""
-    photo_url: FileProjFlat | None = None
+    photo: FileProjFlat | None = Field(default=None, exclude=True)
+
+    @computed_field
+    @property
+    def photo_url(self) -> str | None:
+        return self.photo.signed_url if self.photo else None
 
     class Config:
         from_attributes = True

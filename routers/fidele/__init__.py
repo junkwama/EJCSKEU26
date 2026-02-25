@@ -9,12 +9,7 @@ from datetime import datetime, timezone
 # Local modules
 from core.config import Config
 from models.constants.types import DocumentTypeEnum
-from models.fidele import (
-    Fidele,
-    FideleFamille,
-    FideleOrigine,
-    FideleOccupation,
-)
+from models.fidele import Fidele
 from models.fidele.utils import FideleBase, FideleUpdate
 from models.fidele.projection import FideleProjFlat, FideleProjFlatWithPhoto, FideleProjShallow
 from models.adresse import Adresse, Nation
@@ -113,7 +108,7 @@ async def get_fideles(
     limit: int = Query(Config.PREVIEW_LIST_ITEM_NUMBER, ge=1, le=Config.MAX_ITEMS_PER_PAGE),
     include: Annotated[
         str | None,
-        Query(description="Relations à inclure en flat (ex: photo)")
+        Query(description="Relations à inclure en flat (ex: photo_url)")
     ] = None,
 ) -> List[FideleProjFlat | FideleProjFlatWithPhoto]:
     """
@@ -121,7 +116,7 @@ async def get_fideles(
     """
     # Fetching main data
     include_fields = parse_fidele_include(include)
-    should_include_photo = "photo" in include_fields
+    should_include_photo = "photo_url" in include_fields
 
     statement = (
         select(Fidele)
@@ -148,7 +143,7 @@ async def get_fidele(
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
     include: Annotated[
         str | None,
-        Query(description="Relations à inclure en flat (ex: photo)")
+        Query(description="Relations à inclure en flat (ex: photo_url)")
     ] = None,
 ) -> FideleProjShallow | FideleProjFlat | FideleProjFlatWithPhoto:
     """
@@ -158,7 +153,7 @@ async def get_fidele(
         id (int): L'Id du fidele à récupérer
     """
     include_fields = parse_fidele_include(include)
-    should_include_photo = proj == ProjDepth.FLAT and "photo" in include_fields
+    should_include_photo = proj == ProjDepth.FLAT and "photo_url" in include_fields
 
     # Fetching related data for the shallow projection
     if proj == ProjDepth.SHALLOW or should_include_photo:

@@ -30,6 +30,11 @@ def parse_fidele_include(include: str | None) -> set[str]:
         for item in include.split(",")
         if item and item.strip()
     }
+
+    # backward compatibility: include=photo behaves like include=photo_url
+    if "photo" in include_fields:
+        include_fields.add("photo_url")
+
     return include_fields.intersection(FIDELE_ALLOWED_INCLUDES)
 
 
