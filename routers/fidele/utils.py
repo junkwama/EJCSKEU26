@@ -18,6 +18,21 @@ from core.db import get_session
 from utils.constants import ProjDepth
 
 
+FIDELE_ALLOWED_INCLUDES = {"photo_url"}
+
+
+def parse_fidele_include(include: str | None) -> set[str]:
+    if not include:
+        return set()
+
+    include_fields = {
+        item.strip().lower()
+        for item in include.split(",")
+        if item and item.strip()
+    }
+    return include_fields.intersection(FIDELE_ALLOWED_INCLUDES)
+
+
 async def required_fidele(
     id: Annotated[int, Path(..., description="Fidele's ID")],
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -29,7 +44,10 @@ async def get_fidele_complete_data_by_id(
     id: int,
     session: AsyncSession,
     proj: ProjDepth = ProjDepth.SHALLOW,
+    include_fields: set[str] | None = None,
 ) -> Fidele:
+    include_fields = include_fields or set()
+
     statement = select(Fidele).where(Fidele.id == id)
     if proj == ProjDepth.SHALLOW:
         statement = statement.options(
@@ -50,6 +68,8 @@ async def get_fidele_complete_data_by_id(
             selectinload(Fidele.occupation).selectinload(FideleOccupation.niveau_etude),
             selectinload(Fidele.occupation).selectinload(FideleOccupation.profession),
         )
+    elif "photo_url" in include_fields:
+        statement = statement.options(selectinload(Fidele.photo))
 
     result = await session.exec(statement)
     return result.first()

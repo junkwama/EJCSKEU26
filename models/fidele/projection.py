@@ -93,6 +93,14 @@ class FideleProjShallow(FideleProjFlat):
     class Config:
         from_attributes = True
 
+
+class FideleProjFlatWithPhoto(FideleProjFlat):
+    """Projection plate enrichie avec photo_url (usage via include=photo_url)."""
+    photo_url: FileProjFlat | None = None
+
+    class Config:
+        from_attributes = True
+
 ## ============================================================================
 ## SUB DATA PROJECTIONS
 ## ============================================================================

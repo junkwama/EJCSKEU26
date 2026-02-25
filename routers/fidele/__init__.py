@@ -16,7 +16,7 @@ from models.fidele import (
     FideleOccupation,
 )
 from models.fidele.utils import FideleBase, FideleUpdate
-from models.fidele.projection import FideleProjFlat, FideleProjShallow
+from models.fidele.projection import FideleProjFlat, FideleProjFlatWithPhoto, FideleProjShallow
 from models.adresse import Adresse, Nation
 from models.adresse.utils import AdresseUpdate
 from models.adresse.projection import AdresseProjFlat, AdresseProjShallow
@@ -24,7 +24,11 @@ from models.contact import Contact
 from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
-from routers.fidele.utils import required_fidele, get_fidele_complete_data_by_id
+from routers.fidele.utils import (
+    required_fidele,
+    get_fidele_complete_data_by_id,
+    parse_fidele_include,
+)
 from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send404
 from routers.utils import apply_projection
@@ -107,23 +111,33 @@ async def get_fideles(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
     limit: int = Query(Config.PREVIEW_LIST_ITEM_NUMBER, ge=1, le=Config.MAX_ITEMS_PER_PAGE),
-) -> List[FideleProjFlat]:
+    include: Annotated[
+        str | None,
+        Query(description="Relations à inclure en flat (ex: photo)")
+    ] = None,
+) -> List[FideleProjFlat | FideleProjFlatWithPhoto]:
     """
     Recuperer la liste des fideles avec pagination
     """
     # Fetching main data
+    include_fields = parse_fidele_include(include)
+    should_include_photo = "photo" in include_fields
+
     statement = (
         select(Fidele)
         .where(Fidele.est_supprimee == False)
         .offset(offset)
         .limit(limit)
     )
+    if should_include_photo:
+        statement = statement.options(selectinload(Fidele.photo))
 
     result = await session.exec(statement)
     fidele_list = result.all()
 
     # Returning the list
-    return send200([FideleProjFlat.model_validate(fidele) for fidele in fidele_list])
+    flat_projection = FideleProjFlatWithPhoto if should_include_photo else FideleProjFlat
+    return send200([flat_projection.model_validate(fidele) for fidele in fidele_list])
 
 
 @fidele_router.get("/{id}", tags=["Fidele"])
@@ -132,19 +146,27 @@ async def get_fidele(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[AsyncSession, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
-) -> FideleProjShallow | FideleProjFlat:
+    include: Annotated[
+        str | None,
+        Query(description="Relations à inclure en flat (ex: photo)")
+    ] = None,
+) -> FideleProjShallow | FideleProjFlat | FideleProjFlatWithPhoto:
     """
     Recuperer un fidele par son Id avec ses relations
 
     ARGS:
         id (int): L'Id du fidele à récupérer
     """
+    include_fields = parse_fidele_include(include)
+    should_include_photo = proj == ProjDepth.FLAT and "photo" in include_fields
+
     # Fetching related data for the shallow projection
-    if proj == ProjDepth.SHALLOW:
-        fidele = await get_fidele_complete_data_by_id(id, session, proj)
+    if proj == ProjDepth.SHALLOW or should_include_photo:
+        fidele = await get_fidele_complete_data_by_id(id, session, proj, include_fields)
 
     # Return the fidele as projection
-    projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
+    flat_projection = FideleProjFlatWithPhoto if should_include_photo else FideleProjFlat
+    projected_response = apply_projection(fidele, flat_projection, FideleProjShallow, proj)
     return send200(projected_response)
 
 
