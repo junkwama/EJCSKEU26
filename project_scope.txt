@@ -1,0 +1,139 @@
+PROJET EJCSK
+
+Titre du projet :
+Plateforme Numérique Globale de Gestion Kimbanguiste (Web + Mobile + API Cloud)
+
+1) Contexte et Problématique
+La communauté kimbanguiste constitue une grande organisation religieuse comptant environ 33 millions de fidèles à travers le monde et des milliers de paroisses. Bien que l’administration centrale soit située à Nkamba (Congo), une partie importante des recensements et des processus reste encore manuelle. Cette situation entraîne les problèmes majeurs suivants :
+
+- Absence d’une base de données centrale et constamment à jour
+- Faiblesses dans la vérification des fidèles et la fiabilité identitaire
+- Difficulté de vérification documentaire dans les processus de pèlerinage à Nkamba
+- Retards de coordination entre des structures réparties sur plusieurs continents (Afrique, Europe, Amérique du Nord)
+- Traçabilité et auditabilité limitées pour les services de sécurité
+
+Par conséquent, une plateforme de transformation numérique, sécurisée, orientée rôles et déployable à l’échelle mondiale est nécessaire.
+
+2) Objectif Principal du Projet
+L’objectif de ce projet de fin d’études est de concevoir/développer une plateforme numérique centralisée et multi-clients (web + mobile) pour l’écosystème kimbanguiste. La plateforme ne vise pas seulement la gestion des enregistrements, mais aussi la standardisation numérique des processus de sécurité, de vérification et de gouvernance.
+
+3) Approche de Solution (Résumé)
+La solution proposée repose sur quatre couches :
+
+1. Couche API (FastAPI) :
+   Point central des règles métier, de la gestion d’identité/rôles, de la validation des données et des intégrations.
+
+2. Application Web d’Administration (React + TypeScript) :
+   Opérations administratives, écrans orientés rôles, reporting et gestion des workflows.
+
+3. Applications Mobiles (React Native / Expo) :
+   - Application de vérification et de contrôle pour les services de sécurité
+   - Application pour les fidèles
+   - Application mobile de la plateforme avec des fonctionnalités réduites par rapport au web
+
+4. Couche Données et Cloud :
+   Gestion des données centrée sur MySQL, stockage de fichiers et mécanismes d’accès sécurisé.
+
+4) Valeur Scientifique et Académique
+Ce projet n’est pas uniquement un développement logiciel ; il propose également une démarche de recherche appliquée autour de la problématique de la transformation numérique dans la gestion d’une communauté religieuse distribuée.
+
+Axes de recherche :
+- Impact des systèmes d’identité numérique centralisée sur la sécurité institutionnelle
+- Contribution du contrôle d’accès basé sur les rôles (RBAC) à l’efficacité de gouvernance à grande échelle
+- Rôle des mécanismes de validation NFC et QR dans la réduction de la fraude
+- Effets d’une architecture cloud sur l’accès global et la continuité de service
+
+Métriques proposées d’évaluation :
+- Temps de vérification (comparé au processus manuel)
+- Taux de détection des documents erronés/suspects
+- Temps de complétion des workflows (recommandation/autorisation/visa)
+- Disponibilité du système (uptime), latence et taux d’erreur
+
+5) Processus Principaux à Digitaliser
+A) Recensement Global des Fidèles et Gestion d’Identité
+- Recensement centralisé depuis toutes les paroisses
+- Codification unique des fidèles (matricule)
+- Gestion des statuts sur le cycle de vie
+
+B) Processus de Lettre de Recommandation / Visa pour le Pèlerinage à Nkamba
+- Création numérique du visa par le pasteur sur la plateforme
+- Notification automatique des services de sécurité
+- Vérification documentaire par QR code
+- Validation instantanée via application mobile
+
+C) Gouvernance Hiérarchique et Système de Rôles
+- Modélisation des structures de l’Église, mouvements, chorales et associations
+- Gestion par échelons (paroisse, nation, province, continent)
+- Matrice role-group/rôles pour chaque fonction
+
+D) Vérification de Carte Fidèle Basée sur NFC
+- Association carte NFC ↔ identité enregistrée sur la plateforme
+- Contrôle d’authenticité via application de sécurité
+- Réduction du risque de fausses cartes
+
+6) Composants Système Prévu
+- API Backend : Python, FastAPI, SQLModel/SQLAlchemy, Alembic
+- Frontend Web : React + TypeScript
+- Frontend Mobile : React Native (Expo)
+- Base de données : MySQL
+- Gestion des fichiers : stockage objet cloud + accès par URL signée
+
+Note : Le projet est encore en cours de développement ; néanmoins, le périmètre proposé présente la vision complète du système final.
+
+7) Architecture Générale (Sans Détails Techniques Profonds)
+- Couche client : panel web + plusieurs applications mobiles
+- Couche applicative : API centrale et règles métier
+- Couche données : base relationnelle (MySQL) + stockage de fichiers
+- Couche sécurité : authentification, autorisation par rôles, traçabilité
+- Couche intégration : services de vérification QR/NFC et mécanismes de notification
+
+8) Options d’Hébergement et de Déploiement
+Option 1 (Cloud unique) :
+- API et application web dans le même écosystème cloud
+- Administration simplifiée, faible complexité opérationnelle au démarrage
+
+Option 2 (Hybride) :
+- API et base de données chez un fournisseur, diffusion web/mobile via CDN
+- Meilleure performance d’accès global
+
+Option 3 (Scalabilité entreprise) :
+- Déploiement conteneurisé (approche Docker/Kubernetes)
+- Observabilité avancée, auto-scalabilité et redondance
+
+9) Intégration de l’Intelligence Artificielle (Pour Renforcer le Projet)
+Pour accroître la portée scientifique du projet, les modules IA suivants peuvent être intégrés de manière progressive :
+
+1. Détection d’Anomalies (Fraude / Score de Risque)
+- Détection de patterns suspects (multi-identités depuis un même appareil, activités atypiques)
+- Production de score de risque pour les services de sécurité
+
+2. Vérification Intelligente de Documents
+- Contrôle de cohérence des visas/lettres de recommandation
+- Score de confiance combinant le contenu et les résultats de validation QR
+
+3. Qualité de Données et Détection de Doublons
+- Suggestion de potentiels doublons fidèles (nom/téléphone/adresse similaires)
+- Assistance opérateur pour le nettoyage de données
+
+4. Planification Prédictive
+- Prévision de l’affluence périodique des pèlerinages à Nkamba
+- Aide à la planification des capacités sécurité/opérations
+
+5. Assistant Intelligent Multilingue
+- Support question-réponse pour administrateurs, sécurité et fidèles
+- Orientation procédurale et amélioration de l’adoption utilisateur
+
+Grâce à ces modules IA, la plateforme dépasse un simple CRUD pour devenir un écosystème intelligent, orienté sécurité et aide à la décision.
+
+10) Résultats Attendus
+- Une plateforme numérique centralisée, multi-clients et orientée rôles
+- Une infrastructure globale de recensement des fidèles
+- Des flux de vérification QR + NFC opérationnels
+- Une visibilité opérationnelle renforcée pour les services de sécurité
+- Une base technique pour l’analyse de risque et l’aide à la décision par IA
+- Un rapport de fin d’études, une documentation d’architecture et des scénarios de démonstration
+
+11) Conclusion et Valeur du Projet
+Ce projet présente une forte valeur de projet de fin d’études, car il combine dans un même cadre : ingénierie logicielle, architecture cloud, développement web/mobile, ingénierie de sécurité et systèmes d’aide à la décision appuyés par l’IA. L’objectif est de proposer une solution académique, applicable et scalable pour la transformation numérique globale de la communauté kimbanguiste.
+
+Soumis à l’approbation de l’enseignant encadrant.
