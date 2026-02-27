@@ -8,14 +8,15 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from core.config import Config
 from modules.file.models import File as FileModel, FileProjFlat
 from modules.file.utils import get_upload_file_extension
 
 class S3Service:
 
-    file: UploadFile
+    file: UploadFile | None
     
-    def __init__(self, file: UploadFile):
+    def __init__(self, file: UploadFile | None = None):
         self.file = file
 
         # checking if AWS credentials are set
@@ -38,6 +39,23 @@ class S3Service:
 
         self.bucket = aws_bucket
 
+    @staticmethod
+    def _normalize_expires_in(expires_in: int | tuple | list) -> int:
+        if isinstance(expires_in, (tuple, list)):
+            if not expires_in:
+                raise HTTPException(500, "Durée d'expiration invalide")
+            expires_in = expires_in[0]
+
+        try:
+            expires_in_int = int(expires_in)
+        except (TypeError, ValueError):
+            raise HTTPException(500, "Durée d'expiration invalide")
+
+        if expires_in_int <= 0:
+            raise HTTPException(500, "Durée d'expiration invalide")
+
+        return expires_in_int
+
     async def save_metadata_to_db(
         self,
         session: AsyncSession,
@@ -48,9 +66,6 @@ class S3Service:
         url_expires_in: int,
         original_name: str | None,
     ) -> FileProjFlat:
-        signed_url = self.sign_url(s3_key, url_expires_in)
-        signed_url_expiration_date = datetime.now(timezone.utc) + timedelta(seconds=url_expires_in)
-
         statement = select(FileModel).where(FileModel.file_name == s3_key)
         result = await session.exec(statement)
         db_file = result.first()
@@ -59,8 +74,6 @@ class S3Service:
             db_file.original_name = original_name
             db_file.mimetype = self.file.content_type
             db_file.size = self.file.size or 0
-            db_file.signed_url = signed_url
-            db_file.signed_url_expiration_date = signed_url_expiration_date
             db_file.id_document_type = id_document_type
             db_file.id_document = id_document
             db_file.est_supprimee = False
@@ -72,8 +85,6 @@ class S3Service:
                 file_name=s3_key,
                 mimetype=self.file.content_type,
                 size=self.file.size or 0,
-                signed_url=signed_url,
-                signed_url_expiration_date=signed_url_expiration_date,
                 id_document_type=id_document_type,
                 id_document=id_document,
             )
@@ -82,7 +93,18 @@ class S3Service:
         await session.commit()
         await session.refresh(db_file)
 
-        return FileProjFlat.model_validate(db_file)
+        return self.hydrate_signed_url(db_file, url_expires_in)
+
+    def hydrate_signed_url(
+        self,
+        db_file: FileModel | FileProjFlat,
+        url_expires_in: int = Config.SIGNED_URL_EXPIRATION_PUBLIC_FILE.value,
+    ) -> FileProjFlat:
+        expires_in = self._normalize_expires_in(url_expires_in)
+        projection = FileProjFlat.model_validate(db_file)
+        projection.signed_url = self.sign_url(db_file.file_name, expires_in)
+        projection.signed_url_expiration_date = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
+        return projection
 
     async def upload_file(
         self,
@@ -148,11 +170,12 @@ class S3Service:
             raise HTTPException(500, "Erreur interne pendant l'upload du fichier")
 
     def sign_url(self, s3_key: str, expires_in: int = 3600 * 60):
+        normalized_expires_in = self._normalize_expires_in(expires_in)
         try:
             return self.client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": self.bucket, "Key": s3_key},
-                ExpiresIn=expires_in,
+                ExpiresIn=normalized_expires_in,
             )
         except Exception:
             raise HTTPException(500, "Erreur interne pendant la génération de l'URL signée")
@@ -173,8 +196,6 @@ class S3Service:
             db_file.est_supprimee = True
             db_file.date_suppression = datetime.now(timezone.utc)
             db_file.date_modification = datetime.now(timezone.utc)
-            db_file.signed_url = None
-            db_file.signed_url_expiration_date = None
 
             await session.commit()
             await session.refresh(db_file)
@@ -191,3 +212,7 @@ class S3Service:
 # Factory function to get the S3 service instance
 def get_s3_service(file: UploadFile = File(...)):
     return S3Service(file)
+
+
+def get_s3_service_without_file():
+    return S3Service()

@@ -25,10 +25,11 @@ from routers.fidele.utils import (
     parse_fidele_include,
 )
 from routers.dependencies import check_resource_exists
-from routers.utils.http_utils import send200, send404
+from routers.utils.http_utils import send200, send400, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
 from models.constants import DocumentType, FideleType, Grade, EtatCivile, DocumentStatut
+from modules.file import S3Service
 
 fidele_router = APIRouter()
 
@@ -77,8 +78,7 @@ async def create_fidele(
     )
     if body.id_fidele_recenseur is not None:
         await check_resource_exists(Fidele, session, filters={"id": body.id_fidele_recenseur})
-    if body.id_nation_nationalite is not None:
-        await check_resource_exists(Nation, session, filters={"id": body.id_nation_nationalite})
+    await check_resource_exists(Nation, session, filters={"id": body.id_nation_nationalite})
     if body.id_etat_civile is not None:
         await check_resource_exists(EtatCivile, session, filters={"id": body.id_etat_civile})
     await check_resource_exists(DocumentStatut, session, filters={"id": int(body.id_document_statut)})
@@ -105,7 +105,7 @@ async def create_fidele(
 async def get_fideles(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
-    limit: int = Query(Config.PREVIEW_LIST_ITEM_NUMBER, ge=1, le=Config.MAX_ITEMS_PER_PAGE),
+    limit: int = Query(Config.DEFAULT_ITEMS_PER_PAGE, ge=1, le=Config.MAX_ITEMS_PER_PAGE),
     include: Annotated[
         str | None,
         Query(description="Relations à inclure en flat (ex: photo_url)")
@@ -131,8 +131,17 @@ async def get_fideles(
     fidele_list = result.all()
 
     # Returning the list
-    flat_projection = FideleProjFlatWithPhoto if should_include_photo else FideleProjFlat
-    return send200([flat_projection.model_validate(fidele) for fidele in fidele_list])
+    if should_include_photo:
+        file_service = S3Service()
+        projected_list: list[FideleProjFlatWithPhoto] = []
+        for fidele in fidele_list:
+            projected = FideleProjFlatWithPhoto.model_validate(fidele)
+            if projected.photo:
+                projected.photo = file_service.hydrate_signed_url(projected.photo)
+            projected_list.append(projected)
+        return send200(projected_list)
+
+    return send200([FideleProjFlat.model_validate(fidele) for fidele in fidele_list])
 
 
 @fidele_router.get("/{id}", tags=["Fidele"])
@@ -162,6 +171,11 @@ async def get_fidele(
     # Return the fidele as projection
     flat_projection = FideleProjFlatWithPhoto if should_include_photo else FideleProjFlat
     projected_response = apply_projection(fidele, flat_projection, FideleProjShallow, proj)
+
+    if should_include_photo and isinstance(projected_response, FideleProjFlatWithPhoto) and projected_response.photo:
+        file_service = S3Service()
+        projected_response.photo = file_service.hydrate_signed_url(projected_response.photo)
+
     return send200(projected_response)
 
 
@@ -192,6 +206,8 @@ async def update_fidele(
         await check_resource_exists(Fidele, session, filters={"id": update_data["id_fidele_recenseur"]})
     if "id_nation_nationalite" in update_data and update_data["id_nation_nationalite"] is not None:
         await check_resource_exists(Nation, session, filters={"id": update_data["id_nation_nationalite"]})
+    if "id_nation_nationalite" in update_data and update_data["id_nation_nationalite"] is None:
+        return send400(["body", "id_nation_nationalite"], "id_nation_nationalite est obligatoire")
     if "id_etat_civile" in update_data and update_data["id_etat_civile"] is not None:
         await check_resource_exists(EtatCivile, session, filters={"id": update_data["id_etat_civile"]})
     if "id_document_statut" in update_data and update_data["id_document_statut"] is not None:

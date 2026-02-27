@@ -103,7 +103,7 @@ class FideleBase(SQLModel):
     id_grade: GradeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_fidele_type"])
     id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
-    id_nation_nationalite: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
+    id_nation_nationalite: int = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
     id_etat_civile: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_etat_civile"])
     id_document_statut: int = PydanticField(1, **FIDELE_FIELDS_CONFIG["id_document_statut"])
     code_matriculation: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["code_matriculation"])

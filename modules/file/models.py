@@ -17,9 +17,6 @@ class File(SQLModel, table=True):
     mimetype: str = Field(..., max_length=255)
     size: int = Field(...)
 
-    signed_url: str | None = Field(default=None, nullable=True, max_length=1000)
-    signed_url_expiration_date: datetime | None = Field(default=None, nullable=True, max_length=1000)
-    
     est_supprimee: bool = Field(
         default=False,
         nullable=False,
@@ -67,19 +64,19 @@ class File(SQLModel, table=True):
 
 
 class FileProjFlat(BaseModel):
-	id: int
-	original_name: str | None
-	file_name: str
-	mimetype: str
-	size: int
-	signed_url: str | None
-	signed_url_expiration_date: datetime | None
-	id_document_type: int
-	id_document: int
-	est_supprimee: bool
-	date_suppression: datetime | None
-	date_creation: datetime
-	date_modification: datetime
+    id: int
+    original_name: str | None
+    file_name: str
+    mimetype: str
+    size: int
+    signed_url: str | None = None
+    signed_url_expiration_date: datetime | None = None
+    id_document_type: int
+    id_document: int
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
 
-	class Config:
-		from_attributes = True
+    class Config:
+        from_attributes = True

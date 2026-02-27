@@ -54,12 +54,11 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             nullable=True,
         ),
     )
-    id_nation_nationalite: int | None = SQLModelField(
-        default=None,
+    id_nation_nationalite: int = SQLModelField(
         sa_column=Column(
             Integer,
-            ForeignKey("nation.id", ondelete="SET NULL"),
-            nullable=True,
+            ForeignKey("nation.id", ondelete="RESTRICT"),
+            nullable=False,
         ),
     )
     id_etat_civile: int | None = SQLModelField(

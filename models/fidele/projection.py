@@ -54,7 +54,7 @@ class FideleProjFlat(BaseModel):
     id_grade: GradeEnum 
     id_fidele_type: FideleTypeEnum
     id_fidele_recenseur: int | None = None
-    id_nation_nationalite: int | None = None
+    id_nation_nationalite: int
     id_etat_civile: int | None = None
     id_document_statut: int
     code_matriculation: str | None = None

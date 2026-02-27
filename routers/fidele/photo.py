@@ -4,10 +4,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from core.config import Config
 from models.constants.types import DocumentTypeEnum
 from models.fidele import Fidele
 from modules.file.models import File as FileModel, FileProjFlat
-from modules.file import get_s3_service, S3Service
+from modules.file import get_s3_service, get_s3_service_without_file, S3Service
 from core.db import get_session
 from modules.file.utils import get_upload_file_extension
 from routers.fidele.utils import required_fidele
@@ -77,6 +78,7 @@ async def upload_file(
 async def get_photo(
     session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[Fidele, Depends(required_fidele)],
+    file_service: S3Service = Depends(get_s3_service_without_file),
 ) -> FileProjFlat:
     statement = select(FileModel).where(
         (FileModel.id_document_type == DocumentTypeEnum.FIDELE.value)
@@ -86,4 +88,11 @@ async def get_photo(
     result = await session.exec(statement)
     db_file = result.first()
 
-    return send200(db_file)
+    if not db_file:
+        raise HTTPException(404, "Photo non trouvée")
+
+    projected_file = file_service.hydrate_signed_url(
+        db_file,
+        Config.SIGNED_URL_EXPIRATION_PUBLIC_FILE.value,
+    )
+    return send200(projected_file)
