@@ -143,7 +143,7 @@ async def create_paroisse(
 async def get_paroisses(
     session: Annotated[AsyncSession, Depends(get_session)],
     offset: int = 0,
-    limit: int = Query(Config.PREVIEW_LIST_ITEM_NUMBER, ge=1, le=Config.MAX_ITEMS_PER_PAGE),
+    limit: int = Query(Config.DEFAULT_ITEMS_PER_PAGE, ge=1, le=Config.MAX_ITEMS_PER_PAGE),
 ) -> List[ParoisseProjFlat | ParoisseProjShallow]:
     """
     Recuperer la liste des paroisses avec pagination

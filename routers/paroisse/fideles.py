@@ -41,7 +41,7 @@ async def list_paroisse_fideles(
     ),
     offset: int = 0,
     limit: int = Query(
-        Config.PREVIEW_LIST_ITEM_NUMBER.value, ge=1, le=Config.MAX_ITEMS_PER_PAGE.value
+        Config.DEFAULT_ITEMS_PER_PAGE.value, ge=1, le=Config.MAX_ITEMS_PER_PAGE.value
     ),
 ) -> List[FideleParoisseProjShallowWithoutParoisseData]:
     """Lister les fidèles appartenant à une paroisse (via fidele_paroisse)."""
