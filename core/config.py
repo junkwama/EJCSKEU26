@@ -1,7 +1,7 @@
 from enum import Enum
 
 class Config(Enum): 
-    ALLOWED_HOSTS = ["*"]
+    ALLOWED_ORIGINS = ["*"]
     DEBUG = True
     DEFAULT_ITEMS_PER_PAGE = 10
     MAX_ITEMS_PER_PAGE = 100

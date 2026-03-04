@@ -48,7 +48,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins= Config.ALLOWED_HOSTS.value,
+    allow_origins= Config.ALLOWED_ORIGINS.value,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,4 +125,4 @@ app.include_router(constant_router, prefix="/constant")
 # start the app with: uvicorn main:app --reload
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="localhost", port=8000, reload=True, log_level="info")
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
