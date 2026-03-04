@@ -9,6 +9,7 @@ from models.contact import Contact
 
 from models.paroisse.utils import ParoisseBase
 from models.utils.utils import BaseModelClass
+from utils.utils import SQLModelField
 from models.constants.types import DocumentTypeEnum
 
 if TYPE_CHECKING:
@@ -19,6 +20,8 @@ class Paroisse(ParoisseBase, BaseModelClass, table=True):
     """Modèle de la table Paroisse - Paroisses"""
 
     __tablename__ = "paroisse"
+
+    code_matriculation: str | None = SQLModelField(default=None, max_length=10)
 
     __table_args__ = (
         UniqueConstraint("nom", name="uq_paroisse_nom"),
