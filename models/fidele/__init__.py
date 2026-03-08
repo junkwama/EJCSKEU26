@@ -287,7 +287,7 @@ class FideleOrigine(FideleOrigineBase, BaseModelClass, table=True):
             nullable=False,
         )
     )
-    id_nation: int | None = SQLModelField(
+    id_nation_origine: int | None = SQLModelField(
         default=None,
         sa_column=Column(
             Integer,
@@ -299,7 +299,7 @@ class FideleOrigine(FideleOrigineBase, BaseModelClass, table=True):
     __table_args__ = (
         UniqueConstraint("id_fidele", name="uq_fidele_origine_fidele"),
         Index("idx_fidele_origine_fidele", "id_fidele"),
-        Index("idx_fidele_origine_nation", "id_nation"),
+        Index("idx_fidele_origine_nation_origine", "id_nation_origine"),
         Index("idx_fidele_origine_est_supprimee", "est_supprimee"),
     )
 

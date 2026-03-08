@@ -542,7 +542,7 @@ INSERT INTO fidele_type (nom) VALUES ('Pratiquant');
 INSERT INTO fidele_type (nom) VALUES ('Sympathisant');
 
 -- Grades ecclésiastiques
-INSERT INTO grade (nom) VALUES ('Mondimi');
+INSERT INTO grade (nom) VALUES ('Mondimi simple / Non baptisé / Sympathisant');
 INSERT INTO grade (nom) VALUES ('Nkengi');
 INSERT INTO grade (nom) VALUES ('Longi');
 INSERT INTO grade (nom) VALUES ('Sielo');

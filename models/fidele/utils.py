@@ -81,6 +81,11 @@ FIDELE_FIELDS_CONFIG = {
         "pattern": Regex.PHONE.value,
         "examples": ["+243812345678"],
         "description": "Numero de téléphone au format international. Ex: +243812345678",
+    },
+    "ecole_universite_employeur": {
+        "max_length": 150,
+        "examples": ["Université de Kinshasa"],
+        "description": "École, université ou employeur actuel",
     }
 }
 
@@ -217,12 +222,12 @@ class FideleFamilleUpdate(BaseModel):
 
 
 class FideleOrigineBase(SQLModel):
-    village: str | None = PydanticField(None, max_length=120, examples=["Kisantu"], description="Village d'origine")
-    groupement: str | None = PydanticField(None, max_length=120, examples=["Ngidinga"], description="Groupement d'origine")
-    secteur: str | None = PydanticField(None, max_length=120, examples=["Lukunga"], description="Secteur d'origine")
-    territoire: str | None = PydanticField(None, max_length=120, examples=["Madimba"], description="Territoire d'origine")
-    district: str | None = PydanticField(None, max_length=120, examples=["Mont-Amba"], description="District d'origine")
-    province: str | None = PydanticField(None, max_length=120, examples=["Kongo Central"], description="Province d'origine")
+    village: str | None = PydanticField(None, max_length=120)
+    groupement: str | None = PydanticField(None, max_length=120)
+    secteur: str | None = PydanticField(None, max_length=120)
+    territoire: str | None = PydanticField(None, max_length=120)
+    district: str | None = PydanticField(None, max_length=120)
+    province: str | None = PydanticField(None, max_length=120)
 
     class Config:
         from_attributes = True
@@ -235,32 +240,18 @@ class FideleOrigineCreate(BaseModel):
     territoire: str | None = PydanticField(None, max_length=120, examples=["Madimba"], description="Territoire d'origine")
     district: str | None = PydanticField(None, max_length=120, examples=["Mont-Amba"], description="District d'origine")
     province: str | None = PydanticField(None, max_length=120, examples=["Kongo Central"], description="Province d'origine")
-    id_nation: int | None = PydanticField(None, examples=[1], description="Nation d'origine")
+    id_nation_origine: int | None = PydanticField(None, examples=[1], description="Nation d'origine")
 
     class Config:
         from_attributes = True
 
 
-class FideleOrigineUpdate(BaseModel):
-    village: str | None = PydanticField(None, max_length=120, examples=["Kisantu"], description="Village d'origine")
-    groupement: str | None = PydanticField(None, max_length=120, examples=["Ngidinga"], description="Groupement d'origine")
-    secteur: str | None = PydanticField(None, max_length=120, examples=["Lukunga"], description="Secteur d'origine")
-    territoire: str | None = PydanticField(None, max_length=120, examples=["Madimba"], description="Territoire d'origine")
-    district: str | None = PydanticField(None, max_length=120, examples=["Mont-Amba"], description="District d'origine")
-    province: str | None = PydanticField(None, max_length=120, examples=["Kongo Central"], description="Province d'origine")
-    id_nation: int | None = PydanticField(None, examples=[1], description="Nation d'origine")
-
-    class Config:
-        from_attributes = True
+class FideleOrigineUpdate(FideleOrigineCreate):
+    pass
 
 
 class FideleOccupationBase(SQLModel):
-    ecole_universite_employeur: str | None = PydanticField(
-        None,
-        max_length=150,
-        examples=["Université de Kinshasa"],
-        description="École, université ou employeur actuel",
-    )
+    ecole_universite_employeur: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["ecole_universite_employeur"])
 
     class Config:
         from_attributes = True
@@ -269,26 +260,11 @@ class FideleOccupationBase(SQLModel):
 class FideleOccupationCreate(BaseModel):
     id_niveau_etude: int = PydanticField(..., examples=[1], description="Niveau d'étude du fidèle")
     id_profession: int = PydanticField(..., examples=[1], description="Profession du fidèle")
-    ecole_universite_employeur: str | None = PydanticField(
-        None,
-        max_length=150,
-        examples=["Université de Kinshasa"],
-        description="École, université ou employeur actuel",
-    )
+    ecole_universite_employeur: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["ecole_universite_employeur"])
 
     class Config:
         from_attributes = True
 
 
-class FideleOccupationUpdate(BaseModel):
-    id_niveau_etude: int = PydanticField(..., examples=[1], description="Niveau d'étude du fidèle")
-    id_profession: int = PydanticField(..., examples=[1], description="Profession du fidèle")
-    ecole_universite_employeur: str | None = PydanticField(
-        None,
-        max_length=150,
-        examples=["Université de Kinshasa"],
-        description="École, université ou employeur actuel",
-    )
-
-    class Config:
-        from_attributes = True
+class FideleOccupationUpdate(FideleOccupationCreate):
+    pass
