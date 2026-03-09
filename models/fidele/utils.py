@@ -45,14 +45,6 @@ FIDELE_FIELDS_CONFIG = {
     "est_baptise": {
         "description": "Indique si le fidèle est baptisé"
     },
-    "date_bapteme": {
-        "examples": ["2015-06-15"],
-        "description": "Date de baptême du fidèle (optionnel si pas baptisé)"
-    },
-    "numero_carte": {
-        "examples": ["123456"],
-        "description": "Numéro de carte du fidele."
-    },
     "id_grade": {
         "examples": [1, 2, 3],
         "description": "L'id du grade du fidele."
@@ -97,13 +89,10 @@ class FideleBase(SQLModel):
     sexe: Gender = PydanticField(..., **FIDELE_FIELDS_CONFIG["sexe"])
     date_naissance: date = PydanticField(..., **FIDELE_FIELDS_CONFIG["date_naissance"])
     est_baptise: bool = PydanticField(..., **FIDELE_FIELDS_CONFIG["est_baptise"])
-    date_bapteme: date | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["date_bapteme"])
-    numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
     id_grade: GradeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_fidele_type"])
     id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
     id_nation_nationalite: int = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
-    id_etat_civile: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_etat_civile"])
     id_document_statut: int = PydanticField(1, **FIDELE_FIELDS_CONFIG["id_document_statut"])
     tel: str = PydanticField(..., **FIDELE_FIELDS_CONFIG["tel"])
     password: Password | None = PydanticField(None, **PSW_FIELD_PROPS)
@@ -117,13 +106,10 @@ class FideleUpdate(BaseModel):
     sexe: Gender | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["sexe"])
     date_naissance: date | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["date_naissance"])
     est_baptise: bool | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["est_baptise"])
-    date_bapteme: date | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["date_bapteme"])
-    numero_carte: str | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["numero_carte"])
     id_grade: GradeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_grade"])
     id_fidele_type: FideleTypeEnum | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_type"])
     id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
     id_nation_nationalite: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_nation_nationalite"])
-    id_etat_civile: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_etat_civile"])
     id_document_statut: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_document_statut"])
 
 
@@ -169,39 +155,43 @@ class FideleParoisseCreate(FideleParoisseUpdate):
 
 
 class FideleBaptemeBase(SQLModel):
-    date_bapteme: date | None = PydanticField(None, examples=["2015-06-15"], description="Date de baptême")
+    numero_carte: str | None = PydanticField(None)
+    date_day: int | None = PydanticField(None, ge=1, le=31)
+    date_month: int | None = PydanticField(None, ge=1, le=12)
+    date_year: int | None = PydanticField(None, ge=1900, le=2100)
 
     class Config:
         from_attributes = True
 
 
 class FideleBaptemeCreate(BaseModel):
-    date_bapteme: date | None = PydanticField(None, examples=["2015-06-15"], description="Date de baptême")
+    numero_carte: str | None = PydanticField(None, examples=["123456"], description="Numéro de carte du fidèle.")
+    date_day: int | None = PydanticField(None, ge=1, le=31, examples=[15], description="Jour de baptême (1-31)")
+    date_month: int | None = PydanticField(None, ge=1, le=12, examples=[6], description="Mois de baptême (1-12)")
+    date_year: int | None = PydanticField(None, ge=1900, le=2100, examples=[2015], description="Année de baptême")
     id_paroisse: int | None = PydanticField(None, examples=[1], description="Paroisse du baptême")
 
     class Config:
         from_attributes = True
 
 
-class FideleBaptemeUpdate(BaseModel):
-    date_bapteme: date | None = PydanticField(None, examples=["2015-06-15"], description="Date de baptême")
-    id_paroisse: int | None = PydanticField(None, examples=[1], description="Paroisse du baptême")
-
-    class Config:
-        from_attributes = True
+class FideleBaptemeUpdate(FideleBaptemeCreate):
+    pass
 
 
 class FideleFamilleBase(SQLModel):
-    nom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Kasongo"], description="Nom du conjoint")
-    postnom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Mbuyi"], description="Postnom du conjoint")
-    prenom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Marie"], description="Prénom du conjoint")
-    nombre_enfants: int | None = PydanticField(None, ge=0, examples=[3], description="Nombre d'enfants")
+    id_etat_civile: int = PydanticField(..., examples=[1], description="L'id de l'état civile du fidèle.")
+    nom_conjoint: str | None = PydanticField(None, max_length=100)
+    postnom_conjoint: str | None = PydanticField(None, max_length=100)
+    prenom_conjoint: str | None = PydanticField(None, max_length=100)
+    nombre_enfants: int | None = PydanticField(None, ge=0, examples=[3])
 
     class Config:
         from_attributes = True
 
 
 class FideleFamilleCreate(BaseModel):
+    id_etat_civile: int = PydanticField(..., examples=[1], description="L'id de l'état civile du fidèle.")
     nom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Kasongo"], description="Nom du conjoint")
     postnom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Mbuyi"], description="Postnom du conjoint")
     prenom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Marie"], description="Prénom du conjoint")
@@ -212,6 +202,7 @@ class FideleFamilleCreate(BaseModel):
 
 
 class FideleFamilleUpdate(BaseModel):
+    id_etat_civile: int = PydanticField(..., examples=[1], description="L'id de l'état civile du fidèle.")
     nom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Kasongo"], description="Nom du conjoint")
     postnom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Mbuyi"], description="Postnom du conjoint")
     prenom_conjoint: str | None = PydanticField(None, max_length=100, examples=["Marie"], description="Prénom du conjoint")

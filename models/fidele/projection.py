@@ -10,7 +10,6 @@ from models.constants.projections import (
     StructureProjFlat,
     NiveauEtudesProjFlat,
     ProfessionProjFlat,
-    EtatCivileProjFlat,
 )
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
@@ -25,7 +24,6 @@ class FideleProjFlat(BaseModel):
     Accessible by anyone (authenticated or not)
     """
     id: int = PydanticField(..., description="Identifiant unique du fidèle")
-    numero_carte: str | None = None
     nom: str
     postnom: str | None = None
     prenom: str
@@ -40,7 +38,6 @@ class FideleProjFlat(BaseModel):
     sexe: str
     date_naissance: date
     est_baptise: bool = PydanticField(..., description="Est-ce que le fidèle est baptisé")
-    date_bapteme: date | None = PydanticField(None, description="Date de baptême")
     
     @computed_field
     @property
@@ -55,7 +52,6 @@ class FideleProjFlat(BaseModel):
     id_fidele_type: FideleTypeEnum
     id_fidele_recenseur: int | None = None
     id_nation_nationalite: int
-    id_etat_civile: int | None = None
     id_document_statut: int
     code_matriculation: str | None = None
 
@@ -78,7 +74,6 @@ class FideleProjShallow(FideleProjFlat):
     fidele_type: FideleTypeProjFlat
     fidele_recenseur: Optional["FideleProjFlat"] = None
     nation_nationalite: NationProjFlat | None = None
-    etat_civile: EtatCivileProjFlat | None = None
     document_statut: DocumentStatutProjFlat
     contact: ContactProjShallow | None = None
     adresse: AdresseProjShallow | None = None
@@ -192,7 +187,10 @@ class FideleParoisseProjShallowWithoutFideleData(FideleParoisseProjFlat):
 class FideleBaptemeProjFlat(BaseModel):
     id: int
     id_fidele: int
-    date_bapteme: date | None
+    numero_carte: str | None
+    date_day: int | None
+    date_month: int | None
+    date_year: int | None
     id_paroisse: int | None
     est_supprimee: bool
     date_suppression: datetime | None
@@ -213,6 +211,7 @@ class FideleBaptemeProjShallowWithoutFideleData(FideleBaptemeProjFlat):
 class FideleFamilleProjFlat(BaseModel):
     id: int
     id_fidele: int
+    id_etat_civile: int
     nom_conjoint: str | None
     postnom_conjoint: str | None
     prenom_conjoint: str | None
@@ -235,7 +234,7 @@ class FideleOrigineProjFlat(BaseModel):
     territoire: str | None
     district: str | None
     province: str | None
-    id_nation: int | None
+    id_nation_origine: int | None
     est_supprimee: bool
     date_suppression: datetime | None
     date_creation: datetime

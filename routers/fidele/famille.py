@@ -8,9 +8,11 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
+from models.constants import EtatCivile
 from models.fidele import Fidele, FideleFamille
 from models.fidele.projection import FideleFamilleProjFlat
 from models.fidele.utils import FideleFamilleCreate, FideleFamilleUpdate
+from routers.dependencies import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200, send400, send404
 
@@ -36,6 +38,7 @@ async def create_fidele_famille(
     """Créer les informations familiales d'un fidèle."""
 
     payload = body.model_dump(mode="json", exclude_unset=True)
+    await check_resource_exists(EtatCivile, session, filters={"id": payload["id_etat_civile"]})
 
     statement = select(FideleFamille).where(FideleFamille.id_fidele == fidele.id)
     result = await session.exec(statement)
@@ -87,6 +90,7 @@ async def update_fidele_famille(
     """Créer/mettre à jour les informations familiales d'un fidèle."""
 
     update_data = body.model_dump(mode="json", exclude_unset=True)
+    await check_resource_exists(EtatCivile, session, filters={"id": update_data["id_etat_civile"]})
 
     statement = select(FideleFamille).where(FideleFamille.id_fidele == fidele.id)
     result = await session.exec(statement)

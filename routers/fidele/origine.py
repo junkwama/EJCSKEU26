@@ -48,8 +48,8 @@ async def create_fidele_origine(
     """Créer les informations d'origine d'un fidèle."""
 
     payload = body.model_dump(mode="json", exclude_unset=True)
-    if "id_nation" in payload and payload["id_nation"] is not None:
-        await check_resource_exists(Nation, session, filters={"id": payload["id_nation"]})
+    if "id_nation_origine" in payload and payload["id_nation_origine"] is not None:
+        await check_resource_exists(Nation, session, filters={"id": payload["id_nation_origine"]})
 
     statement = select(FideleOrigine).where(FideleOrigine.id_fidele == fidele.id)
     result = await session.exec(statement)
@@ -128,8 +128,8 @@ async def update_fidele_origine(
     """Créer/mettre à jour les informations d'origine d'un fidèle."""
 
     update_data = body.model_dump(mode="json", exclude_unset=True)
-    if "id_nation" in update_data and update_data["id_nation"] is not None:
-        await check_resource_exists(Nation, session, filters={"id": update_data["id_nation"]})
+    if "id_nation_origine" in update_data and update_data["id_nation_origine"] is not None:
+        await check_resource_exists(Nation, session, filters={"id": update_data["id_nation_origine"]})
 
     statement = select(FideleOrigine).where(FideleOrigine.id_fidele == fidele.id)
     result = await session.exec(statement)

@@ -61,14 +61,6 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             nullable=False,
         ),
     )
-    id_etat_civile: int | None = SQLModelField(
-        default=None,
-        sa_column=Column(
-            Integer,
-            ForeignKey("etat_civile.id", ondelete="SET NULL"),
-            nullable=True,
-        ),
-    )
     id_document_statut: int = SQLModelField(
         default=1,
         sa_column=Column(
@@ -79,7 +71,6 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     )
     code_matriculation: str | None = SQLModelField(default=None, max_length=10)
     __table_args__ = (
-        UniqueConstraint("numero_carte", name="uq_fidele_numero_carte"),
         UniqueConstraint("code_matriculation", name="uq_fidele_code_matriculation"),
         Index("idx_fidele_nom", "nom"),
         Index("idx_fidele_grade", "id_grade"),
@@ -98,7 +89,6 @@ class Fidele(FideleBase, BaseModelClass, table=True):
         )
     )
     nation_nationalite: "Nation" = Relationship()
-    etat_civile: EtatCivile = Relationship()
     document_statut: DocumentStatut = Relationship()
     contact: Contact = Relationship(
         sa_relationship=relationship(
@@ -238,6 +228,7 @@ class FideleBapteme(FideleBaptemeBase, BaseModelClass, table=True):
 
     __table_args__ = (
         UniqueConstraint("id_fidele", name="uq_fidele_bapteme_fidele"),
+        UniqueConstraint("numero_carte", name="uq_fidele_bapteme_numero_carte"),
         Index("idx_fidele_bapteme_fidele", "id_fidele"),
         Index("idx_fidele_bapteme_paroisse", "id_paroisse"),
         Index("idx_fidele_bapteme_est_supprimee", "est_supprimee"),
@@ -262,14 +253,23 @@ class FideleFamille(FideleFamilleBase, BaseModelClass, table=True):
             nullable=False,
         )
     )
+    id_etat_civile: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("etat_civile.id", ondelete="RESTRICT"),
+            nullable=False,
+        )
+    )
 
     __table_args__ = (
         UniqueConstraint("id_fidele", name="uq_fidele_famille_fidele"),
         Index("idx_fidele_famille_fidele", "id_fidele"),
+        Index("idx_fidele_famille_etat_civile", "id_etat_civile"),
         Index("idx_fidele_famille_est_supprimee", "est_supprimee"),
     )
 
     fidele: Fidele = Relationship(back_populates="famille")
+    etat_civile: EtatCivile = Relationship()
 
     class Config:
         from_attributes = True

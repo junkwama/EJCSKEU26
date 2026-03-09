@@ -28,7 +28,7 @@ from routers.dependencies import check_resource_exists
 from routers.utils.http_utils import send200, send400, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth
-from models.constants import DocumentType, FideleType, Grade, EtatCivile, DocumentStatut
+from models.constants import DocumentType, FideleType, Grade, DocumentStatut
 from modules.file import S3Service
 
 fidele_router = APIRouter()
@@ -79,8 +79,6 @@ async def create_fidele(
     if body.id_fidele_recenseur is not None:
         await check_resource_exists(Fidele, session, filters={"id": body.id_fidele_recenseur})
     await check_resource_exists(Nation, session, filters={"id": body.id_nation_nationalite})
-    if body.id_etat_civile is not None:
-        await check_resource_exists(EtatCivile, session, filters={"id": body.id_etat_civile})
     await check_resource_exists(DocumentStatut, session, filters={"id": int(body.id_document_statut)})
 
     # Create new fidele instance
@@ -208,8 +206,6 @@ async def update_fidele(
         await check_resource_exists(Nation, session, filters={"id": update_data["id_nation_nationalite"]})
     if "id_nation_nationalite" in update_data and update_data["id_nation_nationalite"] is None:
         return send400(["body", "id_nation_nationalite"], "id_nation_nationalite est obligatoire")
-    if "id_etat_civile" in update_data and update_data["id_etat_civile"] is not None:
-        await check_resource_exists(EtatCivile, session, filters={"id": update_data["id_etat_civile"]})
     if "id_document_statut" in update_data and update_data["id_document_statut"] is not None:
         await check_resource_exists(DocumentStatut, session, filters={"id": update_data["id_document_statut"]})
 

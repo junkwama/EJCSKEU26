@@ -60,7 +60,6 @@ async def get_fidele_complete_data_by_id(
             selectinload(Fidele.fidele_type),
             selectinload(Fidele.fidele_recenseur),
             selectinload(Fidele.nation_nationalite),
-            selectinload(Fidele.etat_civile),
             selectinload(Fidele.document_statut),
             selectinload(Fidele.contact),
             selectinload(Fidele.adresse).selectinload(Adresse.nation).selectinload(Nation.continent),
