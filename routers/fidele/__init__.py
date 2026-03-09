@@ -19,6 +19,7 @@ from models.contact import Contact
 from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
+from models.utils.utils import Password
 from routers.fidele.utils import (
     required_fidele,
     get_fidele_complete_data_by_id,
@@ -81,8 +82,14 @@ async def create_fidele(
     await check_resource_exists(Nation, session, filters={"id": body.id_nation_nationalite})
     await check_resource_exists(DocumentStatut, session, filters={"id": int(body.id_document_statut)})
 
+    # remove password from body and hash it
+    password = Password.hash(body.password) if body.password else None
+
+    # Transform it into dict for fast processings
+    body_dict: dict = body.model_dump(exclude={"password", "role"}, mode="json")
+
     # Create new fidele instance
-    fidele = Fidele(**body.model_dump(mode="json"))
+    fidele = Fidele(**body_dict, password=password)
     fidele.code_matriculation = None
 
     # Add to session and commit
@@ -262,6 +269,7 @@ async def restore_fidele(
 
     projected_response = apply_projection(fidele, FideleProjFlat, FideleProjShallow, proj)
     return send200(projected_response)
+
 
 @fidele_router.delete("/{id}", tags=["Fidele"])
 async def delete_fidele(

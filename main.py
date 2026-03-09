@@ -29,6 +29,7 @@ from routers.adresse import adresse_router
 from routers.contact import contact_router
 from routers.direction import direction_router
 from routers.constant import constant_router
+from routers.oauth import oauth_router
 
 # Lifespan event handler
 @asynccontextmanager
@@ -113,6 +114,8 @@ def server_status():
     )
 
 # Attaching routers
+app.include_router(oauth_router, prefix="/oauth", tags=["Oauth"])
+
 app.include_router(fidele_router, prefix="/fidele")
 app.include_router(paroisse_router, prefix="/paroisse")
 app.include_router(direction_router, prefix="/direction")

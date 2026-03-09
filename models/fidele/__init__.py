@@ -1,10 +1,15 @@
+import os
+import jwt
 from typing import TYPE_CHECKING, List
 from sqlmodel import Relationship
-from sqlalchemy import Column, ForeignKey, Index, Integer, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, UniqueConstraint
 from sqlalchemy import and_
 from sqlalchemy.orm import relationship
 
 from models.constants.types import DocumentTypeEnum
+from models.oauth import TokenPayload
+from modules.oauth2.config import Config as OauthConfig
+from modules.oauth2.models import AccessToken
 from utils.utils import SQLModelField
 from models.adresse import Adresse
 from models.contact import Contact
@@ -30,6 +35,18 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     """Modèle de la table Fidele"""
 
     __tablename__ = "fidele"
+
+    def generate_token(self) -> str:
+        """Generate a JWT access token with a payload and expiry."""
+
+        payload = TokenPayload(sub=self.id)
+
+        key = os.getenv("JWT_TOKEN_KEY")
+        algorithm = OauthConfig.TOKEN_ALGORITHM
+        return jwt.encode(payload.model_dump(mode="json"), key, algorithm)
+
+    def get_token(self) -> AccessToken[TokenPayload]:
+        return AccessToken[TokenPayload](access_token=self.generate_token())
 
     # OVERWRITTING TO AVOID ENUM TYPE ISSUES
     id_grade: int = SQLModelField(
@@ -69,8 +86,16 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             nullable=False,
         ),
     )
+    password: str | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            String(length=255),
+            nullable=True,
+        ),
+    )
     code_matriculation: str | None = SQLModelField(default=None, max_length=10)
     __table_args__ = (
+        UniqueConstraint("tel", name="uq_fidele_tel"),
         UniqueConstraint("code_matriculation", name="uq_fidele_code_matriculation"),
         Index("idx_fidele_nom", "nom"),
         Index("idx_fidele_grade", "id_grade"),

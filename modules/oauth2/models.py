@@ -1,26 +1,25 @@
+import os
+
 import jwt
 from fastapi import HTTPException
 from pydantic import BaseModel, Field
-from beanie import PydanticObjectId
-from typing import Type, TypeVar, Generic #, Protocol, runtime_checkable
+from typing import Type, TypeVar, Generic, Protocol, runtime_checkable
 
 from .utils import get_token_exp, OAUTH_INVALID_TOKEN_ERROR_MESS, OAUTH_TOKEN_ERROR_CODE
 from .config import Config
 
-UserRoleType = TypeVar("UserRoleType", default=str)
-
-class TokenPayloadBase(BaseModel, Generic[UserRoleType]):
+class TokenPayloadBase(BaseModel):
     """
     This model defines the content of the token's payload.
     Token should be stateless so can only contain constant data.
     That's why data like permissions are not kept in the token but instead, they are collected when needed
     """
 
-    sub: PydanticObjectId
+    sub: int | str # The subject of the token, usually the user id.
     exp: int | None = Field(
         default_factory=get_token_exp
     )  # Timestamp int (Without millisecs)
-    role: UserRoleType
+    # role: UserRoleType
 
     # Fields to be added nexts:
     # `expires_in`: The `expires_in` field indicates how long the token is valid for, in seconds. 
@@ -65,8 +64,7 @@ class AccessToken(BaseModel, Generic[CustomizedGenericTokenPayload]):
             * TokenPayloadClass as The class of the token payload. Must be a child of TokenPayloadBase
             * token_required When True, raises a 401 if the token is invalid or expired
         """
-
-        key = Config.BIBIANE_TOKEN_KEY
+        key = os.getenv("JWT_TOKEN_KEY")
         algorithm = Config.TOKEN_ALGORITHM
 
         if not token:
@@ -80,16 +78,17 @@ class AccessToken(BaseModel, Generic[CustomizedGenericTokenPayload]):
             # * and raise an HTTPException if token_required is True
             if token_required:
                 raise HTTPException(
-                    OAUTH_TOKEN_ERROR_CODE, OAUTH_INVALID_TOKEN_ERROR_MESS
+                    OAUTH_TOKEN_ERROR_CODE, 
+                    OAUTH_INVALID_TOKEN_ERROR_MESS
                 )
             else:
                 return None
 
-# @runtime_checkable
-# class OauthModelProtocol(Protocol):
-#     # This is the protocole used as interface in python to 
-#     # to enforce other class to implement some methods and properties
-#     # We use @runtime_checkable decoration to make this checkable 
-#     # Since normally Protocol only check at compile time and don't raise runtime errors
-#     username: str
-#     password: str
+@runtime_checkable
+class OauthModelProtocol(Protocol):
+    # This is the protocole used as interface in python to 
+    # to enforce other class to implement some methods and properties
+    # We use @runtime_checkable decoration to make this checkable 
+    # Since normally Protocol only check at compile time and don't raise runtime errors
+    username: str
+    password: str

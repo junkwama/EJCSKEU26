@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from .config import Config
 
 secury_scheme = OAuth2PasswordBearer(tokenUrl="oauth", auto_error=False)
-password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+password_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 OAUTH_TOKEN_ERROR_CODE = 401
 OAUTH_TOKEN_ERROR_MESS = "Authentification required"
