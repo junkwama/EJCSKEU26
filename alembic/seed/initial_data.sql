@@ -349,15 +349,15 @@ INSERT INTO fonction_list (nom)
 SELECT 'Chef de partition' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Chef de partition');
 
 -- Document types (IDs fixed to match DocumentTypeEnum)
-INSERT INTO document_type (id, nom, document_key, code) VALUES
-  (1, 'FIDELE', 'FIDELE', 'FDL'),
-  (2, 'STRUCTURE', 'STRUCTURE', 'STR'),
-  (3, 'PAROISSE', 'PAROISSE', 'PRS'),
-  (4, 'VILLE', 'VILLE', 'VLL'),
-  (5, 'PROVINCE', 'PROVINCE', 'PRV'),
-  (6, 'NATION', 'NATION', 'NTN'),
-  (7, 'CONTINENT', 'CONTINENT', 'CTN'),
-  (8, 'GENERALE', 'GENERALE', 'GNR');
+INSERT INTO document_type (id, nom, document_key, code, id_document_type_superieur) VALUES
+  (1, 'FIDELE', 'FIDELE', 'FDL', 2),
+  (2, 'STRUCTURE', 'STRUCTURE', 'STR', 3),
+  (3, 'PAROISSE', 'PAROISSE', 'PRS', 4),
+  (4, 'VILLE', 'VILLE', 'VLL', 5),
+  (5, 'PROVINCE', 'PROVINCE', 'PRV', 6),
+  (6, 'NATION', 'NATION', 'NTN', 7),
+  (7, 'CONTINENT', 'CONTINENT', 'CTN', 8),
+  (8, 'GENERALE', 'GENERALE', 'GNR', NULL);
 
 -- Backfill/align codes for existing rows
 UPDATE document_type SET code = 'FDL' WHERE id = 1;
@@ -368,6 +368,14 @@ UPDATE document_type SET code = 'PRV' WHERE id = 5;
 UPDATE document_type SET code = 'NTN' WHERE id = 6;
 UPDATE document_type SET code = 'CTN' WHERE id = 7;
 UPDATE document_type SET code = 'GNR' WHERE id = 8;
+UPDATE document_type SET id_document_type_superieur = 2 WHERE id = 1;
+UPDATE document_type SET id_document_type_superieur = 3 WHERE id = 2;
+UPDATE document_type SET id_document_type_superieur = 4 WHERE id = 3;
+UPDATE document_type SET id_document_type_superieur = 5 WHERE id = 4;
+UPDATE document_type SET id_document_type_superieur = 6 WHERE id = 5;
+UPDATE document_type SET id_document_type_superieur = 7 WHERE id = 6;
+UPDATE document_type SET id_document_type_superieur = 8 WHERE id = 7;
+UPDATE document_type SET id_document_type_superieur = NULL WHERE id = 8;
 
 -- Document statuts
 INSERT INTO document_statut (id, nom, description, id_document_type) VALUES

@@ -1,5 +1,5 @@
 # External moduls
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, HTTPException, Request, Depends, Path, Query
 from typing import Annotated, List
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -19,7 +19,12 @@ from models.contact import Contact
 from models.contact.utils import ContactUpdate
 from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
+from models.oauth import TokenPayload
 from models.utils.utils import Password
+from modules.oauth2.dependencies import (
+    get_required_token_payload_dependency,
+    get_token_payload_dependency,
+)
 from routers.fidele.utils import (
     required_fidele,
     get_fidele_complete_data_by_id,
@@ -32,8 +37,9 @@ from utils.constants import ProjDepth
 from models.constants import DocumentType, FideleType, Grade, DocumentStatut
 from modules.file import S3Service
 
-fidele_router = APIRouter()
-
+fidele_router = APIRouter(
+    dependencies=[Depends(get_token_payload_dependency(TokenPayload))]
+)
 
 async def get_fidele_any_by_id(fidele_id: int, session: AsyncSession) -> Fidele | None:
     statement = select(Fidele).where(Fidele.id == fidele_id)
@@ -73,6 +79,7 @@ async def create_fidele(
     ARGS:
         body (FideleBase): Les données du fidele à créer
     """
+
     await check_resource_exists(Grade, session, filters={"id": int(body.id_grade)})
     await check_resource_exists(
         FideleType, session, filters={"id": int(body.id_fidele_type)}
@@ -149,16 +156,48 @@ async def get_fideles(
     return send200([FideleProjFlat.model_validate(fidele) for fidele in fidele_list])
 
 
+@fidele_router.get("/me", tags=["Fidele"])
+async def get_my_fidele_profile(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_fidele: Annotated[
+        TokenPayload,
+        Depends(get_required_token_payload_dependency(TokenPayload)),
+    ],
+) -> FideleProjFlatWithPhoto:
+    """Récupérer le profil du fidèle courant (issu du token) en flat avec photo."""
+    try:
+        fidele_id = int(current_fidele.sub)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=401, detail="Invalid token subject") from exc
+
+    fidele = await get_fidele_complete_data_by_id(
+        fidele_id,
+        session,
+        ProjDepth.FLAT,
+        {"photo_url"},
+    )
+    if not fidele:
+        return send404(["token", "sub"], "Fidele non trouvé")
+
+    projected = FideleProjFlatWithPhoto.model_validate(fidele)
+    if projected.photo:
+        file_service = S3Service()
+        projected.photo = file_service.hydrate_signed_url(projected.photo)
+
+    return send200(projected)
+
+
 @fidele_router.get("/{id}", tags=["Fidele"])
 async def get_fidele(
     id: Annotated[int, Path(..., description="Fidele's Id")],
-    session: Annotated[AsyncSession, Depends(get_session)],
     fidele: Annotated[AsyncSession, Depends(required_fidele)],
+    session: Annotated[AsyncSession, Depends(get_session)],
+    request: Request,
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
     include: Annotated[
         str | None,
         Query(description="Relations à inclure en flat (ex: photo_url)")
-    ] = None,
+    ] = None
 ) -> FideleProjShallow | FideleProjFlat | FideleProjFlatWithPhoto:
     """
     Recuperer un fidele par son Id avec ses relations
@@ -166,6 +205,9 @@ async def get_fidele(
     ARGS:
         id (int): L'Id du fidele à récupérer
     """
+
+    print("Current_fidele:", request.state.current_fidele)
+    
     include_fields = parse_fidele_include(include)
     should_include_photo = proj == ProjDepth.FLAT and "photo_url" in include_fields
 

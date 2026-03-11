@@ -15,7 +15,7 @@ class TokenPayloadBase(BaseModel):
     That's why data like permissions are not kept in the token but instead, they are collected when needed
     """
 
-    sub: int | str # The subject of the token, usually the user id.
+    sub: str # The subject of the token, usually the user id. NOTE: JWT expects it to be string, so needs to be converted.
     exp: int | None = Field(
         default_factory=get_token_exp
     )  # Timestamp int (Without millisecs)
@@ -83,6 +83,7 @@ class AccessToken(BaseModel, Generic[CustomizedGenericTokenPayload]):
                 )
             else:
                 return None
+
 
 @runtime_checkable
 class OauthModelProtocol(Protocol):

@@ -39,7 +39,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
     def generate_token(self) -> str:
         """Generate a JWT access token with a payload and expiry."""
 
-        payload = TokenPayload(sub=self.id)
+        payload = TokenPayload(sub=str(self.id))
 
         key = os.getenv("JWT_TOKEN_KEY")
         algorithm = OauthConfig.TOKEN_ALGORITHM

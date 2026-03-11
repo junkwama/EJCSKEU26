@@ -10,6 +10,7 @@ class DocumentTypeProjFlat(BaseModel):
     id: int
     nom: str
     code: str
+    id_document_type_superieur: int | None
 
     class Config:
         from_attributes = True

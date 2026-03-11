@@ -24,7 +24,8 @@ def get_engine() -> AsyncEngine:
     if not db_url:
         raise RuntimeError("MYSQL_DB_ASYNC_URL environment variable is not set")
 
-    _engine = create_async_engine(db_url, echo=Config.DEBUG.value)
+    echo_db_queries = False #Config.DEBUG.value
+    _engine = create_async_engine(db_url, echo=echo_db_queries)
     return _engine
 
 

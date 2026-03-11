@@ -1,5 +1,5 @@
 from typing import Annotated, Callable, Type, TypeVar
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request
 
 from .utils import secury_scheme, OAUTH_TOKEN_ERROR_CODE, OAUTH_TOKEN_ERROR_MESS
 from .models import AccessToken, TokenPayloadBase
@@ -11,24 +11,22 @@ CustomizedGenericTokenPayload = TypeVar(
 def get_token_payload_dependency(
     TokenPayloadClass: Type[CustomizedGenericTokenPayload],
     token_required: bool = False
-) -> Callable[..., CustomizedGenericTokenPayload | None]:
+) -> Callable[..., None]:
     """
     Returns a dependency function that extracts the token from the request and verifies it.
-    The returned function returns:
-        * The token payload of the provided TokenPayloadClass type.
-        * None if the token is invalid or does NOT exists.
+    Stores the resolved token payload in request.state.current_fidele.
     """
     def get_token_payload(
+        request: Request,
         token: str = Depends(secury_scheme),
-    ) -> CustomizedGenericTokenPayload | None:
+    ) -> None:
 
         token_payload = AccessToken[TokenPayloadClass].verity(token, TokenPayloadClass, token_required)
-        if not token_payload:
-            return None
-        return TokenPayloadClass(**token_payload.model_dump())
+        request.state.current_fidele = (
+            TokenPayloadClass(**token_payload.model_dump()) if token_payload else None
+        )
 
     return get_token_payload
-
 
 def get_required_token_payload_dependency(
     TokenPayloadClass: Type[CustomizedGenericTokenPayload],
@@ -41,11 +39,13 @@ def get_required_token_payload_dependency(
         * Raises a 401 if the token is invalid, expired or does NOT exists.
     """
     def get_required_token_payload(
-        cur_user: Annotated[
-            CustomizedGenericTokenPayload,
+        request: Request,
+        _: Annotated[
+            None,
             Depends(get_token_payload_dependency(TokenPayloadClass, True)),
         ],
     ) -> CustomizedGenericTokenPayload:
+        cur_user = getattr(request.state, "current_fidele", None)
         if not cur_user:
             raise HTTPException(OAUTH_TOKEN_ERROR_CODE, OAUTH_TOKEN_ERROR_MESS)
         return cur_user

@@ -18,6 +18,11 @@ DOCUMENT_TYPE_FIELDS_CONFIG = {
         "min_length": 3,
         "max_length": 3,
         "description": "Code court unique du type de document (ex: FDL, PRS, STR)"
+    },
+    "id_document_type_superieur": {
+        "ge": 1,
+        "examples": [8],
+        "description": "ID du type de document directement supérieur (optionnel)"
     }
 }
 
@@ -188,12 +193,18 @@ class DocumentTypeBase(SQLModel):
     nom: str = PydanticField(..., **DOCUMENT_TYPE_FIELDS_CONFIG["nom"])
     document_key: str = PydanticField(..., **DOCUMENT_TYPE_FIELDS_CONFIG["document_key"])
     code: str = PydanticField(..., **DOCUMENT_TYPE_FIELDS_CONFIG["code"])
+    id_document_type_superieur: int | None = PydanticField(
+        None, **DOCUMENT_TYPE_FIELDS_CONFIG["id_document_type_superieur"]
+    )
 
 
 class DocumentTypeUpdate(BaseModel):
     nom: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["nom"])
     document_key: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["document_key"])
     code: str | None = PydanticField(None, **DOCUMENT_TYPE_FIELDS_CONFIG["code"])
+    id_document_type_superieur: int | None = PydanticField(
+        None, **DOCUMENT_TYPE_FIELDS_CONFIG["id_document_type_superieur"]
+    )
 
 
 # ============================================================================

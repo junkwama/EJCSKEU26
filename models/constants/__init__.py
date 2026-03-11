@@ -17,6 +17,15 @@ class DocumentType(DocumentTypeBase, BaseModelClass, table=True):
     """Modèle de la table DocumentType - Types de documents (FIDELE, PAROISSE, STRUCTURE)"""
     __tablename__ = "document_type"
 
+    id_document_type_superieur: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(
+            Integer,
+            ForeignKey("document_type.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+    )
+
     __table_args__ = (
         UniqueConstraint("nom", name="uq_document_type_nom"),
         UniqueConstraint("document_key", name="uq_document_type_key"),

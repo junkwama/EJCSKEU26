@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import Annotated, List
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
@@ -63,6 +63,13 @@ async def create_document_type(
     Returns:
         Le type de document créé
     """
+    if body.id_document_type_superieur is not None:
+        await check_resource_exists(
+            DocumentType,
+            session,
+            filters={"id": body.id_document_type_superieur},
+        )
+
     document_type = DocumentType.model_validate(body, from_attributes=True)
     session.add(document_type)
     await session.commit()
@@ -89,6 +96,17 @@ async def update_document_type(
     """
     # Update fields (only provided fields)
     update_data = body.model_dump(mode="json", exclude_unset=True)
+
+    if "id_document_type_superieur" in update_data:
+        superior_id = update_data["id_document_type_superieur"]
+        if superior_id is not None:
+            if superior_id == document_type.id:
+                raise HTTPException(
+                    status_code=422,
+                    detail="id_document_type_superieur cannot reference itself",
+                )
+            await check_resource_exists(DocumentType, session, filters={"id": superior_id})
+
     for field, value in update_data.items():
         setattr(document_type, field, value)
 
