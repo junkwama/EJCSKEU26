@@ -36,7 +36,7 @@ def upgrade() -> None:
 
     op.execute(
         "INSERT IGNORE INTO document_statut (id, nom, description, id_document_type) "
-        "VALUES (29, 'Validé', 'Document validé', NULL)"
+        "VALUES (2, 'Validé', 'Document validé', NULL)"
     )
 
     if not has_column("nation", "iso_alpha_2"):

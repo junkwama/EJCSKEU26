@@ -30,7 +30,7 @@ fidele_statut_router = APIRouter(prefix="/{id}/statut", tags=["Fidele - Statut"]
 
 
 PENDING_STATUT_ID = 1
-VALIDATED_STATUT_ID = 29
+VALIDATED_STATUT_ID = 2
 
 
 def build_fidele_code(iso_alpha_2: str, fidele_id: int) -> str:
@@ -41,7 +41,7 @@ async def get_fidele_paroisse_nation_iso_alpha_2(
     fidele_id: int,
     session: AsyncSession,
 ) -> str | None:
-    membership_stmt = (
+    statement = (
         select(FideleParoisse)
         .where(
             (FideleParoisse.id_fidele == fidele_id)
@@ -50,16 +50,16 @@ async def get_fidele_paroisse_nation_iso_alpha_2(
         )
         .order_by(FideleParoisse.id.desc())
     )
-    membership_result = await session.exec(membership_stmt)
-    membership = membership_result.first()
-    if not membership:
+    result = await session.exec(statement)
+    fidele_paroisse = result.first()
+    if not fidele_paroisse:
         return None
 
     adresse_stmt = (
         select(Adresse)
         .where(
             (Adresse.id_document_type == DocumentTypeEnum.PAROISSE.value)
-            & (Adresse.id_document == membership.id_paroisse)
+            & (Adresse.id_document == fidele_paroisse.id_paroisse)
             & (Adresse.est_supprimee == False)
         )
         .options(selectinload(Adresse.nation))
@@ -83,7 +83,7 @@ async def update_fidele_statut(
     Mettre à jour le statut d'un fidèle.
 
     Règles métier:
-    - le code_matriculation est attribué uniquement lors du passage `En attente (1)` -> `Validé (29)`
+    - le code_matriculation est attribué uniquement lors du passage `En attente (1)` -> `Validé (2)`
     - les sympathisants (`id_fidele_type=2`) ne reçoivent pas de code
     - `id_fidele_recenseur` est requis lors de la validation
     """

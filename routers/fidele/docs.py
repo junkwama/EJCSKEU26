@@ -30,7 +30,7 @@ FIDELE_ADD_STRUCTURE_DESCRIPTION = (
 FIDELE_STATUT_UPDATE_DESCRIPTION = (
     "Cet endpoint met à jour le statut d'un fidèle (`document_statut`).\n\n"
     "### Règles métier\n"
-    "- Le code matriculation est attribué uniquement au passage `En attente (id=1)` -> `Validé (id=29)`.\n"
+    "- Le code matriculation est attribué uniquement au passage `En attente (id=1)` -> `Validé (id=2)`.\n"
     "- Le champ `id_fidele_recenseur` est requis lors de cette validation.\n"
     "- Les sympathisants (`id_fidele_type=2`) ne reçoivent jamais de code matriculation, même validés.\n"
     "- Format du code fidèle: `ISO_ALPHA_2` + `id_fidele` sur 8 chiffres (10 caractères au total).\n\n"

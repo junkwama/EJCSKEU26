@@ -369,4 +369,4 @@ UPDATE document_type SET id_document_type_superieur = NULL WHERE id = 8;
 -- Document statuts
 INSERT INTO document_statut (id, nom, description, id_document_type) VALUES
   (1, 'En attente', 'Document en attente de traitement/validation', NULL),
-  (29, 'Validé', 'Document validé', NULL);
+  (2, 'Validé', 'Document validé', NULL);
