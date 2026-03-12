@@ -30,7 +30,7 @@ from routers.fidele.utils import (
     get_fidele_complete_data_by_id,
     parse_fidele_include,
 )
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils.http_utils import send200, send400, send404
 from routers.utils import apply_projection
 from utils.constants import ProjDepth

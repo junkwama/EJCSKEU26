@@ -12,7 +12,7 @@ from models.constants import EtatCivile
 from models.fidele import Fidele, FideleFamille
 from models.fidele.projection import FideleFamilleProjFlat
 from models.fidele.utils import FideleFamilleCreate, FideleFamilleUpdate
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200, send400, send404
 

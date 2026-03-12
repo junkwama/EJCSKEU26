@@ -9,7 +9,7 @@ from core.db import get_session
 from models.adresse import Continent, Nation
 from models.adresse.utils import NationBase, NationUpdate
 from models.adresse.projection import NationProjFlat, NationProjShallow
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200
 from utils.constants import ProjDepth

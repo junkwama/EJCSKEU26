@@ -13,7 +13,7 @@ from models.direction import Direction
 from models.direction.projection import DirectionProjFlat, DirectionProjShallow
 from models.direction.utils import DirectionBase, DirectionUpdate
 from models.direction.fonction import DirectionFonction
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.direction.docs import DIRECTION_CREATE_DESCRIPTION
 from routers.utils import (
     apply_projection,

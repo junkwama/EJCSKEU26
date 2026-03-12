@@ -9,7 +9,7 @@ from core.db import get_session
 from models.constants import NiveauEtudes
 from models.constants.projections import NiveauEtudesProjFlat
 from models.constants.utils import NiveauEtudesBase, NiveauEtudesUpdate
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils.http_utils import send200
 
 niveau_etudes_router = APIRouter(prefix="/niveau_etudes", tags=["Constants - Niveau Etudes"])

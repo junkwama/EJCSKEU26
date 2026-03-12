@@ -27,7 +27,7 @@ from utils.constants import ProjDepth
 from models.constants.types import DocumentTypeEnum
 from models.constants import DocumentType
 
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send404
 from routers.paroisse.docs import PAROISSE_CREATE_DESCRIPTION

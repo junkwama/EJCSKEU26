@@ -1,20 +1,52 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterable, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Iterable, Mapping, Type, TypeVar
 
 from fastapi import HTTPException
 from pydantic import BaseModel
-from sqlmodel import SQLModel
+from sqlalchemy import and_
+from sqlmodel import SQLModel, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from routers.dependencies import check_resource_exists
 from utils.constants import ProjDepth
 
 if TYPE_CHECKING:
     from models.constants.types import DocumentTypeEnum
 
 P = TypeVar('P', bound=BaseModel)
+T = TypeVar("T", bound=SQLModel)
 
+
+async def check_resource_exists(
+    model: Type[T],
+    session: AsyncSession,
+    *,
+    filters: Mapping[str, Any] | None = None,
+) -> T:
+    """Generic dependency to check if a resource exists using MANY columns."""
+    if not filters:
+        raise ValueError("check_resource_exists requires at least one filter")
+
+    clauses = []
+    for field_name, value in filters.items():
+        if not hasattr(model, field_name):
+            raise ValueError(f"{model.__name__} has no field '{field_name}'")
+        clauses.append(getattr(model, field_name) == value)
+
+    if hasattr(model, "est_supprimee"):
+        clauses.append(getattr(model, "est_supprimee") == False)
+
+    statement = select(model).where(and_(*clauses))
+    result = await session.exec(statement)
+    resource = result.first()
+
+    if not resource:
+        raise HTTPException(
+            status_code=404,
+            detail=f"{model.__name__} not found for filters={dict(filters)}",
+        )
+
+    return resource
 
 def _coerce_document_type(raw_document_type: Any) -> DocumentTypeEnum | None:
     """Coerce a raw document type value into DocumentTypeEnum.
@@ -57,46 +89,6 @@ def apply_projection(
     projection_class = FlatProjection if proj_type == ProjDepth.FLAT else ShallowProjection
     return projection_class.model_validate(data)
 
-
-async def check_document_reference_exists(
-    session: AsyncSession,
-    *,
-    id_document_type: Any,
-    id_document: int,
-) -> SQLModel:
-    """Validate a polymorphic (id_document_type, id_document) reference.
-
-    - `id_document_type` is validated with `DocumentTypeEnum` (no DB query).
-    - Existence is checked with ONE query via `check_resource_exists()`.
-    """
-
-    document_type = _coerce_document_type(id_document_type)
-    if document_type is None:
-        raise HTTPException(
-            status_code=422,
-            detail=f"Invalid id_document_type={id_document_type!r}",
-        )
-
-    model = _model_for_document_type(document_type)
-    if model is None:
-        raise HTTPException(
-            status_code=422,
-            detail=f"Unsupported document type: {document_type.name}({int(document_type)})",
-        )
-
-    try:
-        return await check_resource_exists(model, session, filters={"id": id_document})
-    except HTTPException as e:
-        if e.status_code != 404:
-            raise
-        raise HTTPException(
-            status_code=404,
-            detail=(
-                f"Target document not found: type={document_type.name}({int(document_type)}), id={id_document}"
-            ),
-        ) from e
-
-
 def _model_for_document_type(document_type: Any) -> type[SQLModel] | None:
     """Map DocumentTypeEnum to its SQLModel class."""
 
@@ -128,7 +120,6 @@ def _model_for_document_type(document_type: Any) -> type[SQLModel] | None:
         return Continent
 
     return None
-
 
 def _document_to_projection(document_type: Any, data: SQLModel) -> BaseModel:
     """Convert a resolved document entity to its projection model.
@@ -170,6 +161,43 @@ def _document_to_projection(document_type: Any, data: SQLModel) -> BaseModel:
 
     return _FallbackDoc.model_validate({"id": getattr(data, "id", None)})
 
+async def check_document_reference_exists(
+    session: AsyncSession,
+    *,
+    id_document_type: Any,
+    id_document: int,
+) -> SQLModel:
+    """Validate a polymorphic (id_document_type, id_document) reference.
+
+    - `id_document_type` is validated with `DocumentTypeEnum` (no DB query).
+    - Existence is checked with ONE query via `check_resource_exists()`.
+    """
+
+    document_type = _coerce_document_type(id_document_type)
+    if document_type is None:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid id_document_type={id_document_type!r}",
+        )
+
+    model = _model_for_document_type(document_type)
+    if model is None:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unsupported document type: {document_type.name}({int(document_type)})",
+        )
+
+    try:
+        return await check_resource_exists(model, session, filters={"id": id_document})
+    except HTTPException as e:
+        if e.status_code != 404:
+            raise
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Target document not found: type={document_type.name}({int(document_type)}), id={id_document}"
+            ),
+        ) from e
 
 async def resolve_document_reference(
     session: AsyncSession,
@@ -202,7 +230,6 @@ async def resolve_document_reference(
         return None
 
     return _document_to_projection(document_type, data)
-
 
 async def resolve_document_references_batch(
     session: AsyncSession,

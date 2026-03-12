@@ -16,7 +16,7 @@ from models.fidele.projection import (
 )
 from models.fidele.utils import FideleParoisseCreate, FideleParoisseUpdate
 from models.paroisse import Paroisse
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200, send400
 

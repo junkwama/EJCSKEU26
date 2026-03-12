@@ -16,7 +16,7 @@ from models.fidele.projection import (
     FideleStructureProjFlat,
     FideleStructureProjShallowWithoutFideleData,
 )
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.fidele.docs import FIDELE_ADD_STRUCTURE_DESCRIPTION
 from routers.utils.http_utils import send200, send400
 from routers.fidele.utils import required_fidele

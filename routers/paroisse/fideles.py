@@ -12,7 +12,7 @@ from core.db import get_session
 from models.fidele import FideleParoisse
 from models.fidele.projection import FideleParoisseProjShallowWithoutParoisseData
 from models.paroisse import Paroisse
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.paroisse.docs import PAROISSE_LIST_FIDELES_DESCRIPTION
 from routers.utils.http_utils import send200
 

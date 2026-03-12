@@ -13,7 +13,7 @@ from models.adresse import Nation
 from models.fidele import Fidele, FideleOrigine
 from models.fidele.projection import FideleOrigineProjFlat, FideleOrigineProjShallowWithoutFideleData
 from models.fidele.utils import FideleOrigineCreate, FideleOrigineUpdate
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send400, send404

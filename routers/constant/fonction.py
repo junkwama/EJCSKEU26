@@ -8,7 +8,7 @@ from core.db import get_session
 from models.constants import Fonction
 from models.constants.utils import FonctionBase, FonctionUpdate
 from models.constants.projections import FonctionProjFlat
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils.http_utils import send200
 
 # ============================================================================

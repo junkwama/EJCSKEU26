@@ -9,7 +9,7 @@ from core.db import get_session
 from models.constants import Structure, StructureType
 from models.constants.utils import StructureBase, StructureUpdate
 from models.constants.projections import StructureProjFlat, StructureProjShallow
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200
 from utils.constants import ProjDepth

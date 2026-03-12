@@ -13,7 +13,7 @@ from models.fidele import (
     FideleOccupation,
 )
 from fastapi import Depends, Path
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from core.db import get_session
 from utils.constants import ProjDepth
 

@@ -13,7 +13,7 @@ from models.fidele import Fidele, FideleBapteme
 from models.fidele.projection import FideleBaptemeProjFlat, FideleBaptemeProjShallowWithoutFideleData
 from models.fidele.utils import FideleBaptemeCreate, FideleBaptemeUpdate
 from models.paroisse import Paroisse
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send400, send404

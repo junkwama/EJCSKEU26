@@ -18,7 +18,7 @@ from models.fidele import (
 )
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
 from models.fidele.utils import FideleStatutUpdate
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele, get_fidele_complete_data_by_id
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send400

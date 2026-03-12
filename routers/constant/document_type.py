@@ -8,7 +8,7 @@ from core.db import get_session
 from models.constants import DocumentType
 from models.constants.utils import DocumentTypeBase, DocumentTypeUpdate
 from models.constants.projections import DocumentTypeProjFlat
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils.http_utils import send200
 
 # ============================================================================

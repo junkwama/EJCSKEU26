@@ -12,7 +12,7 @@ from models.adresse.utils import AdresseBase, AdresseUpdate
 from models.adresse.projection import AdresseProjFlat, AdresseProjShallow
 from routers.utils import apply_projection, check_document_reference_exists
 from routers.utils.http_utils import send200
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from utils.constants import ProjDepth
 
 # ============================================================================

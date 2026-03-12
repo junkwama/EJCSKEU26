@@ -10,7 +10,7 @@ from models.contact import Contact
 from models.contact.utils import ContactBase, ContactUpdate
 from models.contact.projection import ContactProjFlat
 from routers.utils.http_utils import send200, send404
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils import check_document_reference_exists
 
 # ============================================================================

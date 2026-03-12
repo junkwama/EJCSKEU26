@@ -18,7 +18,7 @@ from models.direction.fonction.projection import (
 )
 from models.direction.fonction.utils import DirectionFonctionCreate, DirectionFonctionUpdate
 from models.fidele import Fidele
-from routers.dependencies import check_resource_exists
+from routers.utils import check_resource_exists
 from routers.utils.http_utils import send200, send400, send404
 from sqlalchemy.orm import selectinload
 
