@@ -22,7 +22,7 @@ class DocumentTypeEnum(int, Enum):
 
 class GradeEnum(int, Enum):
     """Enum pour les grades ecclésiastiques"""
-    MONDIMI = 1
+    SANS_GRADE = 1
     NKENGI = 2
     LONGI = 3
     SIELO = 4
@@ -49,3 +49,22 @@ class StructureTypeEnum(int, Enum):
     MOUVEMENT = 2
     ASSOCIATION = 3
     SERVICE = 4
+    
+# ============================================================================
+# FONCTION ENUMS
+# ============================================================================
+class FonctionEnum(int, Enum):
+    """Enum pour les fonctions dans une direction"""
+    RESPONSABLE_PRESIDENT = 1
+    VICE_RESPONSABLE_PRESIDENT_NO1 = 2
+    VICE_RESPONSABLE_PRESIDENT_NO2 = 3
+    EVANGELISTE = 4
+    SECRETAIRE = 5
+    SECRETAIRE_ADJOINT = 6
+    TRESORIER = 7
+    CONSEILLER = 8
+    CHEF_DE_CELLULE = 9
+    DIRIGEANT_TECHNIQUE = 10
+    CHEF_DE_PARTITION = 11
+    CHEF_DE_PARTITION_ADJOINT = 12
+    

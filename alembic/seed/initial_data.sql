@@ -268,7 +268,7 @@ INSERT INTO fidele_type (id, nom) VALUES
 
 -- Grades (IDs fixed to match GradeEnum)
 INSERT INTO grade (id, nom) VALUES
-  (1, 'Mondimi'),
+  (1, 'Sans Grade'),
   (2, 'Nkengi'),
   (3, 'Longi'),
   (4, 'Sielo'),
@@ -321,32 +321,21 @@ INSERT INTO etat_civile (id, nom, description) VALUES
   (4, 'Veuf', 'Conjoint décédé');
 
 -- Fonctions (idempotent even if nom isn't UNIQUE)
-INSERT INTO fonction_list (nom)
-SELECT 'Pasteur Responsable' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Pasteur Responsable');
-INSERT INTO fonction_list (nom)
-SELECT 'Pasteur évangéliste' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Pasteur évangéliste');
-INSERT INTO fonction_list (nom)
-SELECT 'Sielo responsable' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Sielo responsable');
-INSERT INTO fonction_list (nom)
-SELECT 'Président' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Président');
-INSERT INTO fonction_list (nom)
-SELECT 'Vice Président' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Vice Président');
-INSERT INTO fonction_list (nom)
-SELECT 'Secrétaire' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Secrétaire');
-INSERT INTO fonction_list (nom)
-SELECT 'Secrétaire adjoint' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Secrétaire adjoint');
-INSERT INTO fonction_list (nom)
-SELECT 'Trésorier' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Trésorier');
-INSERT INTO fonction_list (nom)
-SELECT 'Trésorier adjoint' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Trésorier adjoint');
-INSERT INTO fonction_list (nom)
-SELECT 'Conseiller' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Conseiller');
-INSERT INTO fonction_list (nom)
-SELECT 'Dirigeant technique' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Dirigeant technique');
-INSERT INTO fonction_list (nom)
-SELECT 'Chef de cellule' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Chef de cellule');
-INSERT INTO fonction_list (nom)
-SELECT 'Chef de partition' WHERE NOT EXISTS (SELECT 1 FROM fonction_list WHERE nom='Chef de partition');
+DELETE from fonction_list where true;
+
+INSERT INTO fonction_list (id, nom, id_document_type) VALUES 
+  (1, "Responsable | Président", null),
+  (2, "1er Vice Responsable | 1er Vice Président", 2),
+  (3, "2ème Vice Responsable | 2ème Vice Président", 2),
+  (4, "Évangéliste", null),
+  (5, "Secrétaire", null),
+  (6, "Secrétaire adjoint", null),
+  (7, "Trésorier", null),
+  (8, "Conseiller", null),
+  (9, "Chef de cellule", null),
+  (10, "Dirigeant technique", 2),
+  (11, "Chef de partition", 2),
+  (12, "Chef de partition adjoint", 2);
 
 -- Document types (IDs fixed to match DocumentTypeEnum)
 INSERT INTO document_type (id, nom, document_key, code, id_document_type_superieur) VALUES
