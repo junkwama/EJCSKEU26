@@ -9,33 +9,28 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
-from models.adresse import Adresse, Nation
+from models.adresse import Adresse
 from models.constants import DocumentStatut
-from models.constants.types import DocumentTypeEnum, FideleTypeEnum
+from models.constants.types import DocumentStatutEnum, DocumentTypeEnum, FideleTypeEnum
 from models.fidele import (
     Fidele,
     FideleParoisse,
 )
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
 from models.fidele.utils import FideleStatutUpdate
+from modules.oauth2.dependencies import get_required_token_payload_dependency
 from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele, get_fidele_complete_data_by_id
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send400
 from routers.fidele.docs import FIDELE_STATUT_UPDATE_DESCRIPTION
 from utils.constants import ProjDepth
-
+from models.oauth import TokenPayload
 
 fidele_statut_router = APIRouter(prefix="/{id}/statut", tags=["Fidele - Statut"])
 
-
-PENDING_STATUT_ID = 1
-VALIDATED_STATUT_ID = 2
-
-
 def build_fidele_code(iso_alpha_2: str, fidele_id: int) -> str:
     return f"{iso_alpha_2.upper()}{str(fidele_id).zfill(8)}"
-
 
 async def get_fidele_paroisse_nation_iso_alpha_2(
     fidele_id: int,
@@ -76,6 +71,10 @@ async def get_fidele_paroisse_nation_iso_alpha_2(
 async def update_fidele_statut(
     body: FideleStatutUpdate,
     session: Annotated[AsyncSession, Depends(get_session)],
+    current_fidele: Annotated[
+        TokenPayload,
+        Depends(get_required_token_payload_dependency(TokenPayload)),
+    ],
     fidele: Annotated[Fidele, Depends(required_fidele)],
     proj: Annotated[ProjDepth, Query()] = ProjDepth.SHALLOW,
 ) -> FideleProjFlat | FideleProjShallow:
@@ -88,12 +87,13 @@ async def update_fidele_statut(
     - `id_fidele_recenseur` est requis lors de la validation
     """
 
-    await check_resource_exists(DocumentStatut, session, filters={"id": body.id_document_statut})
+
+    
 
     current_statut_id = fidele.id_document_statut
     target_statut_id = body.id_document_statut
     is_transition_pending_to_validated = (
-        current_statut_id == PENDING_STATUT_ID and target_statut_id == VALIDATED_STATUT_ID
+        current_statut_id == DocumentStatutEnum.ATTENTE.value and target_statut_id == DocumentStatutEnum.VALIDE.value
     )
 
     if is_transition_pending_to_validated and body.id_fidele_recenseur is None:

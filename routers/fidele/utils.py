@@ -42,6 +42,7 @@ async def required_fidele(
     id: Annotated[int, Path(..., description="Fidele's ID")],
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Fidele:
+    print(f"Checking existence of fidele with id:::::::------- {id}")
     return await check_resource_exists(Fidele, session, filters={"id": id})
 
 

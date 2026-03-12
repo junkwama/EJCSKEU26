@@ -21,10 +21,7 @@ from models.contact.projection import ContactProjFlat, ContactProjShallow
 from core.db import get_session
 from models.oauth import TokenPayload
 from models.utils.utils import Password
-from modules.oauth2.dependencies import (
-    get_required_token_payload_dependency,
-    get_token_payload_dependency,
-)
+from modules.oauth2.dependencies import get_required_token_payload_dependency
 from routers.fidele.utils import (
     required_fidele,
     get_fidele_complete_data_by_id,
@@ -37,9 +34,7 @@ from utils.constants import ProjDepth
 from models.constants import DocumentType, FideleType, Grade, DocumentStatut
 from modules.file import S3Service
 
-fidele_router = APIRouter(
-    dependencies=[Depends(get_token_payload_dependency(TokenPayload))]
-)
+fidele_router = APIRouter()
 
 async def get_fidele_any_by_id(fidele_id: int, session: AsyncSession) -> Fidele | None:
     statement = select(Fidele).where(Fidele.id == fidele_id)

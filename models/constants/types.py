@@ -39,6 +39,7 @@ class FideleTypeEnum(int, Enum):
     SYMPATHISANT = 2
 
 
+
 # ============================================================================
 # STRUCTURE TYPE ENUMS
 # ============================================================================
@@ -49,7 +50,17 @@ class StructureTypeEnum(int, Enum):
     MOUVEMENT = 2
     ASSOCIATION = 3
     SERVICE = 4
-    
+
+
+# ============================================================================
+# FIDELE TYPE ENUMS
+# ============================================================================
+
+class DocumentStatutEnum(int, Enum):
+    """Enum pour les statut des entité (docuement)"""
+    ATTENTE = 1
+    VALIDE = 2
+
 # ============================================================================
 # FONCTION ENUMS
 # ============================================================================
@@ -67,4 +78,5 @@ class FonctionEnum(int, Enum):
     DIRIGEANT_TECHNIQUE = 10
     CHEF_DE_PARTITION = 11
     CHEF_DE_PARTITION_ADJOINT = 12
+
     

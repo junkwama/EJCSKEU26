@@ -1,15 +1,16 @@
 # External modules
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pydantic import ValidationError
 
+from modules.oauth2.dependencies import get_token_payload_dependency
+
 # Loading critic stuff needed accross diff local modules
 from dotenv import load_dotenv
 from core.config import Config
 load_dotenv()
-
 
 # Routers utils
 from routers.utils.http_utils import (
@@ -21,6 +22,9 @@ from routers.utils.http_utils import (
     send403,
     send401,
 )
+
+# models
+from models.oauth import TokenPayload
 
 # Routers
 from routers.fidele import fidele_router
@@ -44,7 +48,8 @@ app = FastAPI(
     title="EJCSK API",
     description="Recencement des Fidèles de l'Église Kimbaguiste",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    dependencies=[Depends(get_token_payload_dependency(TokenPayload))],
 ) # The app's fastweb instance
 
 app.add_middleware(
