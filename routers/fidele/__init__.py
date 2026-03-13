@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 # Local modules
 from core.config import Config
-from models.constants.types import DocumentTypeEnum
+from models.constants.types import DocumentTypeEnum, RecensementEtapeEnum
 from models.fidele import Fidele
 from models.fidele.utils import FideleBase, FideleUpdate
 from models.fidele.projection import FideleProjFlat, FideleProjFlatWithPhoto, FideleProjShallow
@@ -27,6 +27,7 @@ from routers.fidele.utils import (
     get_fidele_complete_data_by_id,
     parse_fidele_include,
 )
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.utils import check_resource_exists
 from routers.utils.http_utils import send200, send400, send404
 from routers.utils import apply_projection
@@ -98,6 +99,12 @@ async def create_fidele(
     session.add(fidele)
     await session.commit()
     await session.refresh(fidele)
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.INFORMATIONS_DE_BASE,
+    )
 
     # re-fetch to get related data for shallow projection
     if proj == ProjDepth.SHALLOW:
@@ -600,3 +607,6 @@ fidele_router.include_router(fidele_fonctions_router)
 
 from routers.fidele.statut import fidele_statut_router
 fidele_router.include_router(fidele_statut_router)
+
+from routers.fidele.recensement_etape import fidele_recensement_etape_router
+fidele_router.include_router(fidele_recensement_etape_router)

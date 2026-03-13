@@ -9,6 +9,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
+from models.constants.types import RecensementEtapeEnum
 from models.fidele import Fidele, FideleParoisse
 from models.fidele.projection import (
     FideleParoisseProjFlat,
@@ -17,6 +18,7 @@ from models.fidele.projection import (
 from models.fidele.utils import FideleParoisseCreate, FideleParoisseUpdate
 from models.paroisse import Paroisse
 from routers.utils import check_resource_exists
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200, send400
 
@@ -96,6 +98,12 @@ async def add_fidele_paroisse(
         await session.commit()
         await session.refresh(existing)
 
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=fidele.id,
+            id_recensement_etape=RecensementEtapeEnum.PAROISSES,
+        )
+
         existing = await get_fidele_paroisse_complete_data_by_id(existing.id, session)
         return send200(FideleParoisseProjShallowWithoutFideleData.model_validate(existing))
 
@@ -110,6 +118,12 @@ async def add_fidele_paroisse(
     session.add(fidele_paroisse)
     await session.commit()
     await session.refresh(fidele_paroisse)
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.PAROISSES,
+    )
 
     fidele_paroisse = await get_fidele_paroisse_complete_data_by_id(fidele_paroisse.id, session)
     return send200(FideleParoisseProjShallowWithoutFideleData.model_validate(fidele_paroisse))

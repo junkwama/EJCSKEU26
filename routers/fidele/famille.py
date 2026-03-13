@@ -8,10 +8,12 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
+from models.constants.types import RecensementEtapeEnum
 from models.constants import EtatCivile
 from models.fidele import Fidele, FideleFamille
 from models.fidele.projection import FideleFamilleProjFlat
 from models.fidele.utils import FideleFamilleCreate, FideleFamilleUpdate
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200, send400, send404
@@ -57,12 +59,24 @@ async def create_fidele_famille(
         session.add(existing)
         await session.commit()
         await session.refresh(existing)
+
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=fidele.id,
+            id_recensement_etape=RecensementEtapeEnum.FAMILLE,
+        )
         return send200(FideleFamilleProjFlat.model_validate(existing))
 
     famille = FideleFamille(id_fidele=fidele.id, **payload)
     session.add(famille)
     await session.commit()
     await session.refresh(famille)
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.FAMILLE,
+    )
 
     return send200(FideleFamilleProjFlat.model_validate(famille))
 

@@ -22,9 +22,11 @@ from models.fidele.utils import (
     FideleFamilleBase,
     FideleOrigineBase,
     FideleOccupationBase,
+    FideleRecensementEtapeBase,
 )
 from models.constants import FideleType, Grade, Structure, Profession, NiveauEtudes, EtatCivile
 from models.constants import DocumentStatut
+from models.constants import RecensementEtape
 from models.utils.utils import BaseModelClass
 
 if TYPE_CHECKING:
@@ -94,6 +96,10 @@ class Fidele(FideleBase, BaseModelClass, table=True):
         ),
     )
     code_matriculation: str | None = SQLModelField(default=None, max_length=10)
+    rencensement_statut: int | None = SQLModelField(
+        default=None,
+        sa_column=Column(Integer, nullable=True),
+    )
     __table_args__ = (
         UniqueConstraint("tel", name="uq_fidele_tel"),
         UniqueConstraint("code_matriculation", name="uq_fidele_code_matriculation"),
@@ -373,6 +379,52 @@ class FideleOccupation(FideleOccupationBase, BaseModelClass, table=True):
     fidele: Fidele = Relationship(back_populates="occupation")
     niveau_etude: NiveauEtudes = Relationship()
     profession: Profession = Relationship()
+
+    class Config:
+        from_attributes = True
+
+
+class FideleRecensementEtape(FideleRecensementEtapeBase, BaseModelClass, table=True):
+    """Progression d'un fidèle dans les étapes du recensement."""
+
+    __tablename__ = "fidele_recensement_etape"
+
+    id_fidele: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("fidele.id", ondelete="CASCADE"),
+            nullable=False,
+        )
+    )
+    id_recensement_etape: int = SQLModelField(
+        sa_column=Column(
+            Integer,
+            ForeignKey("recensement_etape.id", ondelete="RESTRICT"),
+            nullable=False,
+        )
+    )
+    id_document_statut: int = SQLModelField(
+        default=1,
+        sa_column=Column(
+            Integer,
+            ForeignKey("document_statut.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "id_fidele",
+            "id_recensement_etape",
+            name="uq_fidele_recensement_etape",
+        ),
+        Index("idx_fidele_recensement_etape_fidele", "id_fidele"),
+        Index("idx_fidele_recensement_etape_etape", "id_recensement_etape"),
+        Index("idx_fidele_recensement_etape_statut", "id_document_statut"),
+    )
+
+    recensement_etape: RecensementEtape = Relationship()
+    document_statut: DocumentStatut = Relationship()
 
     class Config:
         from_attributes = True

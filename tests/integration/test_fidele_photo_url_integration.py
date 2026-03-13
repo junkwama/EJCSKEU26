@@ -28,7 +28,7 @@ async def _insert_minimum_fidele_and_photo(async_db_url: str) -> None:
                 "tel": "+243900000001",
                 "id_grade": 1,
                 "id_fidele_type": 1,
-                "id_nation_nationalite": 170,
+                "id_nation_nationalite": 171,
                 "id_document_statut": 1,
             },
         )

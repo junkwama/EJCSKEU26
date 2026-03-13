@@ -6,9 +6,11 @@ from datetime import datetime, timezone
 
 # Local modules
 from core.db import get_session
+from models.constants.types import DocumentTypeEnum, RecensementEtapeEnum
 from models.contact import Contact
 from models.contact.utils import ContactBase, ContactUpdate
 from models.contact.projection import ContactProjFlat
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.utils.http_utils import send200, send404
 from routers.utils import check_resource_exists
 from routers.utils import check_document_reference_exists
@@ -62,6 +64,13 @@ async def create_contact(
     session.add(contact)
     await session.commit()
     await session.refresh(contact)
+
+    if int(body.id_document_type) == DocumentTypeEnum.FIDELE.value:
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=int(body.id_document),
+            id_recensement_etape=RecensementEtapeEnum.CONTACT,
+        )
 
     return send200(ContactProjFlat.model_validate(contact))
 

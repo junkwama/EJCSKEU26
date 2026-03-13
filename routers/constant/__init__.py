@@ -10,6 +10,7 @@ from routers.constant.fonction import fonction_router
 from routers.constant.profession import profession_router
 from routers.constant.niveau_etudes import niveau_etudes_router
 from routers.constant.etat_civile import etat_civile_router
+from routers.constant.recensement_etape import recensement_etape_router
 
 # ============================================================================
 # CONSTANTS ROUTER AGGREGATOR
@@ -28,3 +29,4 @@ constant_router.include_router(fonction_router)
 constant_router.include_router(profession_router)
 constant_router.include_router(niveau_etudes_router)
 constant_router.include_router(etat_civile_router)
+constant_router.include_router(recensement_etape_router)

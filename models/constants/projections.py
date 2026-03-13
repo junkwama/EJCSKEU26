@@ -144,6 +144,20 @@ class StructureProjShallow(StructureProjFlat):
 
 
 # ============================================================================
+# RECENSEMENT ETAPE PROJECTIONS
+# ============================================================================
+
+class RecensementEtapeProjFlat(BaseModel):
+    """Projection plate de RecensementEtape - sans relations"""
+    id: int
+    nom: str
+    description: str | None
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================================
 # FONCTION LIST PROJECTIONS
 # ============================================================================
 

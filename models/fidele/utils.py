@@ -257,3 +257,26 @@ class FideleOccupationCreate(BaseModel):
 
 class FideleOccupationUpdate(FideleOccupationCreate):
     pass
+
+
+class FideleRecensementEtapeBase(BaseModel):
+    class Config:
+        from_attributes = True
+
+
+class FideleRecensementEtapeCreate(BaseModel):
+    id_recensement_etape: int = PydanticField(
+        ...,
+        ge=1,
+        examples=[1],
+        description="Identifiant de l'étape de recensement.",
+    )
+    id_document_statut: int = PydanticField(
+        ...,
+        ge=1,
+        examples=[1],
+        description="Identifiant du statut de l'étape (ex: En attente, Validé).",
+    )
+
+    class Config:
+        from_attributes = True

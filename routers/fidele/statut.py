@@ -30,6 +30,7 @@ from routers.fidele.utils import required_fidele, get_fidele_complete_data_by_id
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send400
 from routers.fidele.docs import FIDELE_STATUT_UPDATE_DESCRIPTION
+from routers.fidele.recensement_etape import get_fidele_recensement_completion_details
 from routers.utils.permissions import require_fidele_direction_fonction 
 from utils.constants import ProjDepth
 
@@ -129,6 +130,16 @@ async def update_fidele_statut(
             id_document_type=DocumentTypeEnum.PAROISSE,
             id_document=fidele_paroisse.id_paroisse
         )
+
+        recensement_status = await get_fidele_recensement_completion_details(
+            session,
+            id_fidele=fidele.id,
+        )
+        if not bool(recensement_status["is_completed"]):
+            return send400(
+                ["fidele", "id_document_statut"],
+                "Recensement incomplet",
+            )
 
         # 3: Assign the logged fidele as recenseur 
         fidele.id_fidele_recenseur = int(current_fidele.sub)

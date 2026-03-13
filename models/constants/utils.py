@@ -161,6 +161,22 @@ STRUCTURE_FIELDS_CONFIG = {
 
 
 # ============================================================================
+# RECENSEMENT ETAPE FIELDS CONFIG
+# ============================================================================
+RECENSEMENT_ETAPE_FIELDS_CONFIG = {
+    "nom": {
+        "max_length": 150,
+        "examples": ["Informations de base"],
+        "description": "Nom de l'étape de recensement",
+    },
+    "description": {
+        "examples": ["Identité, grade, type et accès"],
+        "description": "Description de l'étape de recensement (optionnelle)",
+    },
+}
+
+
+# ============================================================================
 # FONCTION FIELDS CONFIG
 # ============================================================================
 FONCTION_FIELDS_CONFIG = {
@@ -184,6 +200,19 @@ FONCTION_FIELDS_CONFIG = {
         "description": "Type de document auquel s'applique cette fonction (optionnel)",
     },
 }
+
+
+# ============================================================================
+# RECENSEMENT ETAPE BASE & UPDATE
+# ============================================================================
+class RecensementEtapeBase(SQLModel):
+    nom: str = PydanticField(..., **RECENSEMENT_ETAPE_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **RECENSEMENT_ETAPE_FIELDS_CONFIG["description"])
+
+
+class RecensementEtapeUpdate(BaseModel):
+    nom: str | None = PydanticField(None, **RECENSEMENT_ETAPE_FIELDS_CONFIG["nom"])
+    description: str | None = PydanticField(None, **RECENSEMENT_ETAPE_FIELDS_CONFIG["description"])
 
 
 # ============================================================================

@@ -9,10 +9,12 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
+from models.constants.types import RecensementEtapeEnum
 from models.fidele import Fidele, FideleBapteme
 from models.fidele.projection import FideleBaptemeProjFlat, FideleBaptemeProjShallowWithoutFideleData
 from models.fidele.utils import FideleBaptemeCreate, FideleBaptemeUpdate
 from models.paroisse import Paroisse
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils import apply_projection
@@ -69,6 +71,12 @@ async def create_fidele_bapteme(
         await session.commit()
         await session.refresh(existing)
 
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=fidele.id,
+            id_recensement_etape=RecensementEtapeEnum.BAPTEME,
+        )
+
         if proj == ProjDepth.SHALLOW:
             existing = await get_fidele_bapteme_complete_data_by_fidele_id(fidele.id, session, proj)
 
@@ -84,6 +92,12 @@ async def create_fidele_bapteme(
     session.add(bapteme)
     await session.commit()
     await session.refresh(bapteme)
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.BAPTEME,
+    )
 
     if proj == ProjDepth.SHALLOW:
         bapteme = await get_fidele_bapteme_complete_data_by_fidele_id(fidele.id, session, proj)

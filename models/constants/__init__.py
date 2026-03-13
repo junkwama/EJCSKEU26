@@ -7,7 +7,7 @@ from models.constants.utils import (
     DocumentTypeBase, GradeBase, FideleTypeBase,
     StructureBase, FonctionBase, StructureTypeBase,
     ProfessionBase, NiveauEtudesBase, EtatCivileBase,
-    DocumentStatutBase,
+    DocumentStatutBase, RecensementEtapeBase,
 )
 
 if TYPE_CHECKING:
@@ -158,6 +158,18 @@ class Structure(StructureBase, BaseModelClass, table=True):
     class Config:
         from_attributes = True
         
+class RecensementEtape(RecensementEtapeBase, BaseModelClass, table=True):
+    """Catalogue des étapes du processus de recensement d'un fidèle."""
+    __tablename__ = "recensement_etape"
+
+    __table_args__ = (
+        UniqueConstraint("nom", name="uq_recensement_etape_nom"),
+    )
+
+    class Config:
+        from_attributes = True
+
+
 class Fonction(FonctionBase, BaseModelClass, table=True):
     """Modèle de la table FonctionList - Catalogue des fonctions"""
     __tablename__ = "fonction_list"

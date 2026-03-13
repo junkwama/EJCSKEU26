@@ -10,6 +10,8 @@ from core.db import get_session
 from models.adresse import Adresse, Nation
 from models.adresse.utils import AdresseBase, AdresseUpdate
 from models.adresse.projection import AdresseProjFlat, AdresseProjShallow
+from models.constants.types import DocumentTypeEnum, RecensementEtapeEnum
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.utils import apply_projection, check_document_reference_exists
 from routers.utils.http_utils import send200
 from routers.utils import check_resource_exists
@@ -68,6 +70,13 @@ async def create_adresse(
     session.add(adresse)
     await session.commit()
     await session.refresh(adresse)
+
+    if int(body.id_document_type) == DocumentTypeEnum.FIDELE.value:
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=int(body.id_document),
+            id_recensement_etape=RecensementEtapeEnum.ADRESSE,
+        )
 
     # Re-fetch the adresse with relations for the Shallow Projection response
     if proj == ProjDepth.SHALLOW:

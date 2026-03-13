@@ -10,6 +10,7 @@ from models.constants.projections import (
     StructureProjFlat,
     NiveauEtudesProjFlat,
     ProfessionProjFlat,
+    RecensementEtapeProjFlat,
 )
 from models.constants.types import FideleTypeEnum, GradeEnum
 from models.contact.projection import ContactProjShallow
@@ -54,6 +55,7 @@ class FideleProjFlat(BaseModel):
     id_nation_nationalite: int
     id_document_statut: int
     code_matriculation: str | None = None
+    rencensement_statut: int | None = None
 
     est_supprimee: bool
     date_suppression: datetime | None = None
@@ -269,6 +271,30 @@ class FideleOccupationProjFlat(BaseModel):
 class FideleOccupationProjShallowWithoutFideleData(FideleOccupationProjFlat):
     niveau_etude: NiveauEtudesProjFlat
     profession: ProfessionProjFlat
+
+    class Config:
+        from_attributes = True
+
+
+class FideleRecensementEtapeProjFlat(BaseModel):
+    """Projection plate de FideleRecensementEtape - sans relations"""
+    id: int
+    id_fidele: int
+    id_recensement_etape: int
+    id_document_statut: int
+    est_supprimee: bool
+    date_suppression: datetime | None
+    date_creation: datetime
+    date_modification: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class FideleRecensementEtapeProjShallow(FideleRecensementEtapeProjFlat):
+    """Projection shallow de FideleRecensementEtape - avec étape et statut résolus"""
+    recensement_etape: RecensementEtapeProjFlat
+    document_statut: DocumentStatutProjFlat
 
     class Config:
         from_attributes = True

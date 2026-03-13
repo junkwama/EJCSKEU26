@@ -9,6 +9,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
+from models.constants.types import RecensementEtapeEnum
 from models.constants import NiveauEtudes, Profession
 from models.fidele import Fidele, FideleOccupation
 from models.fidele.projection import (
@@ -16,6 +17,7 @@ from models.fidele.projection import (
     FideleOccupationProjShallowWithoutFideleData,
 )
 from models.fidele.utils import FideleOccupationCreate, FideleOccupationUpdate
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils import apply_projection
@@ -76,6 +78,12 @@ async def create_fidele_occupation(
         await session.commit()
         await session.refresh(existing)
 
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=fidele.id,
+            id_recensement_etape=RecensementEtapeEnum.OCCUPATION,
+        )
+
         if proj == ProjDepth.SHALLOW:
             existing = await get_fidele_occupation_complete_data_by_fidele_id(fidele.id, session, proj)
 
@@ -91,6 +99,12 @@ async def create_fidele_occupation(
     session.add(occupation)
     await session.commit()
     await session.refresh(occupation)
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.OCCUPATION,
+    )
 
     if proj == ProjDepth.SHALLOW:
         occupation = await get_fidele_occupation_complete_data_by_fidele_id(fidele.id, session, proj)

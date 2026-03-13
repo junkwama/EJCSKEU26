@@ -54,8 +54,8 @@ ADRESSE_FIELDS_CONFIG = {
     "id_nation": {
         "ge": 1,
         "le": 231, # Nombre total de nations dans la base de données
-        "examples": [170],
-        "description": "Identifiant de la nation. Ex: 170 pour la RDC",
+        "examples": [171],
+        "description": "Identifiant de la nation. Ex: 171 pour la RDC",
     },
     "province_etat": {
         "max_length": 100,

@@ -10,9 +10,11 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
 from models.adresse import Nation
+from models.constants.types import RecensementEtapeEnum
 from models.fidele import Fidele, FideleOrigine
 from models.fidele.projection import FideleOrigineProjFlat, FideleOrigineProjShallowWithoutFideleData
 from models.fidele.utils import FideleOrigineCreate, FideleOrigineUpdate
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.utils import check_resource_exists
 from routers.fidele.utils import required_fidele
 from routers.utils import apply_projection
@@ -69,6 +71,12 @@ async def create_fidele_origine(
         await session.commit()
         await session.refresh(existing)
 
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=fidele.id,
+            id_recensement_etape=RecensementEtapeEnum.ORIGINES,
+        )
+
         if proj == ProjDepth.SHALLOW:
             existing = await get_fidele_origine_complete_data_by_fidele_id(fidele.id, session, proj)
 
@@ -84,6 +92,12 @@ async def create_fidele_origine(
     session.add(origine)
     await session.commit()
     await session.refresh(origine)
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.ORIGINES,
+    )
 
     if proj == ProjDepth.SHALLOW:
         origine = await get_fidele_origine_complete_data_by_fidele_id(fidele.id, session, proj)

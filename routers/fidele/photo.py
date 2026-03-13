@@ -5,12 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from core.config import Config
-from models.constants.types import DocumentTypeEnum
+from models.constants.types import DocumentTypeEnum, RecensementEtapeEnum
 from models.fidele import Fidele
 from modules.file.models import File as FileModel, FileProjFlat
 from modules.file import get_s3_service, get_s3_service_without_file, S3Service
 from core.db import get_session
 from modules.file.utils import get_upload_file_extension
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.fidele.utils import required_fidele
 from routers.utils.http_utils import send200
 
@@ -69,6 +70,12 @@ async def upload_file(
         id_document=fidele.id,
         allowed_extensions=["jpg", "jpeg", "png"],
         original_name=file.file.filename,
+    )
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.PHOTO_DE_PROFIL,
     )
 
     return send200(db_file)

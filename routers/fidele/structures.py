@@ -9,6 +9,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from core.db import get_session
+from models.constants.types import RecensementEtapeEnum
 from models.constants import Structure
 from models.fidele import Fidele, FideleStructure
 from models.fidele.utils import FideleStructureCreate
@@ -19,6 +20,7 @@ from models.fidele.projection import (
 from routers.utils import check_resource_exists
 from routers.fidele.docs import FIDELE_ADD_STRUCTURE_DESCRIPTION
 from routers.utils.http_utils import send200, send400
+from routers.fidele.recensement_etape import mark_fidele_recensement_etape_completed
 from routers.fidele.utils import required_fidele
 
 fidele_structures_router = APIRouter(prefix="/{id}/structure", tags=["Fidele - Structures"])
@@ -97,6 +99,12 @@ async def add_fidele_structure(
         await session.commit()
         await session.refresh(existing)
 
+        await mark_fidele_recensement_etape_completed(
+            session,
+            id_fidele=fidele.id,
+            id_recensement_etape=RecensementEtapeEnum.STRUCTURES,
+        )
+
         existing = await get_fidele_structure_complete_data_by_id(existing.id, session)
 
         return send200(FideleStructureProjShallowWithoutFideleData.model_validate(existing))
@@ -109,6 +117,12 @@ async def add_fidele_structure(
     session.add(fidele_structure)
     await session.commit()
     await session.refresh(fidele_structure)
+
+    await mark_fidele_recensement_etape_completed(
+        session,
+        id_fidele=fidele.id,
+        id_recensement_etape=RecensementEtapeEnum.STRUCTURES,
+    )
 
     fidele_structure = await get_fidele_structure_complete_data_by_id(fidele_structure.id, session)
 

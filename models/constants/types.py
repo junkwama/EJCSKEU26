@@ -66,6 +66,24 @@ class DocumentStatutEnum(int, Enum):
     """Enum pour les statut des entité (docuement)"""
     ATTENTE = 1
     VALIDE = 2
+    COMPLETE = 3
+
+# ============================================================================
+# RECENSEMENT ETAPE ENUM
+# ============================================================================
+class RecensementEtapeEnum(int, Enum):
+    """Enum pour les étapes du recensement d'un fidèle"""
+    INFORMATIONS_DE_BASE = 1
+    FAMILLE = 2
+    OCCUPATION = 3
+    CONTACT = 4
+    ADRESSE = 5
+    ORIGINES = 6
+    BAPTEME = 7
+    PAROISSES = 8
+    STRUCTURES = 9
+    PHOTO_DE_PROFIL = 10
+
 
 # ============================================================================
 # FONCTION ENUM
