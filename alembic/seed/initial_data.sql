@@ -50,7 +50,7 @@ INSERT INTO nation (id, nom, id_continent, iso_alpha_2) VALUES
   (37, "Chili", 3, "CL"),
   (38, "Chine", 5, "CN"),
   (39, "Chypre", 4, "CY"),
-  (40, "Chypre du Nord", 5, "NULL"), -- No ISO Code
+  # (40, "Chypre du Nord", 5), -- No ISO Code completely recognised. No iso ..ect
   (41, "Colombie", 3, "CO"),
   (42, "Comores", 1, "KM"),
   (43, "Congo", 1, "CG"),
@@ -181,7 +181,7 @@ INSERT INTO nation (id, nom, id_continent, iso_alpha_2) VALUES
   (168, "Portugal", 4, "PT"),
   (169, "Qatar", 5, "QA"),
   (170, "République Centrafricaine", 1, "CF"),
-  (171, "République Démocratique du Congo", 1, "CD"),
+  (171, "R.D. Congo", 1, "CD"),
   (172, "République Dominicaine", 2, "DO"),
   (173, "République Tchèque", 4, "CZ"),
   (174, "Réunion", 1, "RE"),
