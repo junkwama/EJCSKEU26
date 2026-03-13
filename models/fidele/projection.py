@@ -112,6 +112,7 @@ class FideleStructureProjFlat(BaseModel):
     id: int
     id_fidele: int
     id_structure: int
+    est_structure_principale: bool
     est_supprimee: bool
     date_suppression: datetime | None
     date_creation: datetime

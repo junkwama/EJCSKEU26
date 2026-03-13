@@ -2,7 +2,7 @@ import os
 import jwt
 from typing import TYPE_CHECKING, List
 from sqlmodel import Relationship
-from sqlalchemy import Column, ForeignKey, Index, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, Column, ForeignKey, Index, Integer, String, UniqueConstraint, text
 from sqlalchemy import and_
 from sqlalchemy.orm import relationship
 
@@ -95,7 +95,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
             nullable=True,
         ),
     )
-    code_matriculation: str | None = SQLModelField(default=None, max_length=10)
+    code_matriculation: str | None = SQLModelField(default=None, max_length=12)
     rencensement_statut: int | None = SQLModelField(
         default=None,
         sa_column=Column(Integer, nullable=True),
@@ -187,6 +187,10 @@ class FideleStructure(FideleStructureBase, BaseModelClass, table=True):
             nullable=False,
         )
     )
+    est_structure_principale: bool = SQLModelField(
+        default=False,
+        sa_column=Column(Boolean, nullable=False, server_default=text('0')),
+    )
 
     __table_args__ = (
         Index("idx_fidele_structure_fidele", "id_fidele"),
@@ -221,7 +225,6 @@ class FideleParoisse(FideleParoisseBase, BaseModelClass, table=True):
             nullable=False,
         )
     )
-    est_actif: bool = SQLModelField(default=True)
 
     __table_args__ = (
         Index("idx_fidele_paroisse_fidele", "id_fidele"),

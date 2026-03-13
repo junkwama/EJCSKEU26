@@ -38,6 +38,39 @@ async def get_fidele_structure_complete_data_by_id(
     result = await session.exec(statement)
     return result.first()
 
+
+async def _count_active_fidele_structures(session: AsyncSession, *, id_fidele: int) -> int:
+    statement = select(FideleStructure).where(
+        (FideleStructure.id_fidele == id_fidele)
+        & (FideleStructure.est_supprimee == False)
+    )
+    result = await session.exec(statement)
+    return len(result.all())
+
+
+async def _set_unique_principale_structure(
+    session: AsyncSession,
+    *,
+    id_fidele: int,
+    keep_membership_id: int,
+) -> None:
+    statement = select(FideleStructure).where(
+        (FideleStructure.id_fidele == id_fidele)
+        & (FideleStructure.est_supprimee == False)
+    )
+    result = await session.exec(statement)
+    memberships = result.all()
+
+    now = datetime.now(timezone.utc)
+    for membership in memberships:
+        should_be_principale = membership.id == keep_membership_id
+        if membership.est_structure_principale != should_be_principale:
+            membership.est_structure_principale = should_be_principale
+            membership.date_modification = now
+            session.add(membership)
+
+    await session.commit()
+
 async def required_fidele_structure(
     id: Annotated[int, Path(..., description="Fidele's ID")],
     id_structure: Annotated[int, Path(..., description="Structure's ID")],
@@ -91,13 +124,27 @@ async def add_fidele_structure(
                 "Utilisez plutôt les mandats/fonctions (direction_fonction).",
             )
 
+        active_count = await _count_active_fidele_structures(session, id_fidele=fidele.id)
+
+        should_be_principale = bool(body.est_structure_principale)
+        if active_count == 0:
+            should_be_principale = True
+
         existing.est_supprimee = False
         existing.date_suppression = None
+        existing.est_structure_principale = should_be_principale
         existing.date_modification = datetime.now(timezone.utc)
 
         session.add(existing)
         await session.commit()
         await session.refresh(existing)
+
+        if should_be_principale:
+            await _set_unique_principale_structure(
+                session,
+                id_fidele=fidele.id,
+                keep_membership_id=existing.id,
+            )
 
         await mark_fidele_recensement_etape_completed(
             session,
@@ -109,14 +156,28 @@ async def add_fidele_structure(
 
         return send200(FideleStructureProjShallowWithoutFideleData.model_validate(existing))
 
+    active_count = await _count_active_fidele_structures(session, id_fidele=fidele.id)
+
+    should_be_principale = bool(body.est_structure_principale)
+    if active_count == 0:
+        should_be_principale = True
+
     fidele_structure = FideleStructure(
         id_fidele=fidele.id,
         id_structure=body.id_structure,
+        est_structure_principale=should_be_principale,
     )
 
     session.add(fidele_structure)
     await session.commit()
     await session.refresh(fidele_structure)
+
+    if should_be_principale:
+        await _set_unique_principale_structure(
+            session,
+            id_fidele=fidele.id,
+            keep_membership_id=fidele_structure.id,
+        )
 
     await mark_fidele_recensement_etape_completed(
         session,

@@ -21,12 +21,17 @@ from models.oauth import TokenPayload
 from models.fidele import (
     Fidele,
     FideleParoisse,
+    FideleStructure,
 )
 from models.fidele.projection import FideleProjFlat, FideleProjShallow
 from models.fidele.utils import FideleStatutUpdate
 from modules.oauth2.dependencies import get_required_token_payload_dependency
 from routers.utils import check_resource_exists
-from routers.fidele.utils import required_fidele, get_fidele_complete_data_by_id
+from routers.fidele.utils import (
+    build_fidele_matricule,
+    get_fidele_complete_data_by_id,
+    required_fidele,
+)
 from routers.utils import apply_projection
 from routers.utils.http_utils import send200, send400
 from routers.fidele.docs import FIDELE_STATUT_UPDATE_DESCRIPTION
@@ -35,9 +40,6 @@ from routers.utils.permissions import require_fidele_direction_fonction
 from utils.constants import ProjDepth
 
 fidele_statut_router = APIRouter(prefix="/{id}/statut", tags=["Fidele - Statut"])
-
-def build_fidele_code(iso_alpha_2: str, fidele_id: int) -> str:
-    return f"{iso_alpha_2.upper()}{str(fidele_id).zfill(8)}"
 
 async def get_fidele_paroisse_nation_iso_alpha_2(
     session: AsyncSession,
@@ -152,7 +154,29 @@ async def update_fidele_statut(
                     ["body", "id_document_statut"],
                     "Impossible de générer le code: nation de la paroisse active introuvable",
                 )
-            fidele.code_matriculation = build_fidele_code(paroisse_nation_iso_alpha_2, fidele.id)
+
+            principal_structure_stmt = select(FideleStructure).where(
+                (FideleStructure.id_fidele == fidele.id)
+                & (FideleStructure.est_supprimee == False)
+                & (FideleStructure.est_structure_principale == True)
+            )
+            principal_structure_result = await session.exec(principal_structure_stmt)
+            principal_structure = principal_structure_result.first()
+
+            if not principal_structure:
+                return send400(
+                    ["body", "id_document_statut"],
+                    "Impossible de générer le matricule: aucune structure principale active trouvée.",
+                )
+
+            fidele.code_matriculation = await build_fidele_matricule(
+                session,
+                iso_alpha_2=paroisse_nation_iso_alpha_2,
+                id_structure_principale=principal_structure.id_structure,
+                nom=fidele.nom,
+                prenom=fidele.prenom,
+                date_naissance=fidele.date_naissance,
+            )
 
 
     # 5: Update the fidèle's statut

@@ -78,6 +78,10 @@ FIDELE_FIELDS_CONFIG = {
         "max_length": 150,
         "examples": ["Université de Kinshasa"],
         "description": "École, université ou employeur actuel",
+    },
+    "est_structure_principale": {
+        "examples": [True],
+        "description": "Indique si cette structure est la structure principale du fidele.",
     }
 }
 
@@ -117,13 +121,19 @@ class FideleStatutUpdate(BaseModel):
     id_document_statut: int = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_document_statut"])
 
 class FideleStructureBase(BaseModel):
-    pass
+    est_structure_principale: bool = PydanticField(
+        False,
+        **FIDELE_FIELDS_CONFIG["est_structure_principale"],
+    )
 
     class Config:
         from_attributes = True
 
 class FideleStructureUpdate(BaseModel):
-    pass
+    est_structure_principale: bool | None = PydanticField(
+        None,
+        **FIDELE_FIELDS_CONFIG["est_structure_principale"],
+    )
 
     class Config:
         from_attributes = True
@@ -132,24 +142,19 @@ class FideleStructureCreate(FideleStructureUpdate):
     id_structure: int = PydanticField(..., examples=[1], description="Identifiant de la structure.")
 
 
-class FideleParoisseBase(SQLModel):
+class FideleParoisseBase(BaseModel):
     date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
     date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
+    est_actif: bool = PydanticField(True, expemles=[True], description="Indique si cette paroisse est la paroisse actuelle du fidele.")
 
     class Config:
         from_attributes = True
 
-
-class FideleParoisseUpdate(BaseModel):
-    date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
-    date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
-
-    class Config:
-        from_attributes = True
-
-
-class FideleParoisseCreate(FideleParoisseUpdate):
+class FideleParoisseCreate(FideleParoisseBase):
     id_paroisse: int = PydanticField(..., examples=[1], description="Identifiant de la paroisse")
+
+class FideleParoisseUpdate(FideleParoisseCreate):
+    pass
 
 
 class FideleBaptemeBase(SQLModel):
