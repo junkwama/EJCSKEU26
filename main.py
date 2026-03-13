@@ -34,6 +34,7 @@ from routers.contact import contact_router
 from routers.direction import direction_router
 from routers.constant import constant_router
 from routers.oauth import oauth_router
+from routers.superadmin import superadmin_router
 
 # Lifespan event handler
 @asynccontextmanager
@@ -128,6 +129,7 @@ app.include_router(direction_router, prefix="/direction")
 app.include_router(adresse_router, prefix="/adresse")
 app.include_router(contact_router, prefix="/contact")
 app.include_router(constant_router, prefix="/constant")
+app.include_router(superadmin_router, prefix="/superadmin")
 
 
 # start the app with: uvicorn main:app --reload
