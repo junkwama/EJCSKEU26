@@ -251,15 +251,70 @@ INSERT INTO structure_type (id, nom) VALUES
   (4, 'Service');
 
 -- Bureau structure (ensure at least one exists)
-INSERT INTO structure (nom, code, description, id_structure_type)
-SELECT
-  'Bureau Ecclésiastique',
-  'BUREAU_ECCLESIASTIQUE',
-  'Organe chargé de l’administration des fidèles à un échelon géographique donné (paroissial, provincial, national, etc.)',
-  1
-WHERE NOT EXISTS (
-  SELECT 1 FROM structure WHERE code = 'BUREAU_ECCLESIASTIQUE'
-);
+INSERT INTO structure (id, nom, code, description, id_structure_type) VALUES 
+  (
+    1,
+    "Bureau Ecclésiastique",
+    "BUREAU_ECCLESIASTIQUE",
+    "Organe chargé de l’administration des fidèles à un échelon géographique donné (paroissial, provincial, national, etc.)",
+    1
+  ),
+  (
+    2,
+    "FLUKI",
+    "FLUKI",
+    "Flutistes Kimbaguistes",
+    2
+  ),
+  (
+    3,
+    "Groupe Théâtral Kimbanguiste",
+    "GTKI",
+    "Groupe Théâtral Kimbanguiste",
+    2
+  ),
+  (
+    4,
+    "Flutistes Kimbaguistes",
+    "FLUKI",
+    "Flutistes Kimbaguistes",
+    2
+  ),
+  (
+    5,
+    "Dirigeants",
+    "DIRIGEANTS",
+    "Chorale des dirigeants",
+    2
+  ),
+  (
+    6,
+    "Chorale des enfants kimbaguistes",
+    "CHOREKI",
+    "Chorale des enfants kimbaguistes",
+    2
+  ),
+  (
+    7,
+    "Groupe des guitaristes kimbanguistes",
+    "GGKI",
+    "Groupe des guitaristes kimbanguistes",
+    2
+  ),
+  (
+    8,
+    "Association des Femmes Kimbaguistes",
+    "AFKI",
+    "Association regroupant les femmes dans l'Église Kimbanguiste",
+    3
+  ),
+  (
+    9,
+    "Union de la Jeunesse Kimbanguiste",
+    "UJKI",
+    "Union de la Jeunesse Kimbanguiste regroupant les jeunes dans l'Église Kimbanguiste",
+    3
+  );
 
 -- Fidele types (IDs fixed to match FideleTypeEnum)
 INSERT INTO fidele_type (id, nom) VALUES

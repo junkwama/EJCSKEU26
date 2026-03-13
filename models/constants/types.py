@@ -15,7 +15,6 @@ class DocumentTypeEnum(int, Enum):
     CONTINENT = 7
     GENERALE = 8
 
-
 # ============================================================================
 # GRADE ENUMS
 # ============================================================================
@@ -28,7 +27,6 @@ class GradeEnum(int, Enum):
     SIELO = 4
     PASTEUR = 5
 
-
 # ============================================================================
 # FIDELE TYPE ENUMS
 # ============================================================================
@@ -38,10 +36,8 @@ class FideleTypeEnum(int, Enum):
     PRATIQUANT = 1
     SYMPATHISANT = 2
 
-
-
 # ============================================================================
-# STRUCTURE TYPE ENUMS
+# STRUCTURE AND STRUCTURE TYPE ENUMS
 # ============================================================================
 
 class StructureTypeEnum(int, Enum):
@@ -51,9 +47,19 @@ class StructureTypeEnum(int, Enum):
     ASSOCIATION = 3
     SERVICE = 4
 
+class StructureEnum(int, Enum):
+    """Enum pour les structures (ex: bureau ecclésiastique)"""
+    BUREAU_ECCLESIASTIQUE = 1
+    FLUKI = 2
+    GTKI = 3
+    DIRIGEANTS = 5
+    CHOREKI = 6
+    GGKI = 7
+    AFKI = 8
+    UJKI = 9
 
 # ============================================================================
-# FIDELE TYPE ENUMS
+# DOCUMENT STATUT ENUMS
 # ============================================================================
 
 class DocumentStatutEnum(int, Enum):
@@ -62,7 +68,7 @@ class DocumentStatutEnum(int, Enum):
     VALIDE = 2
 
 # ============================================================================
-# FONCTION ENUMS
+# FONCTION ENUM
 # ============================================================================
 class FonctionEnum(int, Enum):
     """Enum pour les fonctions dans une direction"""
@@ -78,5 +84,3 @@ class FonctionEnum(int, Enum):
     DIRIGEANT_TECHNIQUE = 10
     CHEF_DE_PARTITION = 11
     CHEF_DE_PARTITION_ADJOINT = 12
-
-    

@@ -115,10 +115,8 @@ class FideleUpdate(BaseModel):
 
 class FideleStatutUpdate(BaseModel):
     id_document_statut: int = PydanticField(..., **FIDELE_FIELDS_CONFIG["id_document_statut"])
-    id_fidele_recenseur: int | None = PydanticField(None, **FIDELE_FIELDS_CONFIG["id_fidele_recenseur"])
 
-
-class FideleStructureBase(SQLModel):
+class FideleStructureBase(BaseModel):
     pass
 
     class Config:

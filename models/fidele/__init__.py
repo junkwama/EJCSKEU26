@@ -163,7 +163,7 @@ class Fidele(FideleBase, BaseModelClass, table=True):
         from_attributes = True
 
 
-class FideleStructure(FideleStructureBase,BaseModelClass,  table=True):
+class FideleStructure(FideleStructureBase, BaseModelClass, table=True):
     """Modèle de la table FideleStructure - Table dell'Association entre fidele et structure"""
     __tablename__ = "fidele_structure"
 
