@@ -63,6 +63,7 @@ class Adresse(AdresseBase, BaseModelClass, table=True):
     )
 
     __table_args__ = (
+        UniqueConstraint("id_document_type", "id_document", name="uq_adresse_document"),
         Index("idx_adresse_nation", "id_nation"),
         Index("idx_adresse_document", "id_document_type", "id_document"),
         Index("idx_adresse_est_supprimee", "est_supprimee"),

@@ -153,6 +153,7 @@ class FideleParoisseProjFlat(BaseModel):
     date_adhesion: date | None
     date_sortie: date | None
     est_actif: bool
+    est_paroisse_principale: bool
     est_supprimee: bool
     date_suppression: datetime | None
     date_creation: datetime

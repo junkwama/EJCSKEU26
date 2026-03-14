@@ -1,5 +1,5 @@
 # Local modules
-from sqlalchemy import Column, ForeignKey, Index, Integer
+from sqlalchemy import Column, ForeignKey, Index, Integer, UniqueConstraint
 from models.contact.utils import ContactBase
 from models.utils.utils import BaseModelClass
 from utils.utils import SQLModelField
@@ -18,6 +18,7 @@ class Contact(ContactBase, BaseModelClass, table=True):
     )
 
     __table_args__ = (
+        UniqueConstraint("id_document_type", "id_document", name="uq_contact_document"),
         Index("idx_contact_document", "id_document_type", "id_document"),
         Index("idx_contact_est_supprimee", "est_supprimee"),
     )

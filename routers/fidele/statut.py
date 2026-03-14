@@ -108,7 +108,12 @@ async def update_fidele_statut(
             fidele_paroisse = await check_resource_exists(
                 FideleParoisse,
                 session,
-                filters={"id_fidele": fidele.id, "est_actif": True, "est_supprimee": False},
+                filters={
+                    "id_fidele": fidele.id,
+                    "est_actif": True,
+                    "est_paroisse_principale": True,
+                    "est_supprimee": False,
+                },
             )
         except HTTPException:
             pass

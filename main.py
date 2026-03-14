@@ -1,9 +1,11 @@
 # External modules
+import re
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pydantic import ValidationError
+from sqlalchemy.exc import IntegrityError, OperationalError
 
 from modules.oauth2.dependencies import get_token_payload_dependency
 
@@ -18,7 +20,7 @@ from routers.utils.http_utils import (
     send404,
     send500,
     send422,
-    # send409,
+    send409,
     send403,
     send401,
 )
@@ -76,17 +78,61 @@ def exc_handler_403(request: Request, e: HTTPException):
 def exc_handler_404(request: Request, e: HTTPException):
     return send404(["path"], str(e) or "Resource not found")
 
-# # 409 DB Unique Key Duplication Error
-# @app.exception_handler(DuplicateKeyError)
-# def exc_handler_409(request: Request, e: DuplicateKeyError):
-#     # get the 1st conflict key
-#     errKey, errValue = list(e._OperationFailure__details["keyValue"].items())[0]
-#     loc = (
-#         "path"
-#         if errKey in request.path_params
-#         else "query" if errKey in request.query_params else "body"
-#     )
-#     return send409([loc, errKey], f"'{errValue}' as '{errKey}' is already used.")
+def _extract_duplicate_error_details(error: IntegrityError) -> tuple[str | None, str | None]:
+    raw_message = str(getattr(error, "orig", error))
+
+    # MySQL/MariaDB format: Duplicate entry 'x' for key 'y'
+    mysql_match = re.search(r"Duplicate entry '(.+)' for key '([^']+)'", raw_message)
+    if mysql_match:
+        value = mysql_match.group(1)
+        key = mysql_match.group(2).split(".")[-1]
+        return key, value
+
+    # SQLite format: UNIQUE constraint failed: table.col, table.col
+    sqlite_match = re.search(r"UNIQUE constraint failed: (.+)", raw_message)
+    if sqlite_match:
+        columns = sqlite_match.group(1)
+        first_col = columns.split(",")[0].strip().split(".")[-1]
+        return first_col, None
+
+    return None, None
+
+
+def _is_duplicate_conflict_message(raw_message: str) -> bool:
+    lowered = raw_message.lower()
+    return (
+        "duplicate entry" in lowered
+        or "unique constraint failed" in lowered
+        or "duplicate principale" in lowered
+    )
+
+
+# 409 DB duplicate/unique conflict
+@app.exception_handler(IntegrityError)
+def exc_handler_409(request: Request, e: IntegrityError):
+    err_key, err_value = _extract_duplicate_error_details(e)
+    if err_key:
+        loc = (
+            "path"
+            if err_key in request.path_params
+            else "query" if err_key in request.query_params else "body"
+        )
+        message = (
+            f"'{err_value}' as '{err_key}' is already used."
+            if err_value is not None
+            else f"'{err_key}' is already used."
+        )
+        return send409([loc, err_key], message)
+
+    return send409(["body", "database"], "Duplicate value conflict")
+
+
+@app.exception_handler(OperationalError)
+def exc_handler_409_operational(request: Request, e: OperationalError):
+    raw_message = str(getattr(e, "orig", e))
+    if _is_duplicate_conflict_message(raw_message):
+        return send409(["body", "database"], "Duplicate value conflict")
+    return send500(e)
 
 
 # 422 Pydantic check fails

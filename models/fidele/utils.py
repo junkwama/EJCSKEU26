@@ -82,7 +82,11 @@ FIDELE_FIELDS_CONFIG = {
     "est_structure_principale": {
         "examples": [True],
         "description": "Indique si cette structure est la structure principale du fidele.",
-    }
+    },
+    "est_paroisse_principale": {
+        "examples": [True],
+        "description": "Indique si cette paroisse est la paroisse principale du fidele.",
+    },
 }
 
 # ---- USER BASE MODEL -----#
@@ -145,7 +149,11 @@ class FideleStructureCreate(FideleStructureUpdate):
 class FideleParoisseBase(BaseModel):
     date_adhesion: date | None = PydanticField(None, examples=["2023-01-01"], description="Date d'adhésion")
     date_sortie: date | None = PydanticField(None, examples=["2023-12-31"], description="Date de sortie")
-    est_actif: bool = PydanticField(True, expemles=[True], description="Indique si cette paroisse est la paroisse actuelle du fidele.")
+    est_actif: bool = PydanticField(True, examples=[True], description="Indique si cette paroisse est active pour le fidele.")
+    est_paroisse_principale: bool = PydanticField(
+        False,
+        **FIDELE_FIELDS_CONFIG["est_paroisse_principale"],
+    )
 
     class Config:
         from_attributes = True

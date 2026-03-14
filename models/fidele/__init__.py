@@ -225,6 +225,10 @@ class FideleParoisse(FideleParoisseBase, BaseModelClass, table=True):
             nullable=False,
         )
     )
+    est_paroisse_principale: bool = SQLModelField(
+        default=False,
+        sa_column=Column(Boolean, nullable=False, server_default=text('0')),
+    )
 
     __table_args__ = (
         Index("idx_fidele_paroisse_fidele", "id_fidele"),

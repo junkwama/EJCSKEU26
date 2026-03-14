@@ -26,6 +26,39 @@ from routers.utils.http_utils import send200, send400
 fidele_paroisses_router = APIRouter(prefix="/{id}/paroisse", tags=["Fidele - Paroisses"])
 
 
+async def _count_active_fidele_paroisses(session: AsyncSession, *, id_fidele: int) -> int:
+    statement = select(FideleParoisse).where(
+        (FideleParoisse.id_fidele == id_fidele)
+        & (FideleParoisse.est_supprimee == False)
+    )
+    result = await session.exec(statement)
+    return len(result.all())
+
+
+async def _set_unique_principale_paroisse(
+    session: AsyncSession,
+    *,
+    id_fidele: int,
+    keep_membership_id: int,
+) -> None:
+    statement = select(FideleParoisse).where(
+        (FideleParoisse.id_fidele == id_fidele)
+        & (FideleParoisse.est_supprimee == False)
+    )
+    result = await session.exec(statement)
+    memberships = result.all()
+
+    now = datetime.now(timezone.utc)
+    for membership in memberships:
+        should_be_principale = membership.id == keep_membership_id
+        if membership.est_paroisse_principale != should_be_principale:
+            membership.est_paroisse_principale = should_be_principale
+            membership.date_modification = now
+            session.add(membership)
+
+    await session.commit()
+
+
 def are_membership_dates_valid(date_adhesion: date | None, date_sortie: date | None) -> bool:
     if date_adhesion and date_sortie and date_sortie < date_adhesion:
         return False
@@ -87,16 +120,29 @@ async def add_fidele_paroisse(
         return send400(["body", "id_paroisse"], "Ce fidèle appartient déjà à cette paroisse")
 
     if existing and existing.est_supprimee == True:
+        active_count = await _count_active_fidele_paroisses(session, id_fidele=fidele.id)
+        should_be_principale = bool(body.est_paroisse_principale)
+        if active_count == 0:
+            should_be_principale = True
+
         existing.est_supprimee = False
         existing.date_suppression = None
         existing.date_adhesion = body.date_adhesion
         existing.date_sortie = body.date_sortie
         existing.est_actif = compute_est_actif(body.date_sortie)
+        existing.est_paroisse_principale = should_be_principale
         existing.date_modification = datetime.now(timezone.utc)
 
         session.add(existing)
         await session.commit()
         await session.refresh(existing)
+
+        if should_be_principale:
+            await _set_unique_principale_paroisse(
+                session,
+                id_fidele=fidele.id,
+                keep_membership_id=existing.id,
+            )
 
         await mark_fidele_recensement_etape_completed(
             session,
@@ -107,17 +153,30 @@ async def add_fidele_paroisse(
         existing = await get_fidele_paroisse_complete_data_by_id(existing.id, session)
         return send200(FideleParoisseProjShallowWithoutFideleData.model_validate(existing))
 
+    active_count = await _count_active_fidele_paroisses(session, id_fidele=fidele.id)
+    should_be_principale = bool(body.est_paroisse_principale)
+    if active_count == 0:
+        should_be_principale = True
+
     fidele_paroisse = FideleParoisse(
         id_fidele=fidele.id,
         id_paroisse=body.id_paroisse,
         date_adhesion=body.date_adhesion,
         date_sortie=body.date_sortie,
         est_actif=compute_est_actif(body.date_sortie),
+        est_paroisse_principale=should_be_principale,
     )
 
     session.add(fidele_paroisse)
     await session.commit()
     await session.refresh(fidele_paroisse)
+
+    if should_be_principale:
+        await _set_unique_principale_paroisse(
+            session,
+            id_fidele=fidele.id,
+            keep_membership_id=fidele_paroisse.id,
+        )
 
     await mark_fidele_recensement_etape_completed(
         session,
@@ -165,6 +224,8 @@ async def update_fidele_paroisse(
     if not are_membership_dates_valid(effective_date_adhesion, effective_date_sortie):
         return send400(["body"], "Dates d'adhésion/sortie invalides")
 
+    requested_principale = update_data.get("est_paroisse_principale")
+
     for field, value in update_data.items():
         setattr(fidele_paroisse, field, value)
 
@@ -175,6 +236,13 @@ async def update_fidele_paroisse(
     session.add(fidele_paroisse)
     await session.commit()
     await session.refresh(fidele_paroisse)
+
+    if requested_principale is True:
+        await _set_unique_principale_paroisse(
+            session,
+            id_fidele=fidele_paroisse.id_fidele,
+            keep_membership_id=fidele_paroisse.id,
+        )
 
     return send200(FideleParoisseProjFlat.model_validate(fidele_paroisse))
 
@@ -188,6 +256,7 @@ async def remove_fidele_paroisse(
 
     fidele_paroisse.est_supprimee = True
     fidele_paroisse.est_actif = False
+    fidele_paroisse.est_paroisse_principale = False
     fidele_paroisse.date_suppression = datetime.now(timezone.utc)
     fidele_paroisse.date_modification = datetime.now(timezone.utc)
 
